@@ -1,0 +1,28 @@
+{
+  "name": "csr",
+  "version": "1.0.0",
+  "description": "discord",
+  "main": "irc.js",
+  "scripts": {
+    "test": "node irc.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coolxpress/CSR.git"
+  },
+  "keywords": [
+    "social"
+  ],
+  "author": "DeltaRade",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/coolxpress/CSR/issues"
+  },
+  "homepage": "https://github.com/coolxpress/CSR#readme",
+  "dependencies": {
+    "async": "^2.6.1",
+    "dblapi.js": "^2.3.0",
+    "discord.js": "^11.4.2",
+    "sqlite3": "^4.0.2"
+  }
+}

@@ -1,2 +1,2 @@
 # CSR
-hello
+hello and welcome to Cross Server Relay's repository

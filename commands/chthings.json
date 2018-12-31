@@ -1,0 +1,8 @@
+{
+    "channel":{
+        "name":"irc",
+        "type":"text",
+        "id":"@everyone",
+        "allowed":"READ_MESSAGES"
+    }
+}

@@ -35,12 +35,9 @@ var messagelog = [];
     const exemptUsers = (options && options.exemptUsers) || []
   
     bot.on("message", msg => {
-      try{
-        global.ch=message.guild.channels.find(x=>x.name==='irc')
-        }
-        catch(err){
-        
-        }
+      if(!msg.guild){return}
+        const ch=msg.guild.channels.find(x=>x.name==='irc')
+      
       // bots don't ban do they?
       if (msg.author.bot) {
         return;

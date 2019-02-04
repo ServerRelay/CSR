@@ -5,14 +5,7 @@ const {staff}=require('./stafflist.json')
 
 
 function rgbToHex(R,G,B) {return toHex(R)+toHex(G)+toHex(B)}
-const db=new sqlite.Database('./banDB.sqlite',(err)=>{
-    if (err) {
-        console.log('Could not connect to database', err)
-      } else {
-        console.log('Connected to ban database')
-      }
 
-});
 function toHex(n) {
     n = parseInt(n,10);
     if (isNaN(n)) return "00";
@@ -26,7 +19,15 @@ module.exports = {
     name: 'guildban',
     staff:'ban a whole guild by id or name',
    execute(message, args) {
-       
+    const db=new sqlite.Database('./banDB.sqlite',(err)=>{
+        if (err) {
+            console.log('Could not connect to database', err)
+          }    
+    });
+
+    if(!args[0]){
+        return message.channel.send('please specify a server, we dont want accidental bans')
+    }
         if(staff.findIndex(x=>x===message.author.id)==-1){
             message.channel.send('no permission')
             return

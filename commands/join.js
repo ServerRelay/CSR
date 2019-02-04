@@ -15,7 +15,9 @@ module.exports = {
     alias:['joins'],
     description: 'sends a join request to a server',
    async execute(message, args) {
-       
+       if(!args[0]){
+           return message.channel.send('please specify a server name')
+       }
         let ed=new Discord.RichEmbed()
         .setColor(rgbToHex(138,0,138))
          let sv=message.client.guilds.find(x=>x.name.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)

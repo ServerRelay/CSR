@@ -25,10 +25,7 @@ module.exports = {
         const db=new sqlite.Database('./banDB.sqlite',(err)=>{
             if (err) {
                 console.log('Could not connect to database', err)
-              } else {
-                console.log('Connected to ban database')
-              }
-        
+              } 
         });
         if(staff.findIndex(x=>x===message.author.id)==-1){
             message.channel.send('no permission')

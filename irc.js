@@ -445,4 +445,4 @@ Error: ${err.name}
 });
 
 ///////////////////////////////////////////////////////////////////////////////////
-client.login('NDg2NjE1MjUwMzc2ODUxNDc3.DnBrTg.krZPHuckX-mwALBOhqwtitf9C4A')//process.env.TOKEN
+client.login(process.env.token)//process.env.TOKEN

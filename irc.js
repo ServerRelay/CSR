@@ -22,7 +22,7 @@ const db=new pg.Client({
     ssl:true
 })
 db.connect()
-await db.query('CREATE TABLE IF NOT EXISTS banned(number id)')
+await db.query('CREATE TABLE IF NOT EXISTS banned(id number)')
 db.query(`SELECT * FROM banned`)
 .then((rows)=>{
     console.log(rows)

@@ -3,7 +3,7 @@ const Discord=require('discord.js')
 
 
 module.exports.CSRBan=async function (client,db,usr){
-            await db.query(`INSERT OR REPLACE INTO banned (id) VALUES (${usr.id})`)
+            await db.query(`INSERT INTO banned (id) VALUES (${usr.id}) ON CONFLICT(id) DO UPDATE SET id=${usr.id}`)
             client.banlist.push(usr.id)
 }
 

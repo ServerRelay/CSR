@@ -23,7 +23,7 @@ const db=new pg.Client({
 })
 db.connect()
 await db.query('CREATE TABLE IF NOT EXISTS banned(id integer)')
-db.query(`SELECT * FROM banned`)
+await db.query(`SELECT * FROM banned`)
 .then((rows)=>{
     console.log(rows)
     client.banlist.splice(0)
@@ -40,7 +40,7 @@ db.query(`SELECT * FROM banned`)
 });
 
 
-db.end()
+await db.end()
 
 cacheCSRChannels()
 console.log('cached all csr channels')

@@ -3,7 +3,7 @@ const code=require('./ircrules.js')
 const client=new Discord.Client();
 const fs=require('fs');
 const Url=require('url');
-const sqlite=require('sqlite3');
+const pg=require('pg');
 
 client.commands=new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -13,35 +13,34 @@ bannedservers=[]
 const {prefix, token}=require('./config.json');
 
 //////////////////////////////////////////////////////////////////////////////
-client.on('ready',()=>{
+client.on('ready',async ()=>{
 console.log('irc connected')
 client.user.setActivity('--help')
 
-const db=new sqlite.Database('./banDB.sqlite',(err)=>{
-    if (err) {
-        console.log('Could not connect to database', err)
-      } else {
-        console.log('cached all banned')
-      }
-
-});
-
-db.all(`SELECT * FROM banned`,function(err,rows){
+const db=new pg.Client({
+    connectionString:process.env.DATABASE_URL,
+    ssl:true
+})
+db.connect()
+await db.query('CREATE TABLE IF NOT EXISTS banned(number id)')
+db.query(`SELECT * FROM banned`)
+.then((rows)=>{
+    console.log(rows)
     client.banlist.splice(0)
     if(typeof(rows)!='undefined' &&rows.length>0){
         for(let i in rows){
             client.banlist.push(rows[i]['id'])
         }
-  
     }
     if(err){
         console.log(err)
         
     }
+
 });
 
 
-db.close()
+db.end()
 
 cacheCSRChannels()
 console.log('cached all csr channels')
@@ -56,7 +55,6 @@ setInterval(() => {
 },1800000);
 
 
-
 });
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -68,8 +66,8 @@ function toHex(n) {
     if (isNaN(n)) return "00";
     n = Math.max(0,Math.min(n,255));
     return "0123456789ABCDEF".charAt((n-n%16)/16)
-         + "0123456789ABCDEF".charAt(n%16);
-   }
+        + "0123456789ABCDEF".charAt(n%16);
+}
 function finds(str, needle){
     if (str.indexOf(needle) == -1){
         return false
@@ -83,20 +81,13 @@ function finds(str, needle){
 function findemoji(name){
     let em=client.guilds.get('497475921855381525').emojis.find(x=>x.name===name)
     if(em){
-          return em
+        return em
     }
     else{
         error('no emoji found')
     }
 }
 
-async function waitembed(channel,embed){
-if(channel){
-    await channel.send(RichEmbed=embed)
-    
-}
-
-};
 
 
 for (const file of commandFiles) {
@@ -158,6 +149,7 @@ client.guilds.forEach(async(guild) => {
 });
 //////////////////////////////////////////////////////////////
 client.on('message',(message)=>{
+
 if (message.author==client.user){return};
 if(!message.guild){return}
 if(message.system){ return}
@@ -281,7 +273,10 @@ function findAllMatchingPrivate(ogguild){
     return arr
 }
 
-
+/**
+ * 
+ * @param {Discord.Message} message 
+ */
 function boadcastToAllCSRChannels(message){
     if(message.author.id!==client.user.id && message.author.createdTimestamp<(604800000-new Date().getMilliseconds())){
         return
@@ -296,7 +291,7 @@ function boadcastToAllCSRChannels(message){
                 .catch(e=>{
 
                 })
-            }, 5000);
+            }, 10000);
             
              let ed=new Discord.RichEmbed()
                 .setColor()
@@ -319,8 +314,7 @@ function boadcastToAllCSRChannels(message){
                     let uri=message.content.split(' ')
                     uri=uri.find(x=>x.match(`(http|https)?`))
                     let ur=Url.parse(uri)
-                
-                   //console.log(message.embeds[0])
+                    //console.log(message.embeds[0])
                     if(ur.pathname.endsWith('.jpg')||ur.pathname.endsWith('.png')||ur.pathname.endsWith('.gif')||ur.pathname.endsWith('.jpeg')){
                         ed.setImage(ur.href)
     
@@ -329,7 +323,7 @@ function boadcastToAllCSRChannels(message){
                         //todo - add video embed to embed i.e. https://www.youtube.com/embed/4PAAaFNEIXA
                         try{
                         let arr=message.content.split(' ')
-                        console.log(arr)
+                        //console.log(arr)
                         arr.splice(arr.findIndex(x=>x.includes(`http`)||x.includes(`https`)),1)
                         arr=arr.join(' ')
                     
@@ -346,29 +340,32 @@ function boadcastToAllCSRChannels(message){
                             console.log(err)
                         }
                         //setTimeout(() => {
-                           // message.delete()
-                           // .catch((err)=>{
+                        // message.delete()
+                        // .catch((err)=>{
                             //    console.log(err)
-                           // })
-                       // }, 3000); 
+                        // })
+                        // }, 3000); 
                 }
-            }      
-              else if(message.attachments.array().length>0){
-                    let img = message.attachments.array()[0];
-                    if(img.filename.endsWith('.jpg')||img.filename.endsWith('.png')||img.filename.endsWith('.gif')||img.filename.endsWith('.jpeg')){
-                       //console.log(img)
-                     ed.setImage(img.url)
-                       
-                    }
-                    else{
-                        ed.addField('Attachment',img.url,false)
-                    }
-                   
+            }
+            else if(message.attachments.array().length>0){
+                let img = message.attachments.array()[0];
+                if(img.filename.endsWith('.jpg')||img.filename.endsWith('.png')||img.filename.endsWith('.gif')||img.filename.endsWith('.jpeg')){
+                    //console.log(img)
+                    ed.setImage(img.url)
                 }
-               
-               
+                else{
+                    ed.addField('Attachment',img.url,false)
+                }
+                
+                }
             
-               client.guilds.forEach(async (guild) => {
+            let extembed=message.embeds[0]
+            if(extembed){
+                ed.addField(`${extembed.title}`,extembed.description) 
+                ed.setThumbnail(extembed.thumbnail.url)
+
+            }
+                client.guilds.forEach(async (guild) => {
                 if(!guild.CSRChannel){
                     return
                 }
@@ -382,7 +379,10 @@ function boadcastToAllCSRChannels(message){
 }
 
 
-
+/**
+ * 
+ * @param {Discord.Message} message 
+ */
 function sendPrivate(message){
     if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic===''){return}
     setTimeout(() => {
@@ -390,7 +390,7 @@ function sendPrivate(message){
         .catch(e=>{
 
         })
-    },5000)//180000 is 3 minutes
+    },10000)//180000 is 3 minutes
     let ed=new Discord.RichEmbed()
         .setColor()
         .setAuthor(name=`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),url=`https://discordapp.com/users/${message.author.id}`)
@@ -435,7 +435,7 @@ function sendPrivate(message){
 process.on('unhandledRejection', (err) => { // OHH NO UNHANLED ERROR: NOTIFY ALL BOT DEVS
     console.error(err);
     if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized') return process.exit();
-    (client.channels.get('539073121337212938') || client.channels.get('0')).send(`
+    (client.channels.get('0') || client.channels.get('543167247330312232')).send(`
 \`\`\`xs
 Error: ${err.name}
     ${err.message}
@@ -445,4 +445,4 @@ Error: ${err.name}
 });
 
 ///////////////////////////////////////////////////////////////////////////////////
-client.login(process.env.token)//process.env.TOKEN
+client.login(process.env.token)//process.env.token

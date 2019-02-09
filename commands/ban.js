@@ -1,5 +1,5 @@
 const Discord=require('discord.js');
-const sqlite=require('sqlite3');
+const pg=require('pg');
 const csr=require('./banfuncs.js')
 const {staff}=require('./stafflist.json')
 
@@ -19,11 +19,12 @@ module.exports = {
     name: 'ban',
     staff:'adds someone to the ban database How to use: --ban (@mention)',
     execute(message, args) {
-        const db=new sqlite.Database('./banDB.sqlite',(err)=>{
-            if (err) {
-                console.log('Could not connect to database', err)
-              }
-        });
+        const db=new pg.Client({
+            connectionString:process.env.DATABASE_URL,
+            ssl:true
+        })
+        db.connect()
+
         if(staff.findIndex(x=>x===message.author.id)==-1){
             message.channel.send('no permission')
             return
@@ -31,15 +32,15 @@ module.exports = {
         let banee=message.mentions.members.first()||message.client.users.get(args[0])
         //let banee=message.guild.members.find(x=>x.user.username.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
 if(banee){
-  csr.CSRBan(message.client,db,banee,()=>{
-      message.channel.send('added to DB')
-      db.close()
-  })
+    csr.CSRBan(message.client,db,banee,()=>{
+        message.channel.send(`${message.client.users.get(banee.id).username} has been banned`)
+        db.end()
+    })
     
 }
 else{
     message.channel.send('not found')
-    db.close()
+    db.end()
 }
 
     }

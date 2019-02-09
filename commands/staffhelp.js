@@ -12,7 +12,7 @@ function toHex(n) {
 hlp=[]
 module.exports = {
     name: 'staffhelp',
-    description: 'sends a help command for staff',
+    description: 'CSR staff\'s help command',
     execute(message, args) {
         
      

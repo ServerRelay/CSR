@@ -1,5 +1,5 @@
 const Discord=require('discord.js');
-const sqlite=require('sqlite3');
+const pg=require('pg');
 const ms=require('ms')
 const Csr=require(`./banfuncs.js`)
 const {staff}=require('./stafflist.json')
@@ -14,19 +14,18 @@ function toHex(n) {
     n = Math.max(0,Math.min(n,255));
     return "0123456789ABCDEF".charAt((n-n%16)/16)
          + "0123456789ABCDEF".charAt(n%16);
-   }
-   
+    }
 
 module.exports = {
     name: 'tempban',
     alias:['tban'],
-   staff:'bans an user for a set ammount of time',
+    staff:'bans an user for a set ammount of time',
     execute(message, args) {
-        const db=new sqlite.Database('./banDB.sqlite',(err)=>{
-            if (err) {
-                console.log('Could not connect to database', err)
-              } 
-        });
+        const db=new pg.Client({
+            connectionString:process.env.DATABASE_URL,
+            ssl:true
+        })
+        db.connect()
         if(staff.findIndex(x=>x===message.author.id)==-1){
             message.channel.send('no permission')
             return
@@ -48,13 +47,12 @@ if(banee){
         }
     })
 
-   setTimeout(() => {
-       Csr.CSRUnban(message.client,db,banee,(err)=>{
-           
-           message.channel.send(`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`)
-           db.close()
-       })
-   }, ms(time)); 
+    setTimeout(() => {
+        Csr.CSRUnban(message.client,db,banee,(err)=>{
+            message.channel.send(`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`)
+            db.end()
+        })
+    }, ms(time)); 
 }
 
     }

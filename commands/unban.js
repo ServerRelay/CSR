@@ -14,12 +14,12 @@ function toHex(n) {
 module.exports = {
     name: 'unban',
     staff:'removes someone from the database How to use: --unban (@mention)',
-    execute(message, args) {
+    async execute(message, args) {
         const db=new pg.Client({
             connectionString:process.env.DATABASE_URL,
             ssl:true
         })
-        db.connect()
+        await db.connect()
         if(staff.findIndex(x=>x===message.author.id)==-1){
             message.channel.send('no permission')
             return
@@ -27,11 +27,9 @@ module.exports = {
         //let banee=message.guild.members.find(x=>x.user.username.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
         let banee=message.mentions.members.first()||message.client.users.get(args[0])
         if(banee){
-            csr.CSRUnban(message.client,db,banee,()=>{
+            await csr.CSRUnban(message.client,db,banee)
             message.channel.send('removed from DB')
-            db.end()
-        })
-
+            await db.end()
 }
 
 

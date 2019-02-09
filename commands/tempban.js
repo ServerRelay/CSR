@@ -20,12 +20,12 @@ module.exports = {
     name: 'tempban',
     alias:['tban'],
     staff:'bans an user for a set ammount of time',
-    execute(message, args) {
+    async execute(message, args) {
         const db=new pg.Client({
             connectionString:process.env.DATABASE_URL,
             ssl:true
         })
-        db.connect()
+        await db.connect()
         if(staff.findIndex(x=>x===message.author.id)==-1){
             message.channel.send('no permission')
             return
@@ -36,23 +36,14 @@ module.exports = {
         if(!banee){message.channel.send('who do you expect me to ban?'); return db.close()}
         if(!time){ message.channel.send('BOI If you dont choose the time'); return db.close()}
         //let banee=message.guild.members.find(x=>x.user.username.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
-if(banee){
-    Csr.CSRBan(message.client,db,banee,(err)=>{
-        if(err){
-            message.channel.send(`error adding to DB[${err}]`)
-        }
-        else{
-            console.log(typeof(banee))
+        if(banee){
+            await Csr.CSRBan(message.client,db,banee)
             message.channel.send(`Boi <@${banee.id}> you have been temp banned for ${ms(ms(time),{long:true})}`)
-        }
-    })
-
-    setTimeout(() => {
-        Csr.CSRUnban(message.client,db,banee,(err)=>{
-            message.channel.send(`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`)
-            db.end()
-        })
-    }, ms(time)); 
+            setTimeout(() => {
+                await Csr.CSRUnban(message.client,db,banee)
+                message.channel.send(`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`)
+                await db.end()
+            }, ms(time)); 
 }
 
     }

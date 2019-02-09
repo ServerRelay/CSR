@@ -38,7 +38,7 @@ module.exports = {
         }
         else{
             message.channel.send('not found')
-            db.end()
+            await db.end()
         }
 
     }

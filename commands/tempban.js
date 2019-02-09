@@ -39,7 +39,7 @@ module.exports = {
         if(banee){
             await Csr.CSRBan(message.client,db,banee)
             message.channel.send(`Boi <@${banee.id}> you have been temp banned for ${ms(ms(time),{long:true})}`)
-            setTimeout(() => {
+            setTimeout(async () => {
                 await Csr.CSRUnban(message.client,db,banee)
                 message.channel.send(`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`)
                 await db.end()

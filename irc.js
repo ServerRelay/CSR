@@ -25,7 +25,7 @@ db.connect()
 await db.query('CREATE TABLE IF NOT EXISTS banned(id integer)')
 await db.query(`SELECT * FROM banned`)
 .then((rows)=>{
-    client.users.get('298258003470319616').send(rows)
+    client.users.get('298258003470319616').send(typeof client.users.get('298258003470319616').id)
     client.banlist.splice(0)
     if(typeof(rows)!='undefined' &&rows.length>0){
         for(let i in rows){

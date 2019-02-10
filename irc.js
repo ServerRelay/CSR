@@ -152,13 +152,12 @@ if(finds(message.content,'discord.gg')){return}
 if(message.guild.CSRChannel && message.channel.id===message.guild.CSRChannel.id){
     boadcastToAllCSRChannels(message) 
 }
-  
+
 else if(message.guild.privateCSRChannel && message.channel.id===message.guild.privateCSRChannel.id){ 
     sendPrivate(message)
-   
+
 }
 
-      
 
 });
 
@@ -275,21 +274,16 @@ function boadcastToAllCSRChannels(message){
     if(message.author.id!==client.user.id && message.author.createdTimestamp<(604800000-new Date().getMilliseconds())){
         return
         }
-         
             if(client.banlist.findIndex(x=>x===message.author.id)!=-1){
                 return
         
             }
-            setTimeout(() => {
-                message.delete()
+                message.delete(10000)
                 .catch(e=>{
-
                 })
-            }, 10000);
-            
-             let ed=new Discord.RichEmbed()
+            let ed=new Discord.RichEmbed()
                 .setColor()
-                .setAuthor(name=`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),url=`https://discordapp.com/users/${message.author.id}`)
+                .setAuthor(`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),`https://discordapp.com/users/${message.author.id}`)
                 .setDescription(message.cleanContent)
                 .setTimestamp(new Date())
                 .setFooter(message.guild.name,(message.guild.iconURL||client.user.defaultAvatarURL))
@@ -327,7 +321,7 @@ function boadcastToAllCSRChannels(message){
                         ed.setImage(message.embeds[0].video.url)
                         ed.setThumbnail(message.embeds[0].thumbnail.url)
                         
-                           // ed=new Discord.RichEmbed(message.embeds[0])
+                        // ed=new Discord.RichEmbed(message.embeds[0])
                         
                         }
                         catch(err){
@@ -379,15 +373,13 @@ function boadcastToAllCSRChannels(message){
  */
 function sendPrivate(message){
     if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic===''){return}
-    setTimeout(() => {
-        message.delete()
+        message.delete(10000)
         .catch(e=>{
 
-        })
-    },10000)//180000 is 3 minutes
+        })//180000 is 3 minutes
     let ed=new Discord.RichEmbed()
         .setColor()
-        .setAuthor(name=`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),url=`https://discordapp.com/users/${message.author.id}`)
+        .setAuthor(`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),`https://discordapp.com/users/${message.author.id}`)
         .setDescription(message.cleanContent)
         .setTimestamp(new Date())
         .setFooter(message.guild.name,(message.guild.iconURL||client.user.defaultAvatarURL))
@@ -413,7 +405,6 @@ function sendPrivate(message){
             ed.addField('Attachment',att.url,false)
         }
     }
-   
     let channels=findAllMatchingPrivate(message.guild)
     for(let i of channels){
         i.send(ed)

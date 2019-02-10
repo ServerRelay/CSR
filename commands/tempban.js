@@ -1,5 +1,5 @@
 const Discord=require('discord.js');
-const pg=require('pg');
+const sqlite=require('sqlite3');
 const ms=require('ms')
 const Csr=require(`./banfuncs.js`)
 const {staff}=require('./stafflist.json')
@@ -14,18 +14,19 @@ function toHex(n) {
     n = Math.max(0,Math.min(n,255));
     return "0123456789ABCDEF".charAt((n-n%16)/16)
          + "0123456789ABCDEF".charAt(n%16);
-    }
+   }
+   
 
 module.exports = {
     name: 'tempban',
     alias:['tban'],
-    staff:'bans an user for a set ammount of time',
-    async execute(message, args) {
-        const db=new pg.Client({
-            connectionString:process.env.DATABASE_URL,
-            ssl:true
-        })
-        await db.connect()
+   staff:'bans an user for a set ammount of time',
+    execute(message, args) {
+        const db=new sqlite.Database('./banDB.sqlite',(err)=>{
+            if (err) {
+                console.log('Could not connect to database', err)
+              } 
+        });
         if(staff.findIndex(x=>x===message.author.id)==-1){
             message.channel.send('no permission')
             return
@@ -36,14 +37,24 @@ module.exports = {
         if(!banee){message.channel.send('who do you expect me to ban?'); return db.close()}
         if(!time){ message.channel.send('BOI If you dont choose the time'); return db.close()}
         //let banee=message.guild.members.find(x=>x.user.username.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
-        if(banee){
-            await Csr.CSRBan(message.client,db,banee)
+if(banee){
+    Csr.CSRBan(message.client,db,banee,(err)=>{
+        if(err){
+            message.channel.send(`error adding to DB[${err}]`)
+        }
+        else{
+            console.log(typeof(banee))
             message.channel.send(`Boi <@${banee.id}> you have been temp banned for ${ms(ms(time),{long:true})}`)
-            setTimeout(async () => {
-                await Csr.CSRUnban(message.client,db,banee)
-                message.channel.send(`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`)
-                await db.end()
-            }, ms(time)); 
+        }
+    })
+
+   setTimeout(() => {
+       Csr.CSRUnban(message.client,db,banee,(err)=>{
+           
+           message.channel.send(`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`)
+           db.close()
+       })
+   }, ms(time)); 
 }
 
     }

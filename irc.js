@@ -278,7 +278,7 @@ function boadcastToAllCSRChannels(message){
                 return
         
             }
-                message.delete(10000)
+                message.delete(180000)
                 .catch(e=>{
                 })
             let ed=new Discord.RichEmbed()
@@ -307,33 +307,7 @@ function boadcastToAllCSRChannels(message){
                         ed.setImage(ur.href)
     
                     }
-                    if(ur.host==`www.youtube.com`||ur.host==`youtu.be`){
-                        //todo - add video embed to embed i.e. https://www.youtube.com/embed/4PAAaFNEIXA
-                        try{
-                        let arr=message.content.split(' ')
-                        //console.log(arr)
-                        arr.splice(arr.findIndex(x=>x.includes(`http`)||x.includes(`https`)),1)
-                        arr=arr.join(' ')
                     
-                        ed.setTitle(message.embeds[0].title)
-                        ed.setURL(message.embeds[0].video.url)
-                        ed.setDescription(arr)
-                        ed.setImage(message.embeds[0].video.url)
-                        ed.setThumbnail(message.embeds[0].thumbnail.url)
-                        
-                        // ed=new Discord.RichEmbed(message.embeds[0])
-                        
-                        }
-                        catch(err){
-                            console.log(err)
-                        }
-                        //setTimeout(() => {
-                        // message.delete()
-                        // .catch((err)=>{
-                            //    console.log(err)
-                        // })
-                        // }, 3000); 
-                }
             }
             else if(message.attachments.array().length>0){
                 let img = message.attachments.array()[0];
@@ -349,7 +323,9 @@ function boadcastToAllCSRChannels(message){
             
             let extembed=message.embeds[0]
             if(extembed){
-                ed.addField(`${extembed.title}`,extembed.description) 
+                if(extembed.title){
+                    ed.addField(`${extembed.title}`,extembed.description?extembed.description:'description not defined') 
+                }
                 ed.setThumbnail(extembed.thumbnail.url)
 
             }

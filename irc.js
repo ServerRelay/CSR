@@ -4,10 +4,8 @@ const client=new Discord.Client();
 const fs=require('fs');
 const Url=require('url');
 const sqlite=require('sqlite3');
-
 client.commands=new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-
 client.banlist=[]
 bannedservers=[]
 const {prefix, token}=require('./config.json');
@@ -56,7 +54,6 @@ setInterval(() => {
 },1800000);
 
 
-
 });
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -90,13 +87,6 @@ function findemoji(name){
     }
 }
 
-async function waitembed(channel,embed){
-if(channel){
-    await channel.send(RichEmbed=embed)
-    
-}
-
-};
 
 
 for (const file of commandFiles) {
@@ -158,6 +148,7 @@ client.guilds.forEach(async(guild) => {
 });
 //////////////////////////////////////////////////////////////
 client.on('message',(message)=>{
+
 if (message.author==client.user){return};
 if(!message.guild){return}
 if(message.system){ return}
@@ -281,26 +272,26 @@ function findAllMatchingPrivate(ogguild){
     return arr
 }
 
-
+/**
+ * 
+ * @param {Discord.Message} message 
+ */
 function boadcastToAllCSRChannels(message){
     if(message.author.id!==client.user.id && message.author.createdTimestamp<(604800000-new Date().getMilliseconds())){
         return
         }
-         
+        
             if(client.banlist.findIndex(x=>x===message.author.id)!=-1){
                 return
         
             }
-            setTimeout(() => {
-                message.delete()
+                message.delete(10000)
                 .catch(e=>{
-
                 })
-            }, 5000);
             
-             let ed=new Discord.RichEmbed()
+            let ed=new Discord.RichEmbed()
                 .setColor()
-                .setAuthor(name=`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),url=`https://discordapp.com/users/${message.author.id}`)
+                .setAuthor(`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),`https://discordapp.com/users/${message.author.id}`)
                 .setDescription(message.cleanContent)
                 .setTimestamp(new Date())
                 .setFooter(message.guild.name,(message.guild.iconURL||client.user.defaultAvatarURL))
@@ -319,8 +310,7 @@ function boadcastToAllCSRChannels(message){
                     let uri=message.content.split(' ')
                     uri=uri.find(x=>x.match(`(http|https)?`))
                     let ur=Url.parse(uri)
-                
-                   //console.log(message.embeds[0])
+                    //console.log(message.embeds[0])
                     if(ur.pathname.endsWith('.jpg')||ur.pathname.endsWith('.png')||ur.pathname.endsWith('.gif')||ur.pathname.endsWith('.jpeg')){
                         ed.setImage(ur.href)
     
@@ -329,7 +319,7 @@ function boadcastToAllCSRChannels(message){
                         //todo - add video embed to embed i.e. https://www.youtube.com/embed/4PAAaFNEIXA
                         try{
                         let arr=message.content.split(' ')
-                        console.log(arr)
+                        //console.log(arr)
                         arr.splice(arr.findIndex(x=>x.includes(`http`)||x.includes(`https`)),1)
                         arr=arr.join(' ')
                     
@@ -346,29 +336,32 @@ function boadcastToAllCSRChannels(message){
                             console.log(err)
                         }
                         //setTimeout(() => {
-                           // message.delete()
-                           // .catch((err)=>{
+                        // message.delete()
+                        // .catch((err)=>{
                             //    console.log(err)
-                           // })
-                       // }, 3000); 
+                        // })
+                        // }, 3000); 
                 }
-            }      
-              else if(message.attachments.array().length>0){
-                    let img = message.attachments.array()[0];
-                    if(img.filename.endsWith('.jpg')||img.filename.endsWith('.png')||img.filename.endsWith('.gif')||img.filename.endsWith('.jpeg')){
-                       //console.log(img)
-                     ed.setImage(img.url)
-                       
-                    }
-                    else{
-                        ed.addField('Attachment',img.url,false)
-                    }
-                   
+            }
+            else if(message.attachments.array().length>0){
+                let img = message.attachments.array()[0];
+                if(img.filename.endsWith('.jpg')||img.filename.endsWith('.png')||img.filename.endsWith('.gif')||img.filename.endsWith('.jpeg')){
+                    //console.log(img)
+                    ed.setImage(img.url)
                 }
-               
-               
+                else{
+                    ed.addField('Attachment',img.url,false)
+                }
+                
+                }
             
-               client.guilds.forEach(async (guild) => {
+            let extembed=message.embeds[0]
+            if(extembed){
+                ed.addField(`${extembed.title}`,extembed.description) 
+                ed.setThumbnail(extembed.thumbnail.url)
+
+            }
+                client.guilds.forEach(async (guild) => {
                 if(!guild.CSRChannel){
                     return
                 }
@@ -382,18 +375,16 @@ function boadcastToAllCSRChannels(message){
 }
 
 
-
+/**
+ * 
+ * @param {Discord.Message} message 
+ */
 function sendPrivate(message){
     if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic===''){return}
-    setTimeout(() => {
-        message.delete()
-        .catch(e=>{
-
-        })
-    },5000)//180000 is 3 minutes
+        message.delete(10000)//180000 is 3 minutes
     let ed=new Discord.RichEmbed()
         .setColor()
-        .setAuthor(name=`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),url=`https://discordapp.com/users/${message.author.id}`)
+        .setAuthor(`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),`https://discordapp.com/users/${message.author.id}`)
         .setDescription(message.cleanContent)
         .setTimestamp(new Date())
         .setFooter(message.guild.name,(message.guild.iconURL||client.user.defaultAvatarURL))
@@ -435,7 +426,7 @@ function sendPrivate(message){
 process.on('unhandledRejection', (err) => { // OHH NO UNHANLED ERROR: NOTIFY ALL BOT DEVS
     console.error(err);
     if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized') return process.exit();
-    (client.channels.get('539073121337212938') || client.channels.get('0')).send(`
+    (client.channels.get('0') || client.channels.get('543167247330312232')).send(`
 \`\`\`xs
 Error: ${err.name}
     ${err.message}
@@ -445,4 +436,4 @@ Error: ${err.name}
 });
 
 ///////////////////////////////////////////////////////////////////////////////////
-client.login(process.env.token)//process.env.TOKEN
+client.login(process.env.token)//process.env.token

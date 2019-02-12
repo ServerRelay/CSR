@@ -169,6 +169,7 @@ client.on('channelCreate',(channel)=>{
     if(channel.type!='text'){
         return 
     }
+    console.log(client.channels.get(channel.id))
     cacheCSRChannels()
     cachePrivateChannels()
 

@@ -169,12 +169,8 @@ client.on('channelCreate',(channel)=>{
     if(channel.type!='text'){
         return 
     }
-    let ch=client.channels.get(channel.id)
-    if(ch.name==='irc'||ch.name==='privateirc'){
-        cacheCSRChannels()
-        cachePrivateChannels()
-    }
-
+    cacheCSRChannels()
+    cachePrivateChannels()
 
 })
 /////////////////////////////////////////////////////////////////////////////////////////

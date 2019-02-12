@@ -161,6 +161,23 @@ else if(message.guild.privateCSRChannel && message.channel.id===message.guild.pr
 
 });
 
+/////////////////////////////////////////////////////////////////////////////////////
+client.on('channelCreate',(channel)=>{
+    if(!channel){
+        return
+    }
+    if(channel.type!='text'){
+        return 
+    }
+    let ch=client.channels.get(channel.id)
+    if(ch.name==='irc'||ch.name==='privateirc'){
+        cacheCSRChannels()
+        cachePrivateChannels()
+    }
+
+
+})
+/////////////////////////////////////////////////////////////////////////////////////////
 client.on('message',(message)=>{
 
     if (!message.content.startsWith(prefix) || message.author.bot) {return;}

@@ -339,7 +339,7 @@ function boadcastToAllCSRChannels(message){
                 if(extembed.title){
                     ed.addField(`${extembed.title}`,extembed.description?extembed.description:'description not defined') 
                 }
-                ed.setThumbnail(extembed.thumbnail.url)
+                ed.setThumbnail(extembed.thumbnail?extembed.thumbnail.url:'')
 
             }
                 client.guilds.forEach(async (guild) => {

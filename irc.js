@@ -3,38 +3,43 @@ const code=require('./ircrules.js')
 const client=new Discord.Client();
 const fs=require('fs');
 const Url=require('url');
-const pg=require('pg');
-
+const sqlite=require('sqlite3');
 client.commands=new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-
 client.banlist=[]
-bannedservers=[]
+client.lockdown=false
 const {prefix, token}=require('./config.json');
 
 //////////////////////////////////////////////////////////////////////////////
-client.on('ready',async ()=>{
+client.on('ready',()=>{
 console.log('irc connected')
 client.user.setActivity('--help')
 
-const db=new pg.Client({
-    connectionString:process.env.DATABASE_URL,
-    ssl:true
-})
-db.connect()
-await db.query('CREATE TABLE IF NOT EXISTS banned(id text)')
-await db.query(`SELECT * FROM banned`)
-.then((rows)=>{
+const db=new sqlite.Database('./banDB.sqlite',(err)=>{
+    if (err) {
+        console.log('Could not connect to database', err)
+      } else {
+        console.log('cached all banned')
+      }
+
+});
+
+db.all(`SELECT * FROM banned`,function(err,rows){
     client.banlist.splice(0)
     if(typeof(rows)!='undefined' &&rows.length>0){
         for(let i in rows){
             client.banlist.push(rows[i]['id'])
         }
+  
+    }
+    if(err){
+        console.log(err)
+        
     }
 });
 
 
-await db.end()
+db.close()
 
 cacheCSRChannels()
 console.log('cached all csr channels')
@@ -60,8 +65,8 @@ function toHex(n) {
     if (isNaN(n)) return "00";
     n = Math.max(0,Math.min(n,255));
     return "0123456789ABCDEF".charAt((n-n%16)/16)
-        + "0123456789ABCDEF".charAt(n%16);
-}
+         + "0123456789ABCDEF".charAt(n%16);
+   }
 function finds(str, needle){
     if (str.indexOf(needle) == -1){
         return false
@@ -75,7 +80,7 @@ function finds(str, needle){
 function findemoji(name){
     let em=client.guilds.get('497475921855381525').emojis.find(x=>x.name===name)
     if(em){
-        return em
+          return em
     }
     else{
         error('no emoji found')
@@ -144,36 +149,20 @@ client.guilds.forEach(async(guild) => {
 //////////////////////////////////////////////////////////////
 client.on('message',(message)=>{
 
-if (message.author==client.user){return};
-if(!message.guild){return}
-if(message.system){ return}
-if(finds(message.content,'discord.gg')){return}
-
-if(message.guild.CSRChannel && message.channel.id===message.guild.CSRChannel.id){
-    boadcastToAllCSRChannels(message) 
+    if (message.author==client.user){return};
+    if(!message.guild){return}
+    if(message.system){ return}
+    if(finds(message.content,'discord.gg')){return}
+    const {staff}=require(`./commands/stafflist.json`)  
+    if(client.lockdown && !staff.includes(message.author.id)){ return}
+    if(message.guild.CSRChannel && message.channel.id===message.guild.CSRChannel.id){
+        boadcastToAllCSRChannels(message) 
+    }
+    else if(message.guild.privateCSRChannel && message.channel.id===message.guild.privateCSRChannel.id){ 
+        sendPrivate(message)
 }
-
-else if(message.guild.privateCSRChannel && message.channel.id===message.guild.privateCSRChannel.id){ 
-    sendPrivate(message)
-
-}
-
-
 });
 
-/////////////////////////////////////////////////////////////////////////////////////
-client.on('channelCreate',(channel)=>{
-    if(!channel){
-        return
-    }
-    if(channel.type!='text'){
-        return 
-    }
-    cacheCSRChannels()
-    cachePrivateChannels()
-
-})
-/////////////////////////////////////////////////////////////////////////////////////////
 client.on('message',(message)=>{
 
     if (!message.content.startsWith(prefix) || message.author.bot) {return;}
@@ -287,13 +276,15 @@ function boadcastToAllCSRChannels(message){
     if(message.author.id!==client.user.id && message.author.createdTimestamp<(604800000-new Date().getMilliseconds())){
         return
         }
+        
             if(client.banlist.findIndex(x=>x===message.author.id)!=-1){
                 return
         
             }
-                message.delete(180000)
+                message.delete(10000)
                 .catch(e=>{
                 })
+            
             let ed=new Discord.RichEmbed()
                 .setColor()
                 .setAuthor(`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),`https://discordapp.com/users/${message.author.id}`)
@@ -320,7 +311,33 @@ function boadcastToAllCSRChannels(message){
                         ed.setImage(ur.href)
     
                     }
+                    if(ur.host==`www.youtube.com`||ur.host==`youtu.be`){
+                        //todo - add video embed to embed i.e. https://www.youtube.com/embed/4PAAaFNEIXA
+                        try{
+                        let arr=message.content.split(' ')
+                        //console.log(arr)
+                        arr.splice(arr.findIndex(x=>x.includes(`http`)||x.includes(`https`)),1)
+                        arr=arr.join(' ')
                     
+                        ed.setTitle(message.embeds[0].title)
+                        ed.setURL(message.embeds[0].video.url)
+                        ed.setDescription(arr)
+                        ed.setImage(message.embeds[0].video.url)
+                        ed.setThumbnail(message.embeds[0].thumbnail.url)
+                        
+                           // ed=new Discord.RichEmbed(message.embeds[0])
+                        
+                        }
+                        catch(err){
+                            console.log(err)
+                        }
+                        //setTimeout(() => {
+                        // message.delete()
+                        // .catch((err)=>{
+                            //    console.log(err)
+                        // })
+                        // }, 3000); 
+                }
             }
             else if(message.attachments.array().length>0){
                 let img = message.attachments.array()[0];
@@ -336,10 +353,8 @@ function boadcastToAllCSRChannels(message){
             
             let extembed=message.embeds[0]
             if(extembed){
-                if(extembed.title){
-                    ed.addField(`${extembed.title}`,extembed.description?extembed.description:'description not defined') 
-                }
-                ed.setThumbnail(extembed.thumbnail?extembed.thumbnail.url:'')
+                ed.addField(`${extembed.title}`,extembed.description) 
+                ed.setThumbnail(extembed.thumbnail.url)
 
             }
                 client.guilds.forEach(async (guild) => {
@@ -362,10 +377,7 @@ function boadcastToAllCSRChannels(message){
  */
 function sendPrivate(message){
     if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic===''){return}
-        message.delete(10000)
-        .catch(e=>{
-
-        })//180000 is 3 minutes
+        message.delete(10000)//180000 is 3 minutes
     let ed=new Discord.RichEmbed()
         .setColor()
         .setAuthor(`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),`https://discordapp.com/users/${message.author.id}`)
@@ -394,6 +406,7 @@ function sendPrivate(message){
             ed.addField('Attachment',att.url,false)
         }
     }
+   
     let channels=findAllMatchingPrivate(message.guild)
     for(let i of channels){
         i.send(ed)

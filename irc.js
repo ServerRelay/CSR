@@ -3,43 +3,35 @@ const code=require('./ircrules.js')
 const client=new Discord.Client();
 const fs=require('fs');
 const Url=require('url');
-const sqlite=require('sqlite3');
+const pg=require('pg');
 client.commands=new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 client.banlist=[]
-bannedservers=[]
+client.lockdown=false
 const {prefix, token}=require('./config.json');
-
 //////////////////////////////////////////////////////////////////////////////
-client.on('ready',()=>{
+client.on('ready',async ()=>{
 console.log('irc connected')
 client.user.setActivity('--help')
 
-const db=new sqlite.Database('./banDB.sqlite',(err)=>{
-    if (err) {
-        console.log('Could not connect to database', err)
-      } else {
-        console.log('cached all banned')
-      }
+const db=new pg.Client({
+    connectionString:process.env.DATABASE_URL,
+    ssl:true
+})
+await db.connect()
 
-});
-
-db.all(`SELECT * FROM banned`,function(err,rows){
+await db.query('CREATE TABLE IF NOT EXISTS banned(id')
+let rows=await db.query(`SELECT * FROM banned`)
+rows=rows.rows
     client.banlist.splice(0)
     if(typeof(rows)!='undefined' &&rows.length>0){
         for(let i in rows){
             client.banlist.push(rows[i]['id'])
         }
-  
     }
-    if(err){
-        console.log(err)
-        
-    }
-});
 
 
-db.close()
+await db.end()
 
 cacheCSRChannels()
 console.log('cached all csr channels')
@@ -149,22 +141,18 @@ client.guilds.forEach(async(guild) => {
 //////////////////////////////////////////////////////////////
 client.on('message',(message)=>{
 
-if (message.author==client.user){return};
-if(!message.guild){return}
-if(message.system){ return}
-if(finds(message.content,'discord.gg')){return}
-
-if(message.guild.CSRChannel && message.channel.id===message.guild.CSRChannel.id){
-    boadcastToAllCSRChannels(message) 
+    if (message.author==client.user){return};
+    if(!message.guild){return}
+    if(message.system){ return}
+    if(finds(message.content,'discord.gg')){return}
+    const {staff}=require(`./commands/stafflist.json`)  
+    if(client.lockdown && !staff.includes(message.author.id)){ return}
+    if(message.guild.CSRChannel && message.channel.id===message.guild.CSRChannel.id){
+        boadcastToAllCSRChannels(message) 
+    }
+    else if(message.guild.privateCSRChannel && message.channel.id===message.guild.privateCSRChannel.id){ 
+        sendPrivate(message)
 }
-  
-else if(message.guild.privateCSRChannel && message.channel.id===message.guild.privateCSRChannel.id){ 
-    sendPrivate(message)
-   
-}
-
-      
-
 });
 
 client.on('message',(message)=>{

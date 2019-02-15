@@ -20,7 +20,7 @@ const db=new pg.Client({
 })
 await db.connect()
 
-await db.query('CREATE TABLE IF NOT EXISTS banned(id')
+await db.query('CREATE TABLE IF NOT EXISTS banned(id text)')
 let rows=await db.query(`SELECT * FROM banned`)
 rows=rows.rows
     client.banlist.splice(0)

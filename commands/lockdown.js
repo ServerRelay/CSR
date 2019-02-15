@@ -1,4 +1,3 @@
-
 module.exports = {
     name: 'lockdown',
     description: 'sends the rules to using the #irc channel',

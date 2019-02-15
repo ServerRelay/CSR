@@ -9,7 +9,6 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 client.banlist=[]
 client.lockdown=false
 const {prefix, token}=require('./config.json');
-
 //////////////////////////////////////////////////////////////////////////////
 client.on('ready',()=>{
 console.log('irc connected')
@@ -18,9 +17,9 @@ client.user.setActivity('--help')
 const db=new sqlite.Database('./banDB.sqlite',(err)=>{
     if (err) {
         console.log('Could not connect to database', err)
-      } else {
+    } else {
         console.log('cached all banned')
-      }
+    }
 
 });
 
@@ -30,7 +29,6 @@ db.all(`SELECT * FROM banned`,function(err,rows){
         for(let i in rows){
             client.banlist.push(rows[i]['id'])
         }
-  
     }
     if(err){
         console.log(err)

@@ -7,8 +7,9 @@ const sqlite=require('sqlite3');
 client.commands=new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 client.banlist=[]
-client.lockdown=false
+bannedservers=[]
 const {prefix, token}=require('./config.json');
+
 //////////////////////////////////////////////////////////////////////////////
 client.on('ready',()=>{
 console.log('irc connected')
@@ -17,9 +18,9 @@ client.user.setActivity('--help')
 const db=new sqlite.Database('./banDB.sqlite',(err)=>{
     if (err) {
         console.log('Could not connect to database', err)
-    } else {
+      } else {
         console.log('cached all banned')
-    }
+      }
 
 });
 
@@ -29,6 +30,7 @@ db.all(`SELECT * FROM banned`,function(err,rows){
         for(let i in rows){
             client.banlist.push(rows[i]['id'])
         }
+  
     }
     if(err){
         console.log(err)
@@ -147,18 +149,22 @@ client.guilds.forEach(async(guild) => {
 //////////////////////////////////////////////////////////////
 client.on('message',(message)=>{
 
-    if (message.author==client.user){return};
-    if(!message.guild){return}
-    if(message.system){ return}
-    if(finds(message.content,'discord.gg')){return}
-    const {staff}=require(`./commands/stafflist.json`)  
-    if(client.lockdown && !staff.includes(message.author.id)){ return}
-    if(message.guild.CSRChannel && message.channel.id===message.guild.CSRChannel.id){
-        boadcastToAllCSRChannels(message) 
-    }
-    else if(message.guild.privateCSRChannel && message.channel.id===message.guild.privateCSRChannel.id){ 
-        sendPrivate(message)
+if (message.author==client.user){return};
+if(!message.guild){return}
+if(message.system){ return}
+if(finds(message.content,'discord.gg')){return}
+
+if(message.guild.CSRChannel && message.channel.id===message.guild.CSRChannel.id){
+    boadcastToAllCSRChannels(message) 
 }
+  
+else if(message.guild.privateCSRChannel && message.channel.id===message.guild.privateCSRChannel.id){ 
+    sendPrivate(message)
+   
+}
+
+      
+
 });
 
 client.on('message',(message)=>{

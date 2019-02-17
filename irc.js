@@ -154,7 +154,15 @@ client.on('message',(message)=>{
         sendPrivate(message)
 }
 });
-
+////////////////////////////////////////////////////
+client.on('channelCreate',(channel)=>{
+    if(channel.type!='voice'){
+        return
+    }
+    cacheCSRChannels()
+    cachePrivateChannels()
+})
+/////////////////////////////////////////////
 client.on('message',(message)=>{
 
     if (!message.content.startsWith(prefix) || message.author.bot) {return;}
@@ -182,7 +190,7 @@ try {
 
 
 client.on('rateLimit',(ratelimit)=>{
-  let x=0
+    let x=0
     if(ratelimit){
         x+=1
         if(x>=3){

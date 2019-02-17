@@ -139,12 +139,13 @@ client.guilds.forEach(async(guild) => {
     });
     
 });
-//////////////////////////////////////////////////////////////
+/////////////MAIN MESSAGE EVENT/////////////////////////////////////////////
 client.on('message',(message)=>{
 
     if (message.author==client.user){return};
     if(!message.guild){return}
     if(message.system){ return}
+    if(message.author.bot){return}
     if(finds(message.content,'discord.gg')){return}
     const {staff}=require(`./commands/stafflist.json`)  
     if(client.lockdown && !staff.includes(message.author.id)){ return}
@@ -155,9 +156,21 @@ client.on('message',(message)=>{
         sendPrivate(message)
 }
 });
-////////////////////////////////////////////////////
+//////////////RECACHE TO ChANNEL CREATE//////////////////////////////////
 client.on('channelCreate',(channel)=>{
     if(channel.type!='voice'){
+        return
+    }
+    if(channel.name && channel.name!=='irc' || channel.name!=='privateirc'){
+        return
+    }
+    cacheCSRChannels()
+    cachePrivateChannels()
+})
+////////////////////////////////////////////////////
+client.on('channelUpdate',(oldch,newch)=>{
+    if(newch.type!='text'){return}
+    if(newch.name && newch.name!=='irc' || newch.name!=='privateirc'){
         return
     }
     cacheCSRChannels()
@@ -326,7 +339,7 @@ function boadcastToAllCSRChannels(message){
                         ed.setImage(message.embeds[0].video.url)
                         ed.setThumbnail(message.embeds[0].thumbnail.url)
                         
-                           // ed=new Discord.RichEmbed(message.embeds[0])
+                        // ed=new Discord.RichEmbed(message.embeds[0])
                         
                         }
                         catch(err){

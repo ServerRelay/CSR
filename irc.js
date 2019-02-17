@@ -4,6 +4,7 @@ const client=new Discord.Client();
 const fs=require('fs');
 const Url=require('url');
 const pg=require('pg');
+const env=require('./env').load('.env')
 client.commands=new Discord.Collection()
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 client.banlist=[]

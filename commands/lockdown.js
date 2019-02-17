@@ -1,6 +1,6 @@
 module.exports = {
     name: 'lockdown',
-    description: 'sends the rules to using the #irc channel',
+    staff: 'sends the rules to using the #irc channel',
     execute(message) {
         const {staff}=require(`./stafflist.json`)  
         if(!staff.includes(message.author.id)){ 

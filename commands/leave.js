@@ -1,6 +1,7 @@
 const { staff } = require('./stafflist.json');
 module.exports = {
 	name: 'leave',
+	staff:'makes the bot leave a server',
 	execute(message, args) {
 		if(staff.findIndex(x=>x === message.author.id) == -1) {
 			message.channel.send('no permission');

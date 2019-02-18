@@ -295,7 +295,7 @@ function boadcastToAllCSRChannels(message){
                 return
         
             }
-                message.delete(10000)
+                message.delete(180000)
                 .catch(e=>{
                 })
             
@@ -391,7 +391,9 @@ function boadcastToAllCSRChannels(message){
  */
 function sendPrivate(message){
     if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic===''){return}
-        message.delete(10000)//180000 is 3 minutes
+    message.delete(180000)//180000 is 3 minutes
+    .catch((err)=>{
+    })
     let ed=new Discord.RichEmbed()
         .setColor()
         .setAuthor(`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),`https://discordapp.com/users/${message.author.id}`)

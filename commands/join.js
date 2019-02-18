@@ -14,6 +14,11 @@ module.exports = {
     name: 'join',
     alias:['joins'],
     description: 'sends a join request to a server',
+    /**
+     * 
+     * @param {Discord.Message} message 
+     * @param {[]} args 
+     */
     async execute(message, args) {
         if(!args[0]){
             return message.channel.send('please specify a server name')
@@ -26,11 +31,13 @@ module.exports = {
         if (ch){
             message.author.send(`awaiting aproval from ${sv.name}...`)
             let rq=await sv.createChannel('irc request','text')
-            rq.overwritePermissions(sv.id,{'VIEW_CHANNEL':false})
-            sv.roles.forEach(role => {
-                if(role.hasPermission("KICK_MEMBERS")){
-                    rq.overwritePermissions(role.id,{'VIEW_CHANNEL':true})
-                }
+            await rq.overwritePermissions(sv.id,{'VIEW_CHANNEL':false})
+            sv.roles.forEach(async role => {
+                if(!role.hasPermission('KICK_MEMBERS')){return}
+                await rq.overwritePermissions(role.id,{'VIEW_CHANNEL':true})
+                .catch(e=>{
+                    console.log('error near adding overwrites')
+                })
             });
 
             ed.setAuthor(`user ${message.author.username} is requesting an invite`,icon=(message.author.avatarURL||message.author.defaultAvatarURL))

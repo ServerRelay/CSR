@@ -10,6 +10,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 client.banlist=[]
 client.lockdown=false
 const {prefix, token}=require('./config.json');
+client.cooldowns=new Discord.Collection()
 //////////////////////////////////////////////////////////////////////////////
 client.on('ready',async ()=>{
 console.log('irc connected')
@@ -149,8 +150,19 @@ client.on('message',(message)=>{
     if(finds(message.content,'discord.gg')){return}
     const {staff}=require(`./commands/stafflist.json`)  
     if(client.lockdown && !staff.includes(message.author.id)){ return}
+    
     if(message.guild.CSRChannel && message.channel.id===message.guild.CSRChannel.id){
-        boadcastToAllCSRChannels(message) 
+        console.log(`message from ${message.guild.name},${message.author.username}`)
+        //if(!client.cooldowns.has(message.author.id)){
+            boadcastToAllCSRChannels(message)
+          //  client.cooldowns.set(message.author.id)
+          //  setTimeout(() => {
+          //      client.cooldowns.delete(message.author.id)
+          //   }, 10000);
+        //}
+       // else{
+        //    console.log('ignoring')
+        //}
     }
     else if(message.guild.privateCSRChannel && message.channel.id===message.guild.privateCSRChannel.id){ 
         sendPrivate(message)
@@ -161,7 +173,7 @@ client.on('channelCreate',(channel)=>{
     if(channel.type!='voice'){
         return
     }
-    if(channel.name && channel.name!=='irc' || channel.name!=='privateirc'){
+    if(channel.name && channel.name!='irc' || channel.name!='privateirc'){
         return
     }
     cacheCSRChannels()
@@ -170,7 +182,7 @@ client.on('channelCreate',(channel)=>{
 ////////////////////////////////////////////////////
 client.on('channelUpdate',(oldch,newch)=>{
     if(newch.type!='text'){return}
-    if(newch.name && newch.name!=='irc' || newch.name!=='privateirc'){
+    if(newch.name && newch.name!='irc' || newch.name!='privateirc'){
         return
     }
     cacheCSRChannels()
@@ -325,33 +337,6 @@ function boadcastToAllCSRChannels(message){
                         ed.setImage(ur.href)
     
                     }
-                    if(ur.host==`www.youtube.com`||ur.host==`youtu.be`){
-                        //todo - add video embed to embed i.e. https://www.youtube.com/embed/4PAAaFNEIXA
-                        try{
-                        let arr=message.content.split(' ')
-                        //console.log(arr)
-                        arr.splice(arr.findIndex(x=>x.includes(`http`)||x.includes(`https`)),1)
-                        arr=arr.join(' ')
-                    
-                        ed.setTitle(message.embeds[0].title)
-                        ed.setURL(message.embeds[0].video.url)
-                        ed.setDescription(arr)
-                        ed.setImage(message.embeds[0].video.url)
-                        ed.setThumbnail(message.embeds[0].thumbnail.url)
-                        
-                        // ed=new Discord.RichEmbed(message.embeds[0])
-                        
-                        }
-                        catch(err){
-                            console.log(err)
-                        }
-                        //setTimeout(() => {
-                        // message.delete()
-                        // .catch((err)=>{
-                            //    console.log(err)
-                        // })
-                        // }, 3000); 
-                }
             }
             else if(message.attachments.array().length>0){
                 let img = message.attachments.array()[0];
@@ -375,12 +360,16 @@ function boadcastToAllCSRChannels(message){
                 if(!guild.CSRChannel){
                     return
                 }
-                guild.CSRChannel.send(ed)
-                .catch(e=>{
-                    console.log(e)
+                try{
+                await guild.CSRChannel.send(ed)
+                }
+                catch(e){
+                    console.log(e.name+'[]'+e.message)
+                    if(e.message=='Unknown Channel'){
                     guild.CSRChannel=undefined
                     cacheCSRChannels()
-                })
+                    }
+                }
             });
 }
 
@@ -422,14 +411,14 @@ function sendPrivate(message){
             ed.addField('Attachment',att.url,false)
         }
     }
-   
     let channels=findAllMatchingPrivate(message.guild)
     for(let i of channels){
         i.send(ed)
         .catch(e=>{
             console.log(e)
-            
-            cachePrivateChannels()
+            if(e.message=="Unknown Channel"){
+                cachePrivateChannels()
+            }
         })
     }
 }
@@ -438,7 +427,7 @@ function sendPrivate(message){
 process.on('unhandledRejection', (err) => { // OHH NO UNHANLED ERROR: NOTIFY ALL BOT DEVS
     console.error(err);
     if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized') return process.exit();
-    (client.channels.get('0') || client.channels.get('543167247330312232')).send(`
+    (client.channels.get('543167247330312232')).send(`
 \`\`\`xs
 Error: ${err.name}
     ${err.message}

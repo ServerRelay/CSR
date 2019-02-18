@@ -14,13 +14,13 @@ module.exports = {
     name: 'join',
     alias:['joins'],
     description: 'sends a join request to a server',
-   async execute(message, args) {
-       if(!args[0]){
-           return message.channel.send('please specify a server name')
-       }
+    async execute(message, args) {
+        if(!args[0]){
+            return message.channel.send('please specify a server name')
+        }
         let ed=new Discord.RichEmbed()
         .setColor(rgbToHex(138,0,138))
-         let sv=message.client.guilds.find(x=>x.name.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
+        let sv=message.client.guilds.find(x=>x.name.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
     if(sv){
         let ch=sv.channels.find(x=>x.name==='irc')
         if (ch){
@@ -37,12 +37,11 @@ module.exports = {
             ed.addField(name=`Tag`,value=`${message.author.tag}`,inline=false)
             ed.addField('server:',sv.name,false)
             //ed.addField('role in server',message.author.roles.first().name)
-             
             let perm=await rq.send(RichEmbed=ed)
             await perm.react('✅')
             await perm.react('❎')
-                let filter=(reaction,user)=>(reaction.emoji.name==='✅'||reaction.emoji.name==='❎')&&!user.bot
-            let cll=perm.createReactionCollector(filter,{time:60000})
+            let filter=(reaction,user)=>(reaction.emoji.name==='✅'||reaction.emoji.name==='❎')&&!user.bot
+            let cll=perm.createReactionCollector(filter)//{time:60000}
                 
            // console.log(kl)
            // let filter=(reaction,user)=>(reaction.emoji.name==='✅'||reaction.emoji.name==='❎')&&!user.bot  

@@ -39,7 +39,7 @@ module.exports = {
                    //console.log(i)
                 }
                 d.addField(name=`members: ${sv.members.size}`,value=`members: ${x}/ bots: ${bot}`,inline=false)
-               }
+            }
             message.channel.send(RichEmbed=d)
         }
   

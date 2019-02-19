@@ -93,8 +93,10 @@ for (const file of commandFiles) {
 
 // ////////////////////////////////////////////////////////
 client.on('guildCreate', (guild)=>{
-	guild.owner.send('Thanks for adding me\nfor information use the help command');
-
+	guild.owner.send('Thanks for adding me\nfor information use the help command')
+		.catch(e=>{
+			console.log(`${guild.owner} doesnt have dms on`);
+		});
 	if(!guild.me.permissions.has('MANAGE_CHANNELS') || !guild.me.permissions.has('ADMINISTRATOR')) {
 		return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
 
@@ -307,7 +309,9 @@ function boadcastToAllCSRChannels(message) {
 
 	}
 	message.delete(180000)
-		.catch();
+		.catch(()=>{
+			client.channels.get('543167247330312232').send(`message of content ${message.cleanContent} doesnt exist`);
+		});
 
 	const ed = new Discord.RichEmbed()
 		.setColor()
@@ -379,7 +383,9 @@ function boadcastToAllCSRChannels(message) {
 function sendPrivate(message) {
 	if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic === '') {return;}
 	message.delete(180000)// 180000 is 3 minutes
-		.catch();
+		.catch(()=>{
+			client.channels.get('543167247330312232').send(`privateirc message with content ${message.cleanContent} does not exist`);
+		});
 	const ed = new Discord.RichEmbed()
 		.setColor()
 		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)

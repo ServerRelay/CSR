@@ -94,7 +94,7 @@ for (const file of commandFiles) {
 // ////////////////////////////////////////////////////////
 client.on('guildCreate', (guild)=>{
 	guild.owner.send('Thanks for adding me\nfor information use the help command')
-		.catch(e=>{
+		.catch(()=>{
 			console.log(`${guild.owner} doesnt have dms on`);
 		});
 	if(!guild.me.permissions.has('MANAGE_CHANNELS') || !guild.me.permissions.has('ADMINISTRATOR')) {
@@ -152,7 +152,6 @@ client.on('message', (message)=>{
 	if(client.lockdown && !staff.includes(message.author.id)) { return;}
 
 	if(message.guild.CSRChannel && message.channel.id === message.guild.CSRChannel.id) {
-		console.log(`message from ${message.guild.name},${message.author.username}`);
 		// if(!client.cooldowns.has(message.author.id)){
 		boadcastToAllCSRChannels(message);
 		//  client.cooldowns.set(message.author.id)
@@ -310,9 +309,9 @@ function boadcastToAllCSRChannels(message) {
 	}
 	message.delete(180000)
 		.catch(()=>{
-			client.channels.get('543167247330312232').send(`message of content ${message.cleanContent} doesnt exist`);
+			// client.channels.get('543167247330312232').send(`message of content ${message.cleanContent} doesnt exist`);
 		});
-
+	const externalembed = message.embeds[0];
 	const ed = new Discord.RichEmbed()
 		.setColor()
 		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)
@@ -351,11 +350,9 @@ function boadcastToAllCSRChannels(message) {
 		}
 
 	}
-
-	const extembed = message.embeds[0];
-	if(extembed) {
-		ed.addField(`${extembed.title}`, extembed.description);
-		ed.setThumbnail(extembed.thumbnail.url);
+	if(externalembed) {
+		ed.addField(`${externalembed.title}`, externalembed.description);
+		ed.setThumbnail(externalembed.thumbnail.url);
 
 	}
 	client.guilds.forEach(async (guild) => {
@@ -384,7 +381,7 @@ function sendPrivate(message) {
 	if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic === '') {return;}
 	message.delete(180000)// 180000 is 3 minutes
 		.catch(()=>{
-			client.channels.get('543167247330312232').send(`privateirc message with content ${message.cleanContent} does not exist`);
+			// client.channels.get('543167247330312232').send(`privateirc message with content ${message.cleanContent} does not exist`);
 		});
 	const ed = new Discord.RichEmbed()
 		.setColor()

@@ -2,7 +2,6 @@ const Discord = require('discord.js');
 const code = require('./ircrules.js');
 const client = new Discord.Client();
 const fs = require('fs');
-const Url = require('url');
 const pg = require('pg');
 require('./env').load('.env');
 client.commands = new Discord.Collection();
@@ -39,14 +38,6 @@ client.on('ready', async ()=>{
 	console.log('cached all csr channels');
 	cachePrivateChannels();
 	console.log('cached private channels');
-
-	setInterval(() => {
-		cacheCSRChannels();
-		console.log('re-caching all csr channels');
-		cachePrivateChannels();
-		console.log('re-caching all private channels');
-	}, 1800000);
-
 
 });
 
@@ -331,20 +322,9 @@ function boadcastToAllCSRChannels(message) {
 	else{
 		ed.setColor(rgbToHex(133, 133, 133));
 	}
-
-	if(message.content.match(/(http|https)?(.jpg|.png)?/)) {
-		let uri = message.content.split(' ');
-		uri = uri.find(x=>x.match('(http|https)?'));
-		const ur = Url.parse(uri);
-		// console.log(message.embeds[0])
-		if(ur.pathname.endsWith('.jpg') || ur.pathname.endsWith('.png') || ur.pathname.endsWith('.gif') || ur.pathname.endsWith('.jpeg')) {
-			ed.setImage(ur.href);
-
-		}
-	}
-	else if(message.attachments.array().length > 0) {
+	if(message.attachments.array()[0]) {
 		const img = message.attachments.array()[0];
-		if(img.filename.endsWith('.jpg') || img.filename.endsWith('.png') || img.filename.endsWith('.gif') || img.filename.endsWith('.jpeg')) {
+		if(img.filename.endsWith('.jpg') || img.filename.endsWith('.png') || img.filename.endsWith('.gif') || img.filename.endsWith('.jpeg') || img.filename.endsWith('.PNG')) {
 			// console.log(img)
 			ed.setImage(img.url);
 		}
@@ -355,8 +335,8 @@ function boadcastToAllCSRChannels(message) {
 	}
 
 	if(externalembed) {
-		ed.addField(`${externalembed.title}`, externalembed.description);
-		ed.setThumbnail(externalembed.thumbnail.url);
+		externalembed.title ? externalembed.description ? ed.addField(`${externalembed.title}`, externalembed.description) : '' : '';
+		externalembed.thumbnail.url ? ed.setThumbnail(externalembed.thumbnail.url) : '';
 
 	}
 	client.guilds.forEach(async (guild) => {
@@ -410,7 +390,6 @@ function sendPrivate(message) {
 
 	const attachment = message.attachments.first();
 	if(attachment) {
-		console.log('');
 		if(attachment.filename.endsWith('.jpg') || attachment.filename.endsWith('.png') || attachment.filename.endsWith('.gif') || attachment.filename.endsWith('.jpeg')) {
 			ed.setImage(attachment.url);
 		}

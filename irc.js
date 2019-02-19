@@ -14,7 +14,7 @@ client.cooldowns = new Discord.Collection();
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async ()=>{
 	console.log('irc connected');
-	client.user.setActivity('--help');
+	client.user.setActivity(`${prefix}help`);
 
 	const db = new pg.Client({
 		connectionString:process.env.DATABASE_URL,

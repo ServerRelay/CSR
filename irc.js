@@ -307,10 +307,13 @@ function boadcastToAllCSRChannels(message) {
 		return;
 
 	}
-	message.delete(180000)
-		.catch(()=>{
-			// client.channels.get('543167247330312232').send(`message of content ${message.cleanContent} doesnt exist`);
-		});
+
+	setTimeout(() => {
+		if(!message.deleted) {
+			message.delete();
+		}
+	}, 180000);
+
 	const externalembed = message.embeds[0];
 	const ed = new Discord.RichEmbed()
 		.setColor()
@@ -329,7 +332,7 @@ function boadcastToAllCSRChannels(message) {
 		ed.setColor(rgbToHex(133, 133, 133));
 	}
 
-	if(message.content.match(RegExp('/(http|https)?(.jpg|.png)?/'))) {
+	if(message.content.match(/(http|https)?(.jpg|.png)?/)) {
 		let uri = message.content.split(' ');
 		uri = uri.find(x=>x.match('(http|https)?'));
 		const ur = Url.parse(uri);
@@ -350,6 +353,7 @@ function boadcastToAllCSRChannels(message) {
 		}
 
 	}
+
 	if(externalembed) {
 		ed.addField(`${externalembed.title}`, externalembed.description);
 		ed.setThumbnail(externalembed.thumbnail.url);
@@ -379,10 +383,13 @@ function boadcastToAllCSRChannels(message) {
  */
 function sendPrivate(message) {
 	if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic === '') {return;}
-	message.delete(180000)// 180000 is 3 minutes
-		.catch(()=>{
-			// client.channels.get('543167247330312232').send(`privateirc message with content ${message.cleanContent} does not exist`);
-		});
+
+	setTimeout(() => {
+		if(!message.deleted) {
+			message.delete();
+		}
+	}, 180000);
+
 	const ed = new Discord.RichEmbed()
 		.setColor()
 		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)
@@ -401,14 +408,14 @@ function sendPrivate(message) {
 	}
 
 
-	const att = message.attachments.first();
-	if(att) {
+	const attachment = message.attachments.first();
+	if(attachment) {
 		console.log('');
-		if(att.filename.endsWith('.jpg') || att.filename.endsWith('.png') || att.filename.endsWith('.gif') || att.filename.endsWith('.jpeg')) {
-			ed.setImage(att.url);
+		if(attachment.filename.endsWith('.jpg') || attachment.filename.endsWith('.png') || attachment.filename.endsWith('.gif') || attachment.filename.endsWith('.jpeg')) {
+			ed.setImage(attachment.url);
 		}
 		else{
-			ed.addField('Attachment', att.url, false);
+			ed.addField('Attachment', attachment.url, false);
 		}
 	}
 	const channels = findAllMatchingPrivate(message.guild);

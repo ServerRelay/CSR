@@ -305,7 +305,6 @@ function boadcastToAllCSRChannels(message) {
 		}
 	}, 180000);
 
-	const externalembed = message.embeds[0];
 	const ed = new Discord.RichEmbed()
 		.setColor()
 		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)
@@ -322,6 +321,7 @@ function boadcastToAllCSRChannels(message) {
 	else{
 		ed.setColor(rgbToHex(133, 133, 133));
 	}
+
 	if(message.attachments.array()[0]) {
 		const img = message.attachments.array()[0];
 		if(img.filename.endsWith('.jpg') || img.filename.endsWith('.png') || img.filename.endsWith('.gif') || img.filename.endsWith('.jpeg') || img.filename.endsWith('.PNG')) {
@@ -333,7 +333,7 @@ function boadcastToAllCSRChannels(message) {
 		}
 
 	}
-
+	const externalembed = message.embeds[0];
 	if(externalembed) {
 		externalembed.title ? externalembed.description ? ed.addField(`${externalembed.title}`, externalembed.description) : '' : '';
 		externalembed.thumbnail.url ? ed.setThumbnail(externalembed.thumbnail.url) : '';

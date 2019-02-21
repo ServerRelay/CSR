@@ -159,7 +159,7 @@ client.on('message', (message)=>{
 });
 // ////////////RECACHE TO ChANNEL CREATE//////////////////////////////////
 client.on('channelCreate', (channel)=>{
-	if(channel.type != 'voice') {
+	if(channel.type != 'text') {
 		return;
 	}
 	if(channel.name && (channel.name !== 'irc' || channel.name !== 'privateirc')) {

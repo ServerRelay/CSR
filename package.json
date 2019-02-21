@@ -21,6 +21,7 @@
   "homepage": "https://github.com/coolxpress/CSR#readme",
   "dependencies": {
     "discord.js": "^11.4.2",
+    "ms": "^2.1.1",
     "pg": "^7.8.0"
   }
 }

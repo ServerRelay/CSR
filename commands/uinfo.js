@@ -20,9 +20,10 @@ module.exports = {
 				.setColor(rgbToHex(0, 200, 200));
 
 			let svn = '';
+			const user = message.mentions.users.first() || message.client.users.get(args[0]) || message.client.users.find(x=>x.tag == args.join(' ')) || message.client.users.find(x=>x.username == args.join(' '));
 
 			message.client.guilds.forEach(async sv => {
-				const memb = sv.members.find(x=>x.id == args[0]);
+				const memb = sv.members.get(user.id);
 
 				if(memb) {
 					svn += sv.name + '\n';

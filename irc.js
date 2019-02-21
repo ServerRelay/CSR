@@ -88,10 +88,6 @@ client.on('guildCreate', (guild)=>{
 		.catch(()=>{
 			console.log(`${guild.owner} doesnt have dms on`);
 		});
-	if(!guild.me.permissions.has('MANAGE_CHANNELS') || !guild.me.permissions.has('ADMINISTRATOR')) {
-		return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
-
-	}
 	const cd = new Discord.RichEmbed()
 		.setColor(rgbToHex(0, 200, 138))
 		.setDescription(code)
@@ -101,6 +97,9 @@ client.on('guildCreate', (guild)=>{
 			channel.send('**make sure you read the rules before proceding**', cd);
 			cacheCSRChannels();
 			cachePrivateChannels();
+		})
+		.catch((e)=>{
+			return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
 		});
 
 	console.log('joined server ' + guild.name);
@@ -163,7 +162,7 @@ client.on('channelCreate', (channel)=>{
 	if(channel.type != 'voice') {
 		return;
 	}
-	if(channel.name && channel.name != 'irc' || channel.name != 'privateirc') {
+	if(channel.name && (channel.name !== 'irc' || channel.name !== 'privateirc')) {
 		return;
 	}
 	cacheCSRChannels();
@@ -172,7 +171,7 @@ client.on('channelCreate', (channel)=>{
 // //////////////////////////////////////////////////
 client.on('channelUpdate', (oldch, newch)=>{
 	if(newch.type != 'text') {return;}
-	if(newch.name && newch.name != 'irc' || newch.name != 'privateirc') {
+	if(newch.name && (newch.name != 'irc' || newch.name != 'privateirc')) {
 		return;
 	}
 	cacheCSRChannels();

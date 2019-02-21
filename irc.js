@@ -410,7 +410,7 @@ function sendPrivate(message) {
 }
 
 // ///////////////////////////////////////////////////////////////////////
-process.on('unhandledRejection', (err) => { // OHH NO UNHANLED ERROR: NOTIFY ALL BOT DEVS
+process.on('unhandledRejection', (err) => {
 	console.error(err);
 	if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized') return process.exit();
 	(client.channels.get('543167247330312232')).send(`

@@ -21,7 +21,7 @@ module.exports = {
 
 			let svn = '';
 			const user = message.mentions.users.first() || message.client.users.get(args[0]) || message.client.users.find(x=>x.tag == args.join(' ')) || message.client.users.find(x=>x.username == args.join(' '));
-
+			if(!user) return message.channel.send('No user found!');
 			message.client.guilds.forEach(async sv => {
 				const memb = sv.members.get(user.id);
 

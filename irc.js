@@ -162,6 +162,7 @@ client.on('channelCreate', (channel)=>{
 	if(channel.type != 'text') {
 		return;
 	}
+	console.log(channel.name === 'irc');
 	if(channel.name !== 'irc' || channel.name !== 'privateirc') {
 		return;
 	}

@@ -162,7 +162,7 @@ client.on('channelCreate', (channel)=>{
 	if(channel.type != 'text') {
 		return;
 	}
-	if(channel.name && (channel.name !== 'irc' || channel.name !== 'privateirc')) {
+	if(channel.name !== 'irc' || channel.name !== 'privateirc') {
 		return;
 	}
 	cacheCSRChannels();
@@ -171,7 +171,7 @@ client.on('channelCreate', (channel)=>{
 // //////////////////////////////////////////////////
 client.on('channelUpdate', (oldch, newch)=>{
 	if(newch.type != 'text') {return;}
-	if(newch.name && (newch.name != 'irc' || newch.name != 'privateirc')) {
+	if(newch.name != 'irc' || newch.name != 'privateirc') {
 		return;
 	}
 	cacheCSRChannels();

@@ -142,16 +142,16 @@ client.on('message', (message)=>{
 	if(client.lockdown && !staff.includes(message.author.id)) { return;}
 
 	if(message.guild.CSRChannel && message.channel.id === message.guild.CSRChannel.id) {
-		// if(!client.cooldowns.has(message.author.id)){
-		boadcastToAllCSRChannels(message);
-		//  client.cooldowns.set(message.author.id)
-		//  setTimeout(() => {
-		//      client.cooldowns.delete(message.author.id)
-		//   }, 10000);
-		// }
-		// else{
-		//    console.log('ignoring')
-		// }
+		if(!client.cooldowns.has(message.author.id)) {
+			boadcastToAllCSRChannels(message);
+			client.cooldowns.set(message.author.id);
+			setTimeout(() => {
+				client.cooldowns.delete(message.author.id);
+			}, 1000);
+		}
+		else{
+			console.log('ignoring');
+		}
 	}
 	else if(message.guild.privateCSRChannel && message.channel.id === message.guild.privateCSRChannel.id) {
 		sendPrivate(message);

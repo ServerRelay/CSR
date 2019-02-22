@@ -413,7 +413,17 @@ function sendPrivate(message) {
 process.on('unhandledRejection', (err) => {
 	console.error(err);
 	if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized') return process.exit();
-	(client.channels.get('543167247330312232')).send(`
+
+	if(err.name == 'DiscordAPIError') {
+		return (client.channels.get('543167247330312232')).send(`
+	\`\`\`js
+	Error: ${require('util').inspect(err).slice(0, 1800)}
+		\`\`\`
+		`);
+	}
+
+
+	return (client.channels.get('543167247330312232')).send(`
 \`\`\`xs
 Error: ${err.name}
     ${err.message}

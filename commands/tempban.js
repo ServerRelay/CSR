@@ -27,7 +27,7 @@ module.exports = {
 		}
 		if(!time) {
 			message.channel.send('BOI If you dont choose the time');
-			return db.close();
+			return db.end();
 		}
 		// let banee=message.guild.members.find(x=>x.user.username.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
 		if(banee) {

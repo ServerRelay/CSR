@@ -111,7 +111,13 @@ client.on('guildCreate', (guild)=>{
 
 	client.guilds.forEach(async (gld) => {
 		if(!gld.CSRChannel) {return;}
-		gld.CSRChannel.send(ed);
+		if(!gld.me.permissions.has('EXTERNAL_EMOJIS') || !gld.me.permissions.has('USE_EXTERNAL_EMOJIS')) {
+			ed.setDescription('has left the chat');
+		}
+		gld.CSRChannel.send(ed)
+			.catch(e=>{
+				console.log('on join error ' + e.message + gld.name);
+			});
 	});
 });
 // ////////////////////////////////////////////////////////////////////////////
@@ -126,7 +132,13 @@ client.on('guildDelete', (guild)=>{
 		if(!gld.CSRChannel) {
 			return;
 		}
-		gld.CSRChannel.send(ed);
+		if(!gld.me.permissions.has('EXTERNAL_EMOJIS') || !gld.me.permissions.has('USE_EXTERNAL_EMOJIS')) {
+			ed.setDescription('has left the chat');
+		}
+		gld.CSRChannel.send(ed)
+			.catch(e=>{
+				console.log('on leave error ' + e.message + gld.name);
+			});
 	});
 
 });

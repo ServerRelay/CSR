@@ -1,253 +1,278 @@
-const Discord=require('discord.js');
-const code=require('./ircrules.js')
-const client=new Discord.Client();
-const fs=require('fs');
-const Url=require('url');
-const sqlite=require('sqlite3');
-client.commands=new Discord.Collection()
+const Discord = require('discord.js');
+const code = require('./ircrules.js');
+const client = new Discord.Client();
+const fs = require('fs');
+const pg = require('pg');
+require('./env').load('.env');
+client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-client.banlist=[]
-bannedservers=[]
-const {prefix, token}=require('./config.json');
+client.banlist = [];
+client.lockdown = false;
+const { prefix } = require('./config.json');
+client.cooldowns = new Discord.Collection();
+// ////////////////////////////////////////////////////////////////////////////
+client.on('ready', async ()=>{
+	console.log('irc connected');
+	client.user.setActivity(`${prefix}help`);
 
-//////////////////////////////////////////////////////////////////////////////
-client.on('ready',()=>{
-console.log('irc connected')
-client.user.setActivity('--help')
+	const db = new pg.Client({
+		connectionString:process.env.DATABASE_URL,
+		ssl:true,
+	});
+	await db.connect();
 
-const db=new sqlite.Database('./banDB.sqlite',(err)=>{
-    if (err) {
-        console.log('Could not connect to database', err)
-      } else {
-        console.log('cached all banned')
-      }
-
-});
-
-db.all(`SELECT * FROM banned`,function(err,rows){
-    client.banlist.splice(0)
-    if(typeof(rows)!='undefined' &&rows.length>0){
-        for(let i in rows){
-            client.banlist.push(rows[i]['id'])
-        }
-  
-    }
-    if(err){
-        console.log(err)
-        
-    }
-});
+	await db.query('CREATE TABLE IF NOT EXISTS banned(id text UNIQUE)');
+	let rows = await db.query('SELECT * FROM banned');
+	rows = rows.rows;
+	client.banlist.splice(0);
+	if(typeof (rows) != 'undefined' && rows.length > 0) {
+		for(const i in rows) {
+			client.banlist.push(rows[i]['id']);
+		}
+	}
 
 
-db.close()
+	await db.end();
 
-cacheCSRChannels()
-console.log('cached all csr channels')
-cachePrivateChannels()
-console.log('cached private channels')
-
-setInterval(() => {
-    cacheCSRChannels()
-    console.log('re-caching all csr channels')
-    cachePrivateChannels()
-    console.log('re-caching all private channels')
-},1800000);
-
+	cacheCSRChannels();
+	console.log('cached all csr channels');
+	cachePrivateChannels();
+	console.log('cached private channels');
 
 });
 
-////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////////
 
-function rgbToHex(R,G,B) {return toHex(R)+toHex(G)+toHex(B)}
+function rgbToHex(R, G, B) {return toHex(R) + toHex(G) + toHex(B);}
 
 function toHex(n) {
-    n = parseInt(n,10);
-    if (isNaN(n)) return "00";
-    n = Math.max(0,Math.min(n,255));
-    return "0123456789ABCDEF".charAt((n-n%16)/16)
-         + "0123456789ABCDEF".charAt(n%16);
-   }
-function finds(str, needle){
-    if (str.indexOf(needle) == -1){
-        return false
-    }
-    else{
-        return true
-    }
+	n = parseInt(n, 10);
+	if (isNaN(n)) return '00';
+	n = Math.max(0, Math.min(n, 255));
+	return '0123456789ABCDEF'.charAt((n - n % 16) / 16)
+        + '0123456789ABCDEF'.charAt(n % 16);
+}
+function finds(str, needle) {
+	if (str.indexOf(needle) == -1) {
+		return false;
+	}
+	else{
+		return true;
+	}
 
 }
 
-function findemoji(name){
-    let em=client.guilds.get('497475921855381525').emojis.find(x=>x.name===name)
-    if(em){
-          return em
-    }
-    else{
-        error('no emoji found')
-    }
+function findemoji(name) {
+	const em = client.guilds.get('497475921855381525').emojis.find(x=>x.name === name);
+	if(em) {
+		return em;
+	}
+	else{
+		new Error('no emoji found');
+	}
 }
-
 
 
 for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
+	const command = require(`./commands/${file}`);
 
-    // set a new item in the Collection
-    // with the key as the command name and the value as the exported module
-    client.commands.set(command.name, command);
+	// set a new item in the Collection
+	// with the key as the command name and the value as the exported module
+	client.commands.set(command.name, command);
 }
 
 
+// ////////////////////////////////////////////////////////
+client.on('guildCreate', (guild)=>{
+	guild.owner.send('Thanks for adding me\nfor information use the help command')
+		.catch(()=>{
+			console.log(`${guild.owner} doesnt have dms on`);
+		});
+	const cd = new Discord.RichEmbed()
+		.setColor(rgbToHex(0, 200, 138))
+		.setDescription(code)
+		.setFooter('IRC Code Of Conduct', client.user.avatarURL);
+	guild.createChannel('irc', 'text')
+		.then((channel)=>{
+			channel.send('**make sure you read the rules before proceding**', cd);
+			cacheCSRChannels();
+			cachePrivateChannels();
+		})
+		.catch((e)=>{
+			return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
+		});
 
-//////////////////////////////////////////////////////////
-client.on('guildCreate',(guild)=>{
-    guild.owner.send('Thanks for adding me\nfor information use the help command')
+	console.log('joined server ' + guild.name);
 
-    let cd=new Discord.RichEmbed()
-        .setColor(rgbToHex(0,200,138))
-        .setDescription(code)
-        .setFooter('IRC Code Of Conduct',client.user.avatarURL)
-    guild.createChannel('irc','text')
-        .then((channel)=>{
-            channel.send('**make sure you read the rules before proceding**',cd)
-            cacheCSRChannels()
-            cachePrivateChannels()
-        })
-        .catch((error)=>{
-            guild.owner.send('this bot needs a channel (#irc) to do its intended function')
-            console.log('wasnt allowed to make irc channel')
-        });
+	const ed = new Discord.RichEmbed()
+		.setColor(rgbToHex(0, 255, 0))
+		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
+		.setDescription(`has joined the chat ${findemoji('join')}`);
 
-console.log('joined server '+guild.name)
-
-let ed=new Discord.RichEmbed()
-.setColor(rgbToHex(0,255,0))
-.setAuthor(`${guild.name}`,(guild.iconURL||client.user.defaultAvatarURL))
-.setDescription(`has joined the chat ${findemoji('join')}` )
-
-client.guilds.forEach(async(guild) => {
-    if(!guild.CSRChannel){return}
-    guild.CSRChannel.send(ed)
-    });
+	client.guilds.forEach(async (gld) => {
+		if(!gld.CSRChannel) {return;}
+		if(!gld.me.permissions.has('EXTERNAL_EMOJIS') || !gld.me.permissions.has('USE_EXTERNAL_EMOJIS')) {
+			ed.setDescription('has left the chat');
+		}
+		gld.CSRChannel.send(ed)
+			.catch(e=>{
+				console.log('on join error ' + e.message + gld.name);
+			});
+	});
 });
-//////////////////////////////////////////////////////////////////////////////
-client.on('guildDelete',(guild)=>{
-console.log('bot removed from server '+guild.name)
-let ed=new Discord.RichEmbed()
-        .setColor(rgbToHex(255,0,0))
-        .setAuthor(`${guild.name}`,(guild.iconURL||client.user.defaultAvatarURL))
-        .setDescription(`has left the chat ${findemoji('leave')}` )
-        
-client.guilds.forEach(async(guild) => {
-    if(!guild.CSRChannel){
-        return
-    }
-    guild.CSRChannel.send(ed)
-    });
-    
-});
-//////////////////////////////////////////////////////////////
-client.on('message',(message)=>{
+// ////////////////////////////////////////////////////////////////////////////
+client.on('guildDelete', (guild)=>{
+	console.log('bot removed from server ' + guild.name);
+	const ed = new Discord.RichEmbed()
+		.setColor(rgbToHex(255, 0, 0))
+		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
+		.setDescription(`has left the chat ${findemoji('leave')}`);
 
-if (message.author==client.user){return};
-if(!message.guild){return}
-if(message.system){ return}
-if(finds(message.content,'discord.gg')){return}
-
-if(message.guild.CSRChannel && message.channel.id===message.guild.CSRChannel.id){
-    boadcastToAllCSRChannels(message) 
-}
-  
-else if(message.guild.privateCSRChannel && message.channel.id===message.guild.privateCSRChannel.id){ 
-    sendPrivate(message)
-   
-}
-
-      
+	client.guilds.forEach(async (gld) => {
+		if(!gld.CSRChannel) {
+			return;
+		}
+		if(!gld.me.permissions.has('EXTERNAL_EMOJIS') || !gld.me.permissions.has('USE_EXTERNAL_EMOJIS')) {
+			ed.setDescription('has left the chat');
+		}
+		gld.CSRChannel.send(ed)
+			.catch(e=>{
+				console.log('on leave error ' + e.message + gld.name);
+			});
+	});
 
 });
+// ///////////MAIN MESSAGE EVENT/////////////////////////////////////////////
+client.on('message', (message)=>{
 
-client.on('message',(message)=>{
+	if (message.author == client.user) {return;}
+	if(!message.guild) {return;}
+	if(message.system) { return;}
+	if(message.author.bot) {return;}
+	if(finds(message.content, 'discord.gg')) {return;}
+	const { staff } = require('./commands/stafflist.json');
+	if(client.lockdown && !staff.includes(message.author.id)) { return;}
 
-    if (!message.content.startsWith(prefix) || message.author.bot) {return;}
+	if(message.guild.CSRChannel && message.channel.id === message.guild.CSRChannel.id) {
+		if(!client.cooldowns.has(message.author.id)) {
+			boadcastToAllCSRChannels(message);
+			client.cooldowns.set(message.author.id);
+			setTimeout(() => {
+				client.cooldowns.delete(message.author.id);
+			}, 1000);
+		}
+		else{
+			console.log('ignoring');
+		}
+	}
+	else if(message.guild.privateCSRChannel && message.channel.id === message.guild.privateCSRChannel.id) {
+		sendPrivate(message);
+	}
+});
+// ////////////RECACHE TO ChANNEL CREATE//////////////////////////////////
+client.on('channelCreate', (channel)=>{
+	if(channel.type != 'text') {
+		return;
+	}
+	if(channel.name && channel.name !== 'irc' && channel.name !== 'privateirc') {
+		return;
+	}
+	cacheCSRChannels();
+	cachePrivateChannels();
+});
+// //////////////////////////////////////////////////
+client.on('channelUpdate', (oldch, newch)=>{
+	if(newch.type != 'text') {return;}
+	if(newch.name && newch.name !== 'irc' && newch.name !== 'privateirc') {
+		return;
+	}
+	cacheCSRChannels();
+	cachePrivateChannels();
+});
+// ///////////////////////////////////////////
+client.on('message', (message)=>{
 
-const args = message.content.slice(prefix.length).trim().split(/ +/g);
+	const prefixRegex = new RegExp(`^(<@!?${client.user.id}>|${prefix})\\s*`);
+	if (!prefixRegex.test(message.content)) return;
+	const [, matchedPrefix] = message.content.match(prefixRegex);
+	const args = message.content.slice(matchedPrefix.length).trim().split(/ +/);
+	const commandName = args.shift().toLowerCase();
 
-const commandName = args.shift().toLowerCase();
+	// if(!client.commands.has(commandName)){return;}
 
-//if(!client.commands.has(commandName)){return;}
+	const command = client.commands.get(commandName) || client.commands.find(x=>x.alias && x.alias.includes(commandName));
+	if(!command) {return;}
+	try {
 
-const command=client.commands.get(commandName) || client.commands.find(x=>x.alias && x.alias.includes(commandName))
-if(!command){return}
-try {
+		command.execute(message, args);
 
-    command.execute(message, args);
-    
-} catch (error) {
+	}
+	catch (error) {
 
-    console.error(error);
-    message.channel.send(`there was an error trying to execute that command![${error}]`);
-  
-};
+		console.error(error);
+		message.channel.send(`there was an error trying to execute that command![${error}]`);
+
+	}
 
 });
 
 
-client.on('rateLimit',(ratelimit)=>{
-  let x=0
-    if(ratelimit){
-        x+=1
-        if(x>=3){
-        client.destroy()
-        .then(()=>{    
-            client.login(process.env.TOKEN)
+client.on('rateLimit', (ratelimit)=>{
+	let x = 0;
+	if(ratelimit) {
+		x += 1;
+		if(x >= 3) {
+			client.destroy()
+				.then(()=>{
+					client.login(process.env.TOKEN);
 
-        })
-        x=0
-    }
-    }
-})
-client.on('error',(error)=>{
-    console.log(error)
-})
+				});
+			x = 0;
+		}
+	}
+});
+client.on('error', (error)=>{
+	console.log(error);
+});
 
-function cacheCSRChannels(){
-    client.guilds.forEach(async(guild)=>{
-        if(!guild.available){
-            return
-        }
-        let ch=guild.channels.find(x=>x.name==='irc')
-        if(ch){
-            guild.CSRChannel=ch
-        }
-    })
+function cacheCSRChannels() {
+	client.guilds.forEach(async (guild)=>{
+		if(!guild.available) {
+			return;
+		}
+		const ch = guild.channels.find(x=>x.name === 'irc');
+		if(ch) {
+			guild.CSRChannel = ch;
+		}
+	});
 }
 
-function cachePrivateChannels(){
-    client.guilds.forEach(async(guild)=>{
-        if(!guild.available){
-            return
-        }
-        let ch=guild.channels.find(x=>x.name==='privateirc')
-        if(ch){
-            guild.privateCSRChannel=ch
-        }
-    })
+function cachePrivateChannels() {
+	client.guilds.forEach(async (guild)=>{
+		if(!guild.available) {
+			return;
+		}
+		const ch = guild.channels.find(x=>x.name === 'privateirc');
+		if(ch) {
+			guild.privateCSRChannel = ch;
+		}
+
+	});
 }
 
-function findAllMatchingPrivate(ogguild){
-    if(!ogguild.privateCSRChannel || !ogguild.privateCSRChannel.topic || ogguild.privateCSRChannel.topic===''){
-        return
-    }
-    let arr=[]
-    client.guilds.forEach(guild=>{
-        if(!guild.privateCSRChannel || !guild.privateCSRChannel.topic || guild.privateCSRChannel.topic===''){
-            return
-        }
+function findAllMatchingPrivate(ogguild) {
+	if(!ogguild.privateCSRChannel || !ogguild.privateCSRChannel.topic || ogguild.privateCSRChannel.topic === '') {
+		return;
+	}
+	const arr = [];
+	client.guilds.forEach(guild=>{
+		if(!guild.privateCSRChannel || !guild.privateCSRChannel.topic || guild.privateCSRChannel.topic === '') {
+			return;
+		}
 
-        if(guild.privateCSRChannel.topic===ogguild.privateCSRChannel.topic){
-            arr.push(guild.privateCSRChannel)
-           /* guild.privateCSRChannel.fetchWebhooks()
+		if(guild.privateCSRChannel.topic === ogguild.privateCSRChannel.topic) {
+			arr.push(guild.privateCSRChannel);
+			/* guild.privateCSRChannel.fetchWebhooks()
             .then(wbs=>{
                 let wb=wbs.find(x=>x.name=="csr")
                 if(!wb){
@@ -267,166 +292,150 @@ function findAllMatchingPrivate(ogguild){
             }
 
             })*/
-        }
-    })
-    return arr
+		}
+	});
+	return arr;
 }
 
 /**
- * 
- * @param {Discord.Message} message 
+ *
+ * @param {Discord.Message} message
  */
-function boadcastToAllCSRChannels(message){
-    if(message.author.id!==client.user.id && message.author.createdTimestamp<(604800000-new Date().getMilliseconds())){
-        return
-        }
-        
-            if(client.banlist.findIndex(x=>x===message.author.id)!=-1){
-                return
-        
-            }
-                message.delete(10000)
-                .catch(e=>{
-                })
-            
-            let ed=new Discord.RichEmbed()
-                .setColor()
-                .setAuthor(`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),`https://discordapp.com/users/${message.author.id}`)
-                .setDescription(message.cleanContent)
-                .setTimestamp(new Date())
-                .setFooter(message.guild.name,(message.guild.iconURL||client.user.defaultAvatarURL))
-            const {staff}=require(`./commands/stafflist.json`)  
-            if(staff.includes(message.author.id)){
-                ed.setColor(rgbToHex(0,0,128))
-            }
-            else if(message.author.id===message.guild.owner.id){
-                ed.setColor(rgbToHex(205,205,0))
-            }
-            else{
-                ed.setColor(rgbToHex(133,133,133))
-            }
-    
-                if(message.content.match(RegExp(`/(http|https)?(.jpg|.png)?/`))){
-                    let uri=message.content.split(' ')
-                    uri=uri.find(x=>x.match(`(http|https)?`))
-                    let ur=Url.parse(uri)
-                    //console.log(message.embeds[0])
-                    if(ur.pathname.endsWith('.jpg')||ur.pathname.endsWith('.png')||ur.pathname.endsWith('.gif')||ur.pathname.endsWith('.jpeg')){
-                        ed.setImage(ur.href)
-    
-                    }
-                    if(ur.host==`www.youtube.com`||ur.host==`youtu.be`){
-                        //todo - add video embed to embed i.e. https://www.youtube.com/embed/4PAAaFNEIXA
-                        try{
-                        let arr=message.content.split(' ')
-                        //console.log(arr)
-                        arr.splice(arr.findIndex(x=>x.includes(`http`)||x.includes(`https`)),1)
-                        arr=arr.join(' ')
-                    
-                        ed.setTitle(message.embeds[0].title)
-                        ed.setURL(message.embeds[0].video.url)
-                        ed.setDescription(arr)
-                        ed.setImage(message.embeds[0].video.url)
-                        ed.setThumbnail(message.embeds[0].thumbnail.url)
-                        
-                           // ed=new Discord.RichEmbed(message.embeds[0])
-                        
-                        }
-                        catch(err){
-                            console.log(err)
-                        }
-                        //setTimeout(() => {
-                        // message.delete()
-                        // .catch((err)=>{
-                            //    console.log(err)
-                        // })
-                        // }, 3000); 
-                }
-            }
-            else if(message.attachments.array().length>0){
-                let img = message.attachments.array()[0];
-                if(img.filename.endsWith('.jpg')||img.filename.endsWith('.png')||img.filename.endsWith('.gif')||img.filename.endsWith('.jpeg')){
-                    //console.log(img)
-                    ed.setImage(img.url)
-                }
-                else{
-                    ed.addField('Attachment',img.url,false)
-                }
-                
-                }
-            
-            let extembed=message.embeds[0]
-            if(extembed){
-                ed.addField(`${extembed.title}`,extembed.description) 
-                ed.setThumbnail(extembed.thumbnail.url)
+function boadcastToAllCSRChannels(message) {
+	if(message.author.id !== client.user.id && message.author.createdTimestamp < (604800000 - new Date().getMilliseconds())) {
+		return;
+	}
 
-            }
-                client.guilds.forEach(async (guild) => {
-                if(!guild.CSRChannel){
-                    return
-                }
-                guild.CSRChannel.send(ed)
-                .catch(e=>{
-                    console.log(e)
-                    guild.CSRChannel=undefined
-                    cacheCSRChannels()
-                })
-            });
+	if(client.banlist.findIndex(x=>x === message.author.id) != -1) {
+		return;
+
+	}
+
+	setTimeout(() => {
+		if(!message.deleted) {
+			message.delete();
+		}
+	}, 180000);
+
+	const ed = new Discord.RichEmbed()
+		.setColor()
+		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)
+		.setDescription(message.cleanContent)
+		.setTimestamp(new Date())
+		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));
+	const { staff } = require('./commands/stafflist.json');
+	if(staff.includes(message.author.id)) {
+		ed.setColor(rgbToHex(0, 0, 128));
+	}
+	else if(message.author.id === message.guild.owner.id) {
+		ed.setColor(rgbToHex(205, 205, 0));
+	}
+	else{
+		ed.setColor(rgbToHex(133, 133, 133));
+	}
+
+	if(message.attachments.array()[0]) {
+		const img = message.attachments.array()[0];
+		if(img.filename.endsWith('.jpg') || img.filename.endsWith('.png') || img.filename.endsWith('.gif') || img.filename.endsWith('.jpeg') || img.filename.endsWith('.PNG')) {
+			// console.log(img)
+			ed.setImage(img.url);
+		}
+		else{
+			ed.addField('Attachment', img.url, false);
+		}
+
+	}
+	const externalembed = message.embeds[0];
+	if(externalembed) {
+		externalembed.title ? externalembed.description ? ed.addField(`${externalembed.title}`, externalembed.description) : '' : '';
+		externalembed.thumbnail.url ? ed.setThumbnail(externalembed.thumbnail.url) : '';
+
+	}
+	client.guilds.forEach(async (guild) => {
+		if(!guild.CSRChannel) {
+			return;
+		}
+		try{
+			await guild.CSRChannel.send(ed);
+		}
+		catch(e) {
+			console.log(e.name + '[]' + e.message);
+			if(e.message == 'Unknown Channel') {
+				guild.CSRChannel = undefined;
+				cacheCSRChannels();
+			}
+		}
+	});
 }
 
 
 /**
- * 
- * @param {Discord.Message} message 
+ *
+ * @param {Discord.Message} message
  */
-function sendPrivate(message){
-    if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic===''){return}
-        message.delete(10000)//180000 is 3 minutes
-    let ed=new Discord.RichEmbed()
-        .setColor()
-        .setAuthor(`${message.author.username}`,(message.author.avatarURL||message.author.defaultAvatarURL),`https://discordapp.com/users/${message.author.id}`)
-        .setDescription(message.cleanContent)
-        .setTimestamp(new Date())
-        .setFooter(message.guild.name,(message.guild.iconURL||client.user.defaultAvatarURL))
-    const {staff}=require(`./commands/stafflist.json`)  
-    if(staff.includes(message.author.id)){
-    ed.setColor(rgbToHex(0,0,128))
-    }
-    else if(message.author.id===message.guild.owner.id){
-        ed.setColor(rgbToHex(205,205,0))
-    }
-    else{
-        ed.setColor(rgbToHex(133,133,133))
-    }
+function sendPrivate(message) {
+	if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic === '') {return;}
+
+	setTimeout(() => {
+		if(!message.deleted) {
+			message.delete();
+		}
+	}, 180000);
+
+	const ed = new Discord.RichEmbed()
+		.setColor()
+		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)
+		.setDescription(message.cleanContent)
+		.setTimestamp(new Date())
+		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));
+	const { staff } = require('./commands/stafflist.json');
+	if(staff.includes(message.author.id)) {
+		ed.setColor(rgbToHex(0, 0, 128));
+	}
+	else if(message.author.id === message.guild.owner.id) {
+		ed.setColor(rgbToHex(205, 205, 0));
+	}
+	else{
+		ed.setColor(rgbToHex(133, 133, 133));
+	}
 
 
-    let att=message.attachments.first()
-    if(att){
-        console.log('')
-        if(att.filename.endsWith('.jpg')||att.filename.endsWith('.png')||att.filename.endsWith('.gif')||att.filename.endsWith('.jpeg')){
-            ed.setImage(att.url)
-        }
-        else{
-            ed.addField('Attachment',att.url,false)
-        }
-    }
-   
-    let channels=findAllMatchingPrivate(message.guild)
-    for(let i of channels){
-        i.send(ed)
-        .catch(e=>{
-            console.log(e)
-            
-            cachePrivateChannels()
-        })
-    }
+	const attachment = message.attachments.first();
+	if(attachment) {
+		if(attachment.filename.endsWith('.jpg') || attachment.filename.endsWith('.png') || attachment.filename.endsWith('.gif') || attachment.filename.endsWith('.jpeg')) {
+			ed.setImage(attachment.url);
+		}
+		else{
+			ed.addField('Attachment', attachment.url, false);
+		}
+	}
+	const channels = findAllMatchingPrivate(message.guild);
+	for(const i of channels) {
+		i.send(ed)
+			.catch(e=>{
+				console.log(e);
+				if(e.message == 'Unknown Channel') {
+					cachePrivateChannels();
+				}
+			});
+	}
 }
 
-/////////////////////////////////////////////////////////////////////////
-process.on('unhandledRejection', (err) => { // OHH NO UNHANLED ERROR: NOTIFY ALL BOT DEVS
-    console.error(err);
-    if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized') return process.exit();
-    (client.channels.get('0') || client.channels.get('543167247330312232')).send(`
+// ///////////////////////////////////////////////////////////////////////
+process.on('unhandledRejection', (err) => {
+	console.error(err);
+	if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized') return process.exit();
+
+	if(err.name == 'DiscordAPIError') {
+		return (client.channels.get('543167247330312232')).send(`
+	\`\`\`js
+	Error: ${require('util').inspect(err).slice(0, 1800)}
+		\`\`\`
+		`);
+	}
+
+
+	return (client.channels.get('543167247330312232')).send(`
 \`\`\`xs
 Error: ${err.name}
     ${err.message}
@@ -435,5 +444,5 @@ Error: ${err.name}
     `);
 });
 
-///////////////////////////////////////////////////////////////////////////////////
-client.login(process.env.token)//process.env.token
+// /////////////////////////////////////////////////////////////////////////////////
+client.login(process.env.token);

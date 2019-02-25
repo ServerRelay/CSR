@@ -14,7 +14,7 @@ module.exports = {
 		}
 
 		message.client.guilds.forEach((guild)=>{
-			text += guild.name;
+			text += guild.name + '\n';
 		});
 		message.author.send(text, { split:true });
 	},

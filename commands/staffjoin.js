@@ -30,6 +30,9 @@ module.exports = {
 							console.log(err);
 						});
 				}
+				else{
+					return message.author.send('server has no #irc channel for me to get an invite from')
+				}
 			}
 			else{
 				return message.author.send('could not find the desired server, either try a more/less precise search or it maybe just doesnt exist');

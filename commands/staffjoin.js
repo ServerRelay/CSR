@@ -21,11 +21,11 @@ module.exports = {
         if(sv){
             let ch=sv.channels.find(x=>x.name==='irc')
             if (ch){
-               const bans= await sv.fetchBans()
-               if(bans.has(message.author.id)){
-                   sv.unban(message.author.id)
-               }
-              message.author.send(`staff bypass`)
+        		const bans= await sv.fetchBans()
+				if(bans.has(message.author.id)){
+					sv.unban(message.author.id)
+				}
+				message.author.send(`staff bypass`)
                 ch.createInvite({maxAge:0},'someone requested to join this server')
             .then((invite)=>{
                 message.author.send(`${sv.name}\'s invite code:${invite.url}`)

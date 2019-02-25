@@ -10,7 +10,7 @@ module.exports = {
 	async execute(message, args) {
 		const { staff } = require('./stafflist.json');
 		if(staff.findIndex(x=>x === message.author.id) !== -1) {
-			const sv = message.client.guilds.find(x=>x.name.toLowerCase().indexOf(args.join(' ').toLowerCase()) != -1);
+			const sv = message.client.guilds.find(x=>x.name.indexOf(args.join(' ')) != -1);
 			if(sv) {
 				if(!sv.me.hasPermission('CREATE_INSTANT_INVITE') || !sv.me.hasPermission('ADMINISTRATOR')) {
 					return message.channel.send('insifficient permissions in the guild ypu want to join');

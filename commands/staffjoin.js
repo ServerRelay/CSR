@@ -1,4 +1,3 @@
-const { staff } = require('./stafflist.json');
 module.exports = {
 	name: 'staffjoin',
 	alias:['staffjoins'],
@@ -9,6 +8,7 @@ module.exports = {
      * @param {[]} args
      */
 	async execute(message, args) {
+		const { staff } = require('./stafflist.json');
 		if(staff.findIndex(x=>x === message.author.id) !== -1) {
 			const sv = message.client.guilds.find(x=>x.name.toLowerCase().indexOf(args.join(' ').toLowerCase()) != -1);
 			if(sv) {

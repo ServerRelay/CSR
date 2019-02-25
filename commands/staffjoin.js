@@ -35,5 +35,8 @@ module.exports = {
 				return message.author.send('could not find the desired server, either try a more/less precise search or it maybe just doesnt exist');
 			}
 		}
+		else{
+			return message.send('insufficient permissions');
+		}
 	},
 };

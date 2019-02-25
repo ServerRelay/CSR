@@ -5,9 +5,8 @@ module.exports = {
 	/**
      *
      * @param {Discord.Message} message
-     * @param {[]} args
      */
-	async execute(message, args) {
+	execute(message) {
 		let text;
 		if(message.author.id != '298258003470319616') {
 			return;

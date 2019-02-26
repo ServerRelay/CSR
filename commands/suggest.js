@@ -17,12 +17,8 @@ module.exports = {
 
 		const ed = new Discord.RichEmbed()
 			.setColor(rgbToHex(0, 100, 200));
-		let st = '';
-		for(const i in args) {
-			st = st + args[i] + ' ';
-		}
 		ed.setAuthor(message.author.username + ' has sent a suggestion', message.author.avatarURL);
-		ed.addField('suggestion:', st, false);
+		ed.addField('suggestion:', args.join(' '), false);
 		message.client.channels.get('495661800847572992').send(ed)
 			.then(async (msg)=>{
 				await msg.react('☑');

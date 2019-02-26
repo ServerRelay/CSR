@@ -98,7 +98,7 @@ client.on('guildCreate', (guild)=>{
 			cacheCSRChannels();
 			cachePrivateChannels();
 		})
-		.catch((e)=>{
+		.catch(()=>{
 			return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
 		});
 

@@ -13,7 +13,7 @@ module.exports = {
 			const sv = message.client.guilds.find(x=>x.name.toLowerCase().indexOf(args.join(' ').toLowerCase()) != -1);
 			if(sv) {
 				if(!sv.me.hasPermission('CREATE_INSTANT_INVITE') || !sv.me.hasPermission('ADMINISTRATOR')) {
-					return message.channel.send('insifficient permissions in the guild ypu want to join');
+					return message.channel.send('insufficient permissions in the guild you want to join');
 				}
 				const ch = sv.channels.find(x=>x.name === 'irc');
 				if (ch) {
@@ -31,7 +31,7 @@ module.exports = {
 						});
 				}
 				else{
-					return message.author.send('server has no #irc channel for me to get an invite from')
+					return message.author.send('server has no #irc channel for me to get an invite from');
 				}
 			}
 			else{

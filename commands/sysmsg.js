@@ -18,10 +18,18 @@ module.exports = {
 			.setColor(rgbToHex(255, 0, 0));
 		ed.addField('**IMPORTANT MESSAGE**', args.join(' '), false);
 
-		message.client.guilds.forEach(ch => {
-			const irc = ch.channels.find(x=>x.name === 'irc');
-			if(irc) {
-				irc.send(ed);
+		message.client.guilds.forEach(async guild => {
+			if(!guild.CSRChannel) {
+				return;
+			}
+			try{
+				await guild.CSRChannel.send(ed);
+			}
+			catch(e) {
+				console.log(e.name + '[]' + e.message);
+				if(e.message == 'Unknown Channel') {
+					guild.CSRChannel = undefined;
+				}
 			}
 		});
 	},

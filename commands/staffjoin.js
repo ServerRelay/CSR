@@ -39,7 +39,7 @@ module.exports = {
 			}
 		}
 		else{
-			return message.send('insufficient permissions');
+			return message.author.send('insufficient permissions');
 		}
 	},
 };

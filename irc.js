@@ -152,7 +152,7 @@ client.on('message', (message)=>{
 			client.cooldowns.set(message.author.id);
 			setTimeout(() => {
 				client.cooldowns.delete(message.author.id);
-			}, 1000);
+			}, 2000);
 		}
 		else{
 			console.log('ignoring');

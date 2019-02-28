@@ -10,6 +10,8 @@ client.banlist = [];
 client.lockdown = false;
 const { prefix } = require('./config.json');
 client.cooldowns = new Discord.Collection();
+
+const novites = /(discord\.gg\/|invite\.gg\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async ()=>{
 	console.log('irc connected');
@@ -51,15 +53,6 @@ function toHex(n) {
 	n = Math.max(0, Math.min(n, 255));
 	return '0123456789ABCDEF'.charAt((n - n % 16) / 16)
         + '0123456789ABCDEF'.charAt(n % 16);
-}
-function finds(str, needle) {
-	if (str.indexOf(needle) == -1) {
-		return false;
-	}
-	else{
-		return true;
-	}
-
 }
 
 function findemoji(name) {
@@ -149,7 +142,7 @@ client.on('message', (message)=>{
 	if(!message.guild) {return;}
 	if(message.system) { return;}
 	if(message.author.bot) {return;}
-	if(finds(message.content, 'discord.gg')) {return;}
+	if(novites.test(message.content)) {return;}
 	const { staff } = require('./commands/stafflist.json');
 	if(client.lockdown && !staff.includes(message.author.id)) { return;}
 

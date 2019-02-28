@@ -11,7 +11,7 @@ client.lockdown = false;
 const { prefix } = require('./config.json');
 client.cooldowns = new Discord.Collection();
 
-const novites = /(discord\.gg\/|invite\.gg\/)/;
+const novites = /(discord\.gg\/|invite\.gg\/ | discord\.io\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async ()=>{
 	console.log('irc connected');

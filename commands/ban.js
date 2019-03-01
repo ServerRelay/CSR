@@ -16,7 +16,7 @@ module.exports = {
 			message.channel.send('no permission');
 			return;
 		}
-		const banee = message.mentions.members.first() || message.client.users.get(args[0]);
+		const banee = message.mentions.users.first() || message.client.users.get(args[0]) || message.client.users.find(x=>x.tag == args.join(' ')) || message.client.users.find(x=>x.username == args.join(' '));
 		// let banee=message.guild.members.find(x=>x.user.username.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
 		if(banee) {
 			await csr.CSRBan(message.client, db, banee);

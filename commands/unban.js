@@ -15,7 +15,7 @@ module.exports = {
 			return;
 		}
 		// let banee=message.guild.members.find(x=>x.user.username.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
-		const banee = message.mentions.members.first() || message.client.users.get(args[0]);
+		const banee = message.mentions.users.first() || message.client.users.get(args[0]) || message.client.users.find(x=>x.tag == args.join(' ')) || message.client.users.find(x=>x.username == args.join(' '));
 		if(banee) {
 			await csr.CSRUnban(message.client, db, banee);
 			message.channel.send('removed from DB');

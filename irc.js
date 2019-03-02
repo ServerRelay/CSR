@@ -420,9 +420,19 @@ process.on('unhandledRejection', (err) => {
 	if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized') return process.exit();
 
 	if(err.name == 'DiscordAPIError') {
+		let addInfo = 'None Found!';
+		if(err.path !== undefined) {
+			const channel = client.channels.get(err.path.split('/')[4]);
+			if(channel) {
+				addInfo = `Additional Debug Info:\n\tChannel: ${channel.name ? channel.name : 'Unknown'}\n\tGuild: ${channel.guild ? channel.guild.name : 'Unknown'}`;
+			}
+		}
+
 		return (client.channels.get('543167247330312232')).send(`
 	\`\`\`js
 	Error: ${require('util').inspect(err).slice(0, 1800)}
+
+	${addInfo}
 		\`\`\`
 		`);
 	}

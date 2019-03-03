@@ -422,9 +422,18 @@ process.on('unhandledRejection', (err) => {
 	if(err.name == 'DiscordAPIError') {
 		let addInfo = 'None Found!';
 		if(err.path !== undefined) {
-			const channel = client.channels.get(err.path.split('/')[4]);
-			if(channel) {
-				addInfo = `Additional Debug Info:\n\tChannel: ${channel.name ? channel.name : 'Unknown'}\n\tGuild: ${channel.guild ? channel.guild.name : 'Unknown'}`;
+			const split = err.path.split('/');
+			if(split[3] == 'channels') {
+				const channel = client.channels.get(split[4]);
+				if(channel) {
+					addInfo = `Additional Debug Info:\n\tChannel: ${channel.name ? channel.name : 'Unknown'}\n\tGuild: ${channel.guild ? channel.guild.name : 'Unknown'}`;
+				}
+			}
+			if(split[3] == 'guilds') {
+				const guild = client.guilds.get(split[4]);
+				if(guild) {
+					addInfo = `Additional Debug Info:\n\tGuild: ${guild.name ? guild.name : 'Unknown'}`;
+				}
 			}
 		}
 

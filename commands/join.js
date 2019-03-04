@@ -23,7 +23,7 @@ module.exports = {
 		if(!args[0]) {
 			return message.channel.send('please specify a server name');
 		}
-		if(message.client.banlist.findIndex(x=>x === message.author.id) != -1) {
+		if(message.client.banlist.has(message.author.id)) {
 			return message.channel.send('not allowed');
 		}
 		const ed = new Discord.RichEmbed()

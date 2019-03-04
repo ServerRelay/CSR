@@ -6,7 +6,8 @@ const pg = require('pg');
 require('./env').load('.env');
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-client.banlist = [];
+
+client.banlist = new Discord.Collection();
 client.lockdown = false;
 const { prefix } = require('./config.json');
 client.cooldowns = new Discord.Collection();
@@ -26,10 +27,9 @@ client.on('ready', async ()=>{
 	await db.query('CREATE TABLE IF NOT EXISTS banned(id text UNIQUE)');
 	let rows = await db.query('SELECT * FROM banned');
 	rows = rows.rows;
-	client.banlist.splice(0);
 	if(typeof (rows) != 'undefined' && rows.length > 0) {
 		for(const i in rows) {
-			client.banlist.push(rows[i]['id']);
+			client.banlist.set(rows[i]['id'], true);
 		}
 	}
 
@@ -300,7 +300,7 @@ function boadcastToAllCSRChannels(message) {
 		return;
 	}
 
-	if(client.banlist.findIndex(x=>x === message.author.id) != -1) {
+	if(client.banlist.has(message.author.id)) {
 		return;
 
 	}

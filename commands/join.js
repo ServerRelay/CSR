@@ -23,6 +23,9 @@ module.exports = {
 		if(!args[0]) {
 			return message.channel.send('please specify a server name');
 		}
+		if(message.client.banlist.findIndex(x=>x === message.author.id) != -1) {
+			return message.channel.send('not allowed');
+		}
 		const ed = new Discord.RichEmbed()
 			.setColor(rgbToHex(138, 0, 138));
 		const sv = message.client.guilds.find(x=>x.name.toLowerCase().indexOf(args.join(' ').toLowerCase()) != -1);

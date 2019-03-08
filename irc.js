@@ -11,7 +11,7 @@ client.banlist = new Discord.Collection();
 client.lockdown = false;
 const { prefix } = require('./config.json');
 client.cooldowns = new Discord.Collection();
-
+client.csrchannels = new Discord.Collection();
 const novites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async ()=>{
@@ -102,14 +102,10 @@ client.on('guildCreate', (guild)=>{
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has joined the chat ${findemoji('join')}`);
 
-	client.guilds.forEach(async (gld) => {
-		if(!gld.CSRChannel) {return;}
-		if(!gld.me.permissions.has('EXTERNAL_EMOJIS') || !gld.me.permissions.has('USE_EXTERNAL_EMOJIS')) {
-			ed.setDescription('has left the chat');
-		}
-		gld.CSRChannel.send(ed)
+	client.csrchannels.forEach(async (ch) => {
+		ch.send(ed)
 			.catch(e=>{
-				console.log('on join error ' + e.message + gld.name);
+				console.log('on join error ' + e.message + ch.guild.name);
 			});
 	});
 });
@@ -121,16 +117,10 @@ client.on('guildDelete', (guild)=>{
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has left the chat ${findemoji('leave')}`);
 
-	client.guilds.forEach(async (gld) => {
-		if(!gld.CSRChannel) {
-			return;
-		}
-		if(!gld.me.permissions.has('EXTERNAL_EMOJIS') || !gld.me.permissions.has('USE_EXTERNAL_EMOJIS')) {
-			ed.setDescription('has left the chat');
-		}
-		gld.CSRChannel.send(ed)
+	client.csrchannels.forEach(async (ch) => {
+		ch.send(ed)
 			.catch(e=>{
-				console.log('on leave error ' + e.message + gld.name);
+				console.log('on leave error ' + e.message + ch.guild.name);
 			});
 	});
 
@@ -147,7 +137,7 @@ client.on('message', (message)=>{
 	const { staff } = require('./commands/stafflist.json');
 	if(client.lockdown && !staff.includes(message.author.id)) { return;}
 
-	if(message.guild.CSRChannel && message.channel.id === message.guild.CSRChannel.id) {
+	if(client.csrchannels.has(message.channel.id)) {
 		if(!client.cooldowns.has(message.author.id)) {
 			boadcastToAllCSRChannels(message);
 			client.cooldowns.set(message.author.id);
@@ -210,18 +200,16 @@ client.on('message', (message)=>{
 
 });
 
-
+let limitcount = 0;
 client.on('rateLimit', (ratelimit)=>{
-	let x = 0;
 	if(ratelimit) {
-		x += 1;
-		if(x >= 3) {
+		limitcount += 1;
+		if(limitcount >= 3) {
 			client.destroy()
 				.then(()=>{
 					client.login(process.env.TOKEN);
-
 				});
-			x = 0;
+			limitcount = 0;
 		}
 	}
 });
@@ -230,13 +218,14 @@ client.on('error', (error)=>{
 });
 
 function cacheCSRChannels() {
+	client.csrchannels.clear();
 	client.guilds.forEach(async (guild)=>{
 		if(!guild.available) {
 			return;
 		}
 		const ch = guild.channels.find(x=>x.name === 'irc');
 		if(ch) {
-			guild.CSRChannel = ch;
+			client.csrchannels.set(ch.id, ch);
 		}
 	});
 }
@@ -345,17 +334,13 @@ function boadcastToAllCSRChannels(message) {
 		externalembed.thumbnail.url ? ed.setThumbnail(externalembed.thumbnail.url) : '';
 
 	}
-	client.guilds.forEach(async (guild) => {
-		if(!guild.CSRChannel) {
-			return;
-		}
+	client.csrchannels.forEach(async (ch) => {
 		try{
-			await guild.CSRChannel.send(ed);
+			await ch.send(ed);
 		}
 		catch(e) {
 			console.log(e.name + '[]' + e.message);
 			if(e.message == 'Unknown Channel') {
-				guild.CSRChannel = undefined;
 				cacheCSRChannels();
 			}
 		}

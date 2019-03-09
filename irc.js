@@ -437,20 +437,20 @@ function getDebugInfo(arr) {
 	if(arr[3] == 'channels') {
 		const channel = client.channels.get(arr[4]);
 		if(channel) {
-			data.channel = channel ? channel : 'Unknown';
+			data.channel = channel;
 			data.guild = channel.guild;
 		}
 	}
 	if(arr[3] == 'guilds') {
 		const guild = client.guilds.get(arr[4]);
 		if(guild) {
-			data.guild = guild ? guild : 'Unknown';
+			data.guild = guild;
 		}
 	}
-	if(!arr[5])return;
+	if(!arr[5])return data;
 
 	if(arr[5] == 'permissions') {
-		const role = client.data.channel.guild.roles.get(arr[6]);
+		const role = data.channel.guild.roles.get(arr[6]);
 		if(role) {
 			data.role = role;
 		}

@@ -23,17 +23,14 @@ module.exports = {
 		ed.setDescription(code);
 		ed.setFooter('IRC Code Of Conduct', message.client.user.avatarURL);
 
-		message.client.guilds.forEach(async (guild) => {
-			if(!guild.CSRChannel) {
-				return;
-			}
+		message.client.csrchannels.forEach(async (ch) => {
 			try{
-				await guild.CSRChannel.send(ed);
+				await ch.send(ed);
 			}
 			catch(e) {
 				console.log(e.name + '[]' + e.message);
 				if(e.message == 'Unknown Channel') {
-					guild.CSRChannel = undefined;
+					message.client.csrchannels.delete(ch.id);
 				}
 			}
 		});

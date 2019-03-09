@@ -409,7 +409,7 @@ process.on('unhandledRejection', (err) => {
 		let addInfo = 'None Found!';
 		if(err.path !== undefined) {
 			const split = err.path.split('/');
-			let info=getDebugInfo(split)
+			const info = getDebugInfo(split);
 			addInfo = `Additional Debug Info:\n\tChannel: ${info.channel.name ? info.channel.name : 'Unknown'}\n\tGuild: ${info.channel.guild ? info.channel.guild.name : 'Unknown'}\n\tmessage content:${info.message.cleanContent}`;
 		}
 

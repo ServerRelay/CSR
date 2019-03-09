@@ -133,7 +133,7 @@ client.on('message', (message)=>{
 	if(message.system) { return;}
 	if(message.author.bot) {return;}
 	if(novites.test(message.content)) {return;}
-	if(message.content.includes('﷽') || message.author.tag.includes('﷽')) return;
+	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;
 	const { staff } = require('./commands/stafflist.json');
 	if(client.lockdown && !staff.includes(message.author.id)) { return;}
 

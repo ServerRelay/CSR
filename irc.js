@@ -298,43 +298,10 @@ function boadcastToAllCSRChannels(message) {
 		message.delete(500);
 	}
 
-	const ed = new Discord.RichEmbed()
-		.setColor()
-		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)
-		.setDescription(message.cleanContent)
-		.setTimestamp(new Date())
-		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));
-	const { staff } = require('./commands/stafflist.json');
-	if(staff.includes(message.author.id)) {
-		ed.setColor(rgbToHex(0, 0, 128));
-	}
-	else if(message.author.id === message.guild.owner.id) {
-		ed.setColor(rgbToHex(205, 205, 0));
-	}
-	else{
-		ed.setColor(rgbToHex(133, 133, 133));
-	}
-
-	if(message.attachments.array()[0]) {
-		const img = message.attachments.array()[0];
-		if(img.filename.endsWith('.jpg') || img.filename.endsWith('.png') || img.filename.endsWith('.gif') || img.filename.endsWith('.jpeg') || img.filename.endsWith('.PNG')) {
-			// console.log(img)
-			ed.setImage(img.url);
-		}
-		else{
-			ed.addField('Attachment', img.url, false);
-		}
-
-	}
-	const externalembed = message.embeds[0];
-	if(externalembed) {
-		externalembed.title ? externalembed.description ? ed.addField(`${externalembed.title}`, externalembed.description) : '' : '';
-		externalembed.thumbnail.url ? ed.setThumbnail(externalembed.thumbnail.url) : '';
-
-	}
+	const embed = generateEmbed(message);
 	client.csrchannels.forEach(async (ch) => {
 		try{
-			await ch.send(ed);
+			await ch.send(embed);
 		}
 		catch(e) {
 			console.log(e.name + '[]' + e.message);
@@ -461,6 +428,43 @@ function getDebugInfo(arr) {
 		}
 	}
 	return data;
+}
+
+function generateEmbed(message) {
+	const relayEmbed = new Discord.RichEmbed()
+		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)
+		.setDescription(message.cleanContent)
+		.setTimestamp(new Date())
+		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));
+	const { staff } = require('./commands/stafflist.json');
+	if(staff.includes(message.author.id)) {
+		relayEmbed.setColor(rgbToHex(0, 0, 128));
+	}
+	else if(message.author.id === message.guild.owner.id) {
+		relayEmbed.setColor(rgbToHex(205, 205, 0));
+	}
+	else{
+		relayEmbed.setColor(rgbToHex(133, 133, 133));
+	}
+
+	// find and add image
+	if(message.attachments.array()[0]) {
+		const img = message.attachments.array()[0];
+		if(img.filename.endsWith('.jpg') || img.filename.endsWith('.png') || img.filename.endsWith('.gif') || img.filename.endsWith('.jpeg') || img.filename.endsWith('.PNG')) {
+			relayEmbed.setImage(img.url);
+		}
+		else{
+			relayEmbed.addField('Attachment', img.url, false);
+		}
+
+	}
+	// fetch external embeds and place them there
+	const externalembed = message.embeds[0];
+	if(externalembed) {
+		externalembed.title ? externalembed.description ? relayEmbed.addField(`${externalembed.title}`, externalembed.description) : '' : '';
+		externalembed.thumbnail.url ? relayEmbed.setThumbnail(externalembed.thumbnail.url) : '';
+	}
+	return relayEmbed;
 }
 // /////////////////////////////////////////////////////////////////////////////////
 client.login(process.env.token);

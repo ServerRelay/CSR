@@ -294,11 +294,9 @@ function boadcastToAllCSRChannels(message) {
 
 	}
 
-	setTimeout(() => {
-		if(!message.deleted) {
-			message.delete();
-		}
-	}, 180000);
+	if(!message.attachments.size) {
+		message.delete(500);
+	}
 
 	const ed = new Discord.RichEmbed()
 		.setColor()

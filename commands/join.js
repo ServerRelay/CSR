@@ -29,7 +29,7 @@ module.exports = {
 		if(!sv) return message.author.send('could not find the desired server, either try a more/less precise search or it maybe just doesnt exist');
 
 		const ch = sv.channels.find(x=>x.name === 'irc');
-		if (ch) return message.channel.send('Server has no #irc channel!');
+		if (!ch) return message.channel.send('Server has no #irc channel!');
 		message.author.send(`awaiting aproval from ${sv.name}...`);
 		const rq = await sv.createChannel('irc request', 'text', [{
 			id: sv.id,

@@ -34,7 +34,7 @@ module.exports = {
 		const rq = await sv.createChannel('irc request', 'text', [{
 			id: sv.id,
 			deny: ['MANAGE_MESSAGES'],
-			allow: ['SEND_MESSAGES'],
+			allow: [],
 		},
 		{
 			id: message.client.user.id,

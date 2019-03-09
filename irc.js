@@ -442,5 +442,37 @@ Error: ${err.name}
     `);
 });
 
+function getDebugInfo(arr) {
+	const data = {};
+	if(arr[3] == 'channels') {
+		const channel = client.channels.get(arr[4]);
+		if(channel) {
+			data.channel = channel ? channel : 'Unknown';
+			data.guild = channel.guild;
+		}
+	}
+	if(arr[3] == 'guilds') {
+		const guild = client.guilds.get(arr[4]);
+		if(guild) {
+			data.guild = guild ? guild : 'Unknown';
+		}
+	}
+	if(!arr[5])return;
+	switch(arr[5]) {
+	case 'permissions':
+		const role = client.data.channel.guild.roles.get(arr[6]);
+		if(role) {
+			data.role = role;
+		}
+		break;
+	case 'messages':
+		const msg = client.channels.get(arr[4]).messages.get(arr[6]);
+		if(msg) {
+			data.message = msg;
+		}
+		break;
+	}
+	return data;
+}
 // /////////////////////////////////////////////////////////////////////////////////
 client.login(process.env.token);

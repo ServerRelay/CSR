@@ -409,18 +409,8 @@ process.on('unhandledRejection', (err) => {
 		let addInfo = 'None Found!';
 		if(err.path !== undefined) {
 			const split = err.path.split('/');
-			if(split[3] == 'channels') {
-				const channel = client.channels.get(split[4]);
-				if(channel) {
-					addInfo = `Additional Debug Info:\n\tChannel: ${channel.name ? channel.name : 'Unknown'}\n\tGuild: ${channel.guild ? channel.guild.name : 'Unknown'}`;
-				}
-			}
-			if(split[3] == 'guilds') {
-				const guild = client.guilds.get(split[4]);
-				if(guild) {
-					addInfo = `Additional Debug Info:\n\tGuild: ${guild.name ? guild.name : 'Unknown'}`;
-				}
-			}
+			let info=getDebugInfo(split)
+			addInfo = `Additional Debug Info:\n\tChannel: ${info.channel.name ? info.channel.name : 'Unknown'}\n\tGuild: ${info.channel.guild ? info.channel.guild.name : 'Unknown'}\n\tmessage content:${info.message.cleanContent}`;
 		}
 
 		return (client.channels.get('543167247330312232')).send(`
@@ -458,19 +448,19 @@ function getDebugInfo(arr) {
 		}
 	}
 	if(!arr[5])return;
-	switch(arr[5]) {
-	case 'permissions':
+
+	if(arr[5] == 'permissions') {
 		const role = client.data.channel.guild.roles.get(arr[6]);
 		if(role) {
 			data.role = role;
 		}
-		break;
-	case 'messages':
+
+	}
+	if(arr[5] == 'messages') {
 		const msg = client.channels.get(arr[4]).messages.get(arr[6]);
 		if(msg) {
 			data.message = msg;
 		}
-		break;
 	}
 	return data;
 }

@@ -23,7 +23,7 @@ module.exports = {
 		const time = args.shift();
 		if(!banee) {
 			message.channel.send('who do you expect me to ban?');
-			return db.close();
+			return db.end();
 		}
 		if(!time) {
 			message.channel.send('BOI If you dont choose the time');

@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/coolxpress/CSR#readme",
   "dependencies": {
+    "bufferutil": "^4.0.1",
     "discord.js": "^11.4.2",
+    "erlpack": "github:hammerandchisel/erlpack",
     "ms": "^2.1.1",
     "pg": "^7.8.0"
   }

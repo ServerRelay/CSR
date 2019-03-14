@@ -387,6 +387,7 @@ client.on('error', (err)=>{
 
 	return (client.channels.get('543167247330312232')).send(`
 \`\`\`xs
+Client Error:
 Error: ${err.name}
     ${err.message}
     ${err.stack}
@@ -459,6 +460,12 @@ function getDebugInfo(arr) {
 	return data;
 }
 
+/**
+ *
+ *
+ * @param {Discord.Message} message
+ * @returns {Discord.RichEmbed}
+ */
 function generateEmbed(message) {
 	const relayEmbed = new Discord.RichEmbed()
 		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)

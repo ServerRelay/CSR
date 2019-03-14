@@ -199,7 +199,7 @@ client.on('message', (message)=>{
 	}
 
 });
-
+// /RATE LIMIT EVENT////////
 let limitcount = 0;
 client.on('rateLimit', (ratelimit)=>{
 	if(ratelimit) {
@@ -207,12 +207,13 @@ client.on('rateLimit', (ratelimit)=>{
 		if(limitcount >= 3) {
 			client.destroy()
 				.then(()=>{
-					client.login(process.env.TOKEN);
+					client.login(process.env.token);
 				});
 			limitcount = 0;
 		}
 	}
 });
+// //////////////////
 function cacheCSRChannels() {
 	client.csrchannels.clear();
 	client.guilds.forEach(async (guild)=>{

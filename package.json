@@ -25,6 +25,6 @@
     "dmap-postgres": "git+https://github.com/DeltaRade/dmap.git#postgresql",
     "erlpack": "github:hammerandchisel/erlpack",
     "ms": "^2.1.1",
-    "pg": "^7.8.0"
+    "pg": "^7.9.0"
   }
 }

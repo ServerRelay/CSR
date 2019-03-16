@@ -18,7 +18,7 @@ module.exports = {
 			message.channel.send('no permission');
 			return;
 		}
-		const banee = message.mentions.members.first() || message.client.users.get(args[0]);
+		const banee = message.mentions.users.first() || message.client.users.get(args[0]) || message.client.users.find(x=>x.tag == args.join(' ')) || message.client.users.find(x=>x.username == args.join(' '));
 		args.shift();
 		const time = args.shift();
 		if(!banee) {

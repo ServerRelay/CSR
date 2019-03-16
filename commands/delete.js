@@ -20,7 +20,8 @@ module.exports = {
 			return;
 		}
 
-		message.client.csrchannels.forEach(async (ch, i) => {
+		let i = 0;
+		message.client.csrchannels.forEach(async (ch) => {
 			setTimeout(async function deleteMSG() {
 				try{
 					if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES')) {ch.bulkDelete(args[0], true);}
@@ -31,7 +32,7 @@ module.exports = {
 				}
 
 			}, i * 5000);
-
+			i++;
 		});
 	},
 

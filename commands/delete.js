@@ -22,7 +22,7 @@ module.exports = {
 
 		message.client.csrchannels.forEach(async (ch) => {
 			let i = 0;
-			setTimeout(deleteMSG(ch), i * 5000);
+			setTimeout(deleteMSG(ch, args[0]), i * 5000);
 			i++;
 
 		});
@@ -30,9 +30,9 @@ module.exports = {
 
 };
 
-async function deleteMSG(ch) {
+async function deleteMSG(ch, num) {
 	try{
-		if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES')) {ch.bulkDelete(args[0]);}
+		if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES')) {ch.bulkDelete(num, true);}
 		else {ch.send('COULD NOT DELETE LAST MESSAGES BECAUSE I DO NOT HAVE PERMS!');}
 	}
 	catch(e) {

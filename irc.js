@@ -202,6 +202,7 @@ client.on('message', (message)=>{
 // /RATE LIMIT EVENT////////
 let limitcount = 0;
 client.on('rateLimit', (ratelimit)=>{
+    console.log(ratelimit);
 	if(ratelimit) {
 		limitcount += 1;
 		if(limitcount >= 3) {

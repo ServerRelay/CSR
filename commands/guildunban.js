@@ -1,4 +1,4 @@
-const pg = require('pg');
+const dmap = require('dmap-postgres');
 const csr = require('./banfuncs.js');
 const { staff } = require('./stafflist.json');
 
@@ -6,11 +6,11 @@ module.exports = {
 	name: 'guildunban',
 	staff:'unban a whole guild by id or name',
 	async execute(message, args) {
-		const db = new pg.Client({
+		const db = new dmap('data', {
 			connectionString:process.env.DATABASE_URL,
 			ssl:true,
 		});
-		await db.connect();
+		await db.prepared;
 		if(!args[0]) {
 			return message.channel.send('please specify a server, we dont want accidental unbans');
 		}
@@ -23,7 +23,7 @@ module.exports = {
 			let o = 0;
 			for(const i of guild.members.array()) {
 				o += 1;
-				await csr.CSRUnban(message.client, db, i);
+				await csr.CSRUnban(message.client, i, db);
 			}
 			message.channel.send(`${guild.name}:unbanned ${o} members`);
 		}

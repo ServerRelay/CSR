@@ -1,11 +1,13 @@
-module.exports.CSRBan = async function(client, db, usr) {
-	// await db.query(`INSERT INTO banned (id) VALUES (${usr.id}) ON CONFLICT(id) DO UPDATE SET id=EXCLUDED.id;`)
-	await db.query(`INSERT INTO banned(id) VALUES(${usr.id}) ON CONFLICT (id) DO NOTHING`);
+module.exports.CSRBan = async function(client, usr, db) {
 	client.banlist.set(usr.id, true);
+	const data = await db.secure('bans', {});
+	data[usr.id] = true;
+	await db.set('bans', data);
 };
 
-module.exports.CSRUnban = async function(client, db, usr) {
-	await db.query(`DELETE FROM banned WHERE id = '${usr.id}'`);
+module.exports.CSRUnban = async function(client, usr, db) {
 	client.banlist.delete(usr.id);
-
+	const data = await db.get('bans');
+	data[usr.id] ? delete data[usr.id] : '';
+	await db.set('bans', data);
 };

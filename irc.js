@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const code = require('./ircrules.js');
 const client = new Discord.Client();
 const fs = require('fs');
-const pg = require('pg');
+const dmap = require('dmap-postgres');
 require('./env').load('.env');
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -15,24 +15,17 @@ client.csrchannels = new Discord.Collection();
 const novites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async ()=>{
+	const db = new dmap('data', { connectionString:process.env.DATABASE_URL, ssl:true });
 	console.log('irc connected');
 	client.user.setActivity(`${prefix}help`);
 
-	const db = new pg.Client({
-		connectionString:process.env.DATABASE_URL,
-		ssl:true,
-	});
-	await db.connect();
-
-	await db.query('CREATE TABLE IF NOT EXISTS banned(id text UNIQUE)');
-	let rows = await db.query('SELECT * FROM banned');
-	rows = rows.rows;
-	if(typeof (rows) != 'undefined' && rows.length > 0) {
+	await db.prepared;
+	const rows = await db.get('bans');
+	if(rows) {
 		for(const i in rows) {
-			client.banlist.set(rows[i]['id'], true);
+			client.banlist.set(i, rows[i]);
 		}
 	}
-
 
 	await db.end();
 

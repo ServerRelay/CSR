@@ -38,7 +38,7 @@ module.exports = {
 						const messages = await message.channel.fetchMessages({ limit: args[0] }).then(msg => msg.filter(m => m.author.id == message.client.user.id && m.content != warner));
 						await ch.bulkDelete(messages, true);
 					}
-					else {ch.send('COULD NOT DELETE LAST MESSAGES BECAUSE I DO NOT HAVE PERMS!');}
+					else if(ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
 						ch.send('COULD NOT DELETE LAST MESSAGES BECAUSE I DO NOT HAVE PERMS!');
 					}
 				}

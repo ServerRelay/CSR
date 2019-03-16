@@ -3,8 +3,8 @@ const csr = require('./banfuncs.js');
 const { staff } = require('./stafflist.json');
 
 module.exports = {
-	name: 'guildban',
-	staff:'ban a whole guild by id or name',
+	name: 'guildunban',
+	staff:'unban a whole guild by id or name',
 	async execute(message, args) {
 		const db = new pg.Client({
 			connectionString:process.env.DATABASE_URL,

@@ -292,7 +292,7 @@ function boadcastToAllCSRChannels(message) {
 	}
 
 	if(!message.attachments.size) {
-		message.delete(500);
+		message.delete(2000);
 	}
 
 	const embed = generateEmbed(message);

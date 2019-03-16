@@ -36,6 +36,7 @@ module.exports = {
 				try{
 					if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES') && ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
 						const messages = await message.channel.fetchMessages({ limit: args[0] }).then(msg => msg.filter(m => m.author.id == message.client.user.id && m.content != warner));
+						if(!messages.size) return console.log('Skipping');
 						await ch.bulkDelete(messages, true);
 					}
 					else if(ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {

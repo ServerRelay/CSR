@@ -1,6 +1,7 @@
 const { staff } = require('./stafflist.json');
 // eslint-disable-next-line no-unused-vars
 const { Message } = require('discord.js');
+const ms = require('ms');
 
 const warner = 'Deleting Last Messages, this might take a while!';
 module.exports = {
@@ -25,7 +26,7 @@ module.exports = {
 		if(!['193406800614129664', '298258003470319616'].includes(message.author.id)) return message.reply('No Permission!');
 
 		message.client.lockdown = true;
-		message.channel.send('Enabled Lockdown, procceding to delete Messages!');
+		message.channel.send(`Enabled Lockdown, procceding to delete Messages, this may take up to ${ms(args[1] * message.client.guilds.size, { long: true })}!`);
 		let i = 0;
 		message.client.csrchannels.forEach((ch) => {
 			ch.send(warner);
@@ -38,6 +39,8 @@ module.exports = {
 						await ch.bulkDelete(messages, true);
 					}
 					else {ch.send('COULD NOT DELETE LAST MESSAGES BECAUSE I DO NOT HAVE PERMS!');}
+						ch.send('COULD NOT DELETE LAST MESSAGES BECAUSE I DO NOT HAVE PERMS!');
+					}
 				}
 				catch(e) {
 					console.log(e.name + '[]' + e.message);

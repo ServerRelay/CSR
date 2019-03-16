@@ -326,7 +326,7 @@ function sendPrivate(message) {
 
 	const ed = new Discord.RichEmbed()
 		.setColor()
-		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `discord:///users/298258003470319616/${message.author.id}`)
+		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)
 		.setDescription(message.cleanContent)
 		.setTimestamp(new Date())
 		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));

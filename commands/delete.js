@@ -21,14 +21,22 @@ module.exports = {
 		}
 
 		message.client.csrchannels.forEach(async (ch) => {
-			try{
-				if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES')) {ch.bulkDelete(args[0]);}
-				else {ch.send('COULD NOT DELETE LAST MESSAGES BECAUSE I DO NOT HAVE PERMS!');}
-			}
-			catch(e) {
-				console.log(e.name + '[]' + e.message);
-			}
+			let i = 0;
+			setTimeout(deleteMSG(ch), i * 5000);
+			i++;
+
 		});
 	},
 
 };
+
+async function deleteMSG(ch) {
+	try{
+		if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES')) {ch.bulkDelete(args[0]);}
+		else {ch.send('COULD NOT DELETE LAST MESSAGES BECAUSE I DO NOT HAVE PERMS!');}
+	}
+	catch(e) {
+		console.log(e.name + '[]' + e.message);
+	}
+
+}

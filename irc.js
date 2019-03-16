@@ -353,6 +353,15 @@ function sendPrivate(message) {
 	}
 	const channels = findAllMatchingPrivate(message.guild);
 	for(const i of channels) {
+		if(!i.nsfw && i.topic.includes('nsfw')) {
+			return i.send('Received new Message\nBut this Channel is not NSFW').catch(e=>{
+				console.log(e);
+				if(e.message == 'Unknown Channel') {
+					cachePrivateChannels();
+				}
+			});
+		}
+
 		i.send(ed)
 			.catch(e=>{
 				console.log(e);

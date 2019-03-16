@@ -43,7 +43,7 @@ module.exports = {
 					}
 				}
 				catch(e) {
-					console.log(e.name + '[]' + e.message);
+					console.log(e);
 				}
 
 			}, i * args[1]);

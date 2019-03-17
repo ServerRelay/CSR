@@ -26,8 +26,10 @@ module.exports = {
 				await csr.CSRUnban(message.client, i, db);
 			}
 			message.channel.send(`${guild.name}:unbanned ${o} members`);
+			await db.end()
 		}
 		else{
+			await db.end()
 			return message.channel.send('not found');
 		}
 	},

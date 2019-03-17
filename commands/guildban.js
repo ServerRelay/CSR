@@ -26,9 +26,11 @@ module.exports = {
 				await csr.CSRBan(message.client, i, db);
 			}
 			message.channel.send(`${guild.name}:banned ${o} members`);
+			await db.end()
 		}
 		else{
 			return message.channel.send('not found');
+			await db.end()
 		}
 	},
 

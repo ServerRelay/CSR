@@ -19,8 +19,8 @@ module.exports = {
 			if(cmd.alias) {
 				i = i + ' | ' + cmd.alias.join(' ');
 			}
-			if(cmd.staff) {
-				hlp[`${cmd.name}${i}`] = cmd.staff;
+			if(cmd.description) {
+				hlp[`${cmd.name}${i}`] = cmd.description;
 			}
 		});
 		const ed = new Discord.RichEmbed()

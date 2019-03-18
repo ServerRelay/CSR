@@ -13,19 +13,16 @@ const hlp = {};
 module.exports = {
 	name: 'help',
 	execute(message) {
-		const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-		for (const file of commandFiles) {
 
-			const command = require(`./${file}`);
+		message.client.commands.forEach(cmd=> {
 			let i = '';
-			if(command.alias) {
-				i = i + ' | ' + command.alias.join(' ');
+			if(cmd.alias) {
+				i = i + ' | ' + cmd.alias.join(' ');
 			}
-			if(command.description) {
-				hlp[`${command.name}${i}`] = command.description;
+			if(cmd.staff) {
+				hlp[`${cmd.name}${i}`] = cmd.staff;
 			}
-			// message.client.commands.delete(command.name)
-		}
+		});
 		const ed = new Discord.RichEmbed()
 			.setColor(rgbToHex(0, 138, 138));
 		for(const i in hlp) {

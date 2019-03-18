@@ -17,16 +17,13 @@ module.exports = {
 			return;
 		}
 		const banee = message.mentions.users.first() || message.client.users.get(args[0]) || message.client.users.find(x=>x.tag == args.join(' ')) || message.client.users.find(x=>x.username == args.join(' '));
-		// let banee=message.guild.members.find(x=>x.user.username.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
-		if(banee) {
-			await csr.CSRBan(message.client, banee, db);
-			message.channel.send(`${message.client.users.get(banee.id).username} has been banned`);
-			await db.end();
-		}
-		else{
+		if(!banee) {
 			message.channel.send('not found');
 			await db.end();
 		}
+		await csr.CSRBan(message.client, banee, db);
+		message.channel.send(`${message.client.users.get(banee.id).username} has been banned`);
+		await db.end();
 
 	},
 

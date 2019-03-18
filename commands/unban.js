@@ -14,13 +14,11 @@ module.exports = {
 			message.channel.send('no permission');
 			return;
 		}
-		// let banee=message.guild.members.find(x=>x.user.username.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
 		const banee = message.mentions.users.first() || message.client.users.get(args[0]) || message.client.users.find(x=>x.tag == args.join(' ')) || message.client.users.find(x=>x.username == args.join(' '));
-		if(banee) {
-			await csr.CSRUnban(message.client, banee,db);
-			message.channel.send('removed from DB');
-			await db.end();
-		}
+		if(!banee) {return await db.end();}
+		await csr.CSRUnban(message.client, banee, db);
+		message.channel.send('removed from DB');
+		await db.end();
 
 
 	},

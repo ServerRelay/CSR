@@ -19,19 +19,17 @@ module.exports = {
 			return;
 		}
 		const guild = message.client.guilds.get(args[0]) || message.client.guilds.find(x=>x.name.toLowerCase().indexOf(args.join(' ').toLowerCase()) != -1);
-		if(guild) {
-			let o = 0;
-			for(const i of guild.members.array()) {
-				o += 1;
-				await csr.CSRUnban(message.client, i, db);
-			}
-			message.channel.send(`${guild.name}:unbanned ${o} members`);
-			await db.end()
-		}
-		else{
-			await db.end()
+		if(!guild) {
+			await db.end();
 			return message.channel.send('not found');
 		}
+		let o = 0;
+		for(const i of guild.members.array()) {
+			o += 1;
+			await csr.CSRUnban(message.client, i, db);
+		}
+		message.channel.send(`${guild.name}:unbanned ${o} members`);
+		await db.end();
 	},
 
 };

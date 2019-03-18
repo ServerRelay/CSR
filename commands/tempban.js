@@ -23,22 +23,22 @@ module.exports = {
 		const time = args.shift();
 		if(!banee) {
 			message.channel.send('who do you expect me to ban?');
-			return db.end();
+			return await db.end();
 		}
 		if(!time) {
 			message.channel.send('BOI If you dont choose the time');
-			return db.end();
+			return await db.end();
 		}
 		// let banee=message.guild.members.find(x=>x.user.username.toLowerCase().indexOf(args.join(' ').toLowerCase())!=-1)
-		if(banee) {
-			await Csr.CSRBan(message.client, banee, db);
-			message.channel.send(`Boi <@${banee.id}> you have been temp banned for ${ms(ms(time), { long:true })}`);
-			setTimeout(async () => {
-				await Csr.CSRUnban(message.client, banee, db);
-				message.channel.send(`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`);
-				await db.end();
-			}, ms(time));
-		}
+		if(!banee) {return await db.end();}
+		await Csr.CSRBan(message.client, banee, db);
+		message.channel.send(`Boi <@${banee.id}> you have been temp banned for ${ms(ms(time), { long:true })}`);
+		setTimeout(async () => {
+			await Csr.CSRUnban(message.client, banee, db);
+			message.channel.send(`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`);
+			await db.end();
+		}, ms(time));
+
 
 	},
 

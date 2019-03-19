@@ -1,5 +1,5 @@
 const discord = require('discord.js');
-const code = require('./commands/code');
+const code = require('./ircrules');
 
 /**
  *

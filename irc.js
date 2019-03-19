@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const code = require('./ircrules.js');
+const helper = require('./helper');
 const client = new Discord.Client();
 const fs = require('fs');
 const dmap = require('dmap-postgres');
@@ -18,7 +18,6 @@ client.on('ready', async ()=>{
 	const db = new dmap('data', { connectionString:process.env.DATABASE_URL, ssl:true });
 	console.log('irc connected');
 	client.user.setActivity(`${prefix}help`);
-
 	await db.prepared;
 	const rows = await db.get('bans');
 	if(rows) {
@@ -37,16 +36,6 @@ client.on('ready', async ()=>{
 });
 
 // //////////////////////////////////////////////////////////////////////////////////
-
-function rgbToHex(R, G, B) {return toHex(R) + toHex(G) + toHex(B);}
-
-function toHex(n) {
-	n = parseInt(n, 10);
-	if (isNaN(n)) return '00';
-	n = Math.max(0, Math.min(n, 255));
-	return '0123456789ABCDEF'.charAt((n - n % 16) / 16)
-        + '0123456789ABCDEF'.charAt(n % 16);
-}
 
 function findemoji(name) {
 	const em = client.guilds.get('497475921855381525').emojis.find(x=>x.name === name);
@@ -74,10 +63,7 @@ client.on('guildCreate', (guild)=>{
 		.catch(()=>{
 			console.log(`${guild.owner} doesnt have dms on`);
 		});
-	const cd = new Discord.RichEmbed()
-		.setColor(rgbToHex(0, 200, 138))
-		.setDescription(code)
-		.setFooter('IRC Code Of Conduct', client.user.avatarURL);
+	const cd = helper.insertRules(client);
 	guild.createChannel('irc', 'text')
 		.then((channel)=>{
 			channel.send('**make sure you read the rules before proceding**', cd);
@@ -91,7 +77,7 @@ client.on('guildCreate', (guild)=>{
 	console.log('joined server ' + guild.name);
 
 	const ed = new Discord.RichEmbed()
-		.setColor(rgbToHex(0, 255, 0))
+		.setColor([0, 255, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has joined the chat ${findemoji('join')}`);
 
@@ -106,7 +92,7 @@ client.on('guildCreate', (guild)=>{
 client.on('guildDelete', (guild)=>{
 	console.log('bot removed from server ' + guild.name);
 	const ed = new Discord.RichEmbed()
-		.setColor(rgbToHex(255, 0, 0))
+		.setColor([255, 0, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has left the chat ${findemoji('leave')}`);
 
@@ -325,13 +311,13 @@ function sendPrivate(message) {
 		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));
 	const { staff } = require('./commands/stafflist.json');
 	if(staff.includes(message.author.id)) {
-		ed.setColor(rgbToHex(0, 0, 128));
+		ed.setColor([0, 0, 128]);
 	}
 	else if(message.author.id === message.guild.owner.id) {
-		ed.setColor(rgbToHex(205, 205, 0));
+		ed.setColor([205, 205, 0]);
 	}
 	else{
-		ed.setColor(rgbToHex(133, 133, 133));
+		ed.setColor([133, 133, 133]);
 	}
 
 
@@ -477,13 +463,13 @@ function generateEmbed(message) {
 		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));
 	const { staff } = require('./commands/stafflist.json');
 	if(staff.includes(message.author.id)) {
-		relayEmbed.setColor(rgbToHex(0, 0, 128));
+		relayEmbed.setColor([0, 0, 128]);
 	}
 	else if(message.author.id === message.guild.owner.id) {
-		relayEmbed.setColor(rgbToHex(205, 205, 0));
+		relayEmbed.setColor([205, 205, 0]);
 	}
 	else{
-		relayEmbed.setColor(rgbToHex(133, 133, 133));
+		relayEmbed.setColor([133, 133, 133]);
 	}
 
 	// find and add image

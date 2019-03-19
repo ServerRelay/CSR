@@ -3,7 +3,7 @@ module.exports = {
 	name:'eval',
 	alias:['e'],
 	async execute(message, args) {
-		if(message.author.id != message.client.ownerID) {return message.reply('not allowed to use this command');}
+		if(message.author.id != '298258003470319616') {return message.reply('not allowed to use this command');}
 		try {
 			let content = args.join(' ');
 			if (cblockre.test(content)) {

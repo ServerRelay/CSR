@@ -25,6 +25,9 @@ module.exports = {
 		}
 		let o = 0;
 		for(const i of guild.members.array()) {
+			if(i.bot) {
+				continue;
+			}
 			o += 1;
 			await csr.CSRBan(message.client, i, db);
 		}

@@ -274,7 +274,7 @@ function boadcastToAllCSRChannels(message) {
 	}
 
 	if(!message.attachments.size) {
-		message.delete(2000);
+		message.delete(800);
 	}
 
 	const embed = generateEmbed(message);

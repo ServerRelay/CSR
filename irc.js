@@ -178,17 +178,19 @@ client.on('message', (message)=>{
 	}
 
 });
-// /RATE LIMIT EVENT////////
+// /RATE LIMIT EVENT/////////////////////////////////////////////////////////////
 let limitcount = 0;
 client.on('rateLimit', (ratelimit)=>{
 	console.log(ratelimit);
 	if(ratelimit) {
 		limitcount += 1;
 		if(limitcount >= 3) {
-			client.destroy()
-				.then(()=>{
-					client.login(process.env.token);
-				});
+			client.lockdown = true;
+			client.user.setActivity(`${prefix}help | locking down due to ratelimits`);
+			setTimeout(() => {
+				client.lockdown = false;
+				client.user.setActivity(`${prefix}help`);
+			}, 4000);
 			limitcount = 0;
 		}
 	}

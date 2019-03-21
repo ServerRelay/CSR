@@ -443,9 +443,12 @@ function getDebugInfo(arr) {
 
 	}
 	if(arr[5] == 'messages') {
-		const msg = client.channels.get(arr[4]).messages.get(arr[6]);
-		if(msg) {
-			data.message = msg;
+		const channel = client.channels.get(arr[4]);
+		if(channel) {
+			const msg = channel.messages.get(arr[6]);
+			if(msg) {
+				data.message = msg;
+			}
 		}
 	}
 	return data;

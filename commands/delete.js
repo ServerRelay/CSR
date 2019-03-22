@@ -31,11 +31,11 @@ module.exports = {
 		message.client.csrchannels.forEach((ch) => {
 			ch.send(warner);
 		});
-		await message.client.csrchannels.forEach(async (ch) => {
-			await setTimeout(async function() {
+		message.client.csrchannels.forEach(async (ch) => {
+			setTimeout(async function() {
 				try{
 					if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES') && ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
-						const messages = await message.channel.fetchMessages({ limit: args[0] }).then(msg => msg.filter(m => m.author.id == message.client.user.id && m.content != warner));
+						const messages = await ch.fetchMessages({ limit: args[0] }).then(msg => msg.filter(m => m.author.id == message.client.user.id && m.content != warner));
 						if(!messages.size) return console.log('Skipping');
 						await ch.bulkDelete(messages, true);
 					}
@@ -50,7 +50,7 @@ module.exports = {
 			}, i * args[1]);
 			i++;
 		});
-		await console.log(i);
+		console.log(i);
 	},
 
 };

@@ -19,7 +19,7 @@ module.exports = {
 		const banee = message.mentions.users.first() || message.client.users.get(args[0]) || message.client.users.find(x=>x.tag == args.join(' ')) || message.client.users.find(x=>x.username == args.join(' '));
 		if(!banee) {
 			message.channel.send('not found');
-			await db.end();
+			return await db.end();
 		}
 		await csr.CSRBan(message.client, banee, db);
 		message.channel.send(`${message.client.users.get(banee.id).username} has been banned`);

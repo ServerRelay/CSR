@@ -56,11 +56,16 @@ module.exports = {
 		}
 		else {
 			let i = 0;
+			let error = false;
 			message.client.csrchannels.forEach(async (ch) => {
 				setTimeout(async function() {
 					try{
 						if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES') && ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
-							if(!ch.messages.last()) return console.log('Fast Delete could not be done!');
+							const message_delete = ch.messages.last();
+							if(!message_delete && error === false) {
+								error = true;
+								return message.channel.send('One or More FastDeletes Failed, if you want to be sure that everything is deleted use the SlowDelete!');
+							}
 							ch.messages.last().delete();
 						}
 						else if(ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {

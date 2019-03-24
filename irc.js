@@ -462,7 +462,7 @@ function getDebugInfo(arr) {
  */
 function generateEmbed(message) {
 	const relayEmbed = new Discord.RichEmbed()
-		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)
+		.setAuthor(`${message.author.username}`, message.author.displayAvatarURL, `https://discordapp.com/users/${message.author.id}`)
 		.setDescription(message.cleanContent)
 		.setTimestamp(new Date())
 		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));

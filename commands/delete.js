@@ -66,7 +66,7 @@ module.exports = {
 								error = true;
 								return message.channel.send('One or More FastDeletes Failed, if you want to be sure that everything is deleted use the SlowDelete!');
 							}
-							ch.messages.last().delete();
+							if(message_delete) message_delete.delete();
 						}
 						else if(ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
 							ch.send('COULD NOT DELETE LAST MESSAGES BECAUSE I DO NOT HAVE PERMS!');

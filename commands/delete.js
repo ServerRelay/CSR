@@ -16,7 +16,7 @@ module.exports = {
      */
 	async execute(message, args) {
 		if(!args[0] || isNaN(args[0]) || args[0] > 50 || args[0] < 0) args[0] = 1;
-		if(!args[1] || isNaN(args[1]) || args[1] < 5000) args[1] = 5000;
+		if(!args[1] || isNaN(args[1])) args[1] = 5000;
 
 
 		/* 	if(staff.findIndex(x=>x === message.author.id) == -1) {

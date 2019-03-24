@@ -1,12 +1,11 @@
 const Discord = require('discord.js');
-const { staff } = require('./stafflist.json');
 
 module.exports = {
 	name: 'sinfo',
 	alias:['serverinfo'],
 	staff:'gets info on a server,How to use: --sinfo (server name)',
 	execute(message, args) {
-		if(staff.findIndex(x=>x === message.author.id) !== -1) {
+		if(message.client.staff.has(message.author.id)) {
 			const d = new Discord.RichEmbed()
 				.setColor([0, 200, 200]);
 			const sv = message.client.guilds.find(x=>x.name.toLowerCase().indexOf(args.join(' ').toLowerCase()) != -1);

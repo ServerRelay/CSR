@@ -28,6 +28,7 @@ client.on('ready', async ()=>{
 
 	await db.end();
 
+	client.staff = helper.loadStaff();
 	cacheCSRChannels();
 	console.log('cached all csr channels');
 	cachePrivateChannels();
@@ -113,8 +114,7 @@ client.on('message', (message)=>{
 	if(message.author.bot) {return;}
 	if(novites.test(message.content)) {return;}
 	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;
-	const { staff } = require('./commands/stafflist.json');
-	if(client.lockdown && !staff.includes(message.author.id)) { return;}
+	if(client.lockdown && !client.staff.has(message.author.id)) { return;}
 
 	if(client.csrchannels.has(message.channel.id)) {
 		if(!client.cooldowns.has(message.author.id)) {
@@ -466,8 +466,7 @@ function generateEmbed(message) {
 		.setDescription(message.cleanContent)
 		.setTimestamp(new Date())
 		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));
-	const { staff } = require('./commands/stafflist.json');
-	if(staff.includes(message.author.id)) {
+	if(client.staff.has(message.author.id)) {
 		relayEmbed.setColor([0, 0, 128]);
 	}
 	else if(message.author.id === message.guild.owner.id) {

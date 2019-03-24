@@ -14,5 +14,13 @@ function insertRules(client) {
 	return cd;
 }
 
-
+function loadStaff() {
+	const { staff } = require('./commands/stafflist.json');
+	const arr = new Map();
+	for(const i in staff) {
+		arr.set(i, '');
+	}
+	return arr;
+}
 exports.insertRules = insertRules;
+exports.loadStaff = loadStaff;

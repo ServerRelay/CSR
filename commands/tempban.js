@@ -1,7 +1,6 @@
 const dmap = require('dmap-postgres');
 const ms = require('ms');
 const Csr = require('./banfuncs.js');
-const { staff } = require('./stafflist.json');
 // const {staff}=require('./stafflist.json')
 
 module.exports = {
@@ -14,7 +13,7 @@ module.exports = {
 			ssl:true,
 		});
 		await db.prepared;
-		if(staff.findIndex(x=>x === message.author.id) == -1) {
+		if(!message.client.staff.has(message.author.id)) {
 			message.channel.send('no permission');
 			return;
 		}

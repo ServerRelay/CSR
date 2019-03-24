@@ -1,6 +1,5 @@
 const dmap = require('dmap-postgres');
 const csr = require('./banfuncs.js');
-const { staff } = require('./stafflist.json');
 
 module.exports = {
 	name: 'guildunban',
@@ -14,7 +13,7 @@ module.exports = {
 		if(!args[0]) {
 			return message.channel.send('please specify a server, we dont want accidental unbans');
 		}
-		if(staff.findIndex(x=>x === message.author.id) == -1) {
+		if(!message.client.staff.has(message.author.id)) {
 			message.channel.send('no permission');
 			return;
 		}

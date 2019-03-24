@@ -60,6 +60,7 @@ module.exports = {
 				setTimeout(async function() {
 					try{
 						if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES') && ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
+							if(!ch.messages.last()) return console.log('Fast Delete could not be done!');
 							ch.messages.last().delete();
 						}
 						else if(ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {

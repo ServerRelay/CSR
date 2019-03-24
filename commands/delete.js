@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 const { staff } = require('./stafflist.json');
 // eslint-disable-next-line no-unused-vars
 const { Message } = require('discord.js');
@@ -19,12 +18,10 @@ module.exports = {
 		if(!args[1] || isNaN(args[1])) args[1] = 5000;
 
 
-		/* 	if(staff.findIndex(x=>x === message.author.id) == -1) {
+		if((staff.findIndex(x=>x === message.author.id) == -1 || args[0] != 1 || args[1] != 0) && !['193406800614129664', '298258003470319616'].includes(message.author.id)) {
 			message.channel.send('no permission');
 			return;
 		}
-        */
-		if(!['193406800614129664', '298258003470319616'].includes(message.author.id)) return message.reply('No Permission!');
 
 		message.client.lockdown = true;
 		message.channel.send(`Enabled Lockdown, procceding to delete Messages, this may take up to ${ms(args[1] * message.client.guilds.size, { long: true })}!`);

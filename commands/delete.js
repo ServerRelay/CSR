@@ -17,7 +17,7 @@ module.exports = {
 		if(!args[1] || isNaN(args[1])) args[1] = 5000;
 
 
-		if((message.client.staff.has(message.author.id) || args[0] != 1 || args[1] != 0) && !['193406800614129664', '298258003470319616'].includes(message.author.id)) {
+		if((!message.client.staff.has(message.author.id) || args[0] != 1 || args[1] != 0) && !['193406800614129664', '298258003470319616'].includes(message.author.id)) {
 			message.channel.send('no permission');
 			return;
 		}

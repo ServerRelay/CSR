@@ -24,24 +24,29 @@ module.exports = {
 
 		message.channel.send('Fast Delete engaged starting to delete!');
 		if(args[0] == 1) {
+			let i = 0;
 			let error = false;
 			message.client.csrchannels.forEach(async (ch) => {
-				try{
-					if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES') && ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
-						const message_delete = ch.messages.last();
-						if(!message_delete && error === false) {
-							error = true;
-							return message.channel.send('One or More FastDeletes Failed, if you want to be sure that everything is deleted use the SlowDelete!');
+				setTimeout(async function() {
+					try{
+						if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES') && ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
+							const message_delete = ch.messages.last();
+							if(!message_delete && error === false) {
+								error = true;
+								return message.channel.send('One or More FastDeletes Failed, if you want to be sure that everything is deleted use the SlowDelete!');
+							}
+							if(message_delete) message_delete.delete().catch(console.error);
 						}
-						if(message_delete) message_delete.delete().catch(console.error);
+						else if(ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
+							ch.send('COULD NOT DELETE LAST MESSAGES BECAUSE I DO NOT HAVE PERMS!');
+						}
 					}
-					else if(ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
-						ch.send('COULD NOT DELETE LAST MESSAGES BECAUSE I DO NOT HAVE PERMS!');
+					catch(e) {
+						console.log(e);
 					}
-				}
-				catch(e) {
-					console.log(e);
-				}
+
+				}, i * args[1]);
+				i++;
 			});
 		}
 		else if (args[0] <= 3) {

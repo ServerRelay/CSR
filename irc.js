@@ -489,6 +489,7 @@ function generateEmbed(message) {
 
 	}
 	// fetch external embeds and place them there
+	waitfor(1000);
 	const externalembed = new Discord.RichEmbed(message.embeds[0]);
 	// if(externalembed) {
 	externalembed.title && externalembed.description ? relayEmbed.addField(`${externalembed.title}`, externalembed.description) : '';

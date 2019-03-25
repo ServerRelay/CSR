@@ -263,7 +263,7 @@ function findAllMatchingPrivate(ogguild) {
  *
  * @param {Discord.Message} message
  */
-function boadcastToAllCSRChannels(message) {
+async function boadcastToAllCSRChannels(message) {
 	if(message.author.id !== client.user.id && message.author.createdTimestamp < (604800000 - new Date().getMilliseconds())) {
 		return;
 	}
@@ -276,7 +276,8 @@ function boadcastToAllCSRChannels(message) {
 	if(!message.attachments.size) {
 		message.delete(1000);
 	}
-
+	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+	await wait(2000);
 	const embed = generateEmbed(message);
 	client.csrchannels.forEach(async (ch) => {
 		try{
@@ -494,6 +495,9 @@ function generateEmbed(message) {
 	externalembed.thumbnail ? relayEmbed.setThumbnail(externalembed.thumbnail.url) : '';
 	// }
 	return relayEmbed;
+}
+function waitfor(time) {
+	const sleep = require('child_process').spawnSync(process.argv[0], ['-e', 'setTimeout(function(){},' + time + ')']);
 }
 // /////////////////////////////////////////////////////////////////////////////////
 client.login(process.env.token);

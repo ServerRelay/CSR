@@ -4,7 +4,7 @@ const ms = require('ms');
 
 const warner = 'Deleting Last Messages, this might take a while!';
 module.exports = {
-	name: 'delete',
+	name: 'fastdelete',
 	/**
      *
      *

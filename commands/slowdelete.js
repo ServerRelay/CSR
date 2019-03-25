@@ -3,7 +3,7 @@ const { Message } = require('discord.js');
 const ms = require('ms');
 
 module.exports = {
-	name: 'delete',
+	name: 'slowdelete',
 	/**
      *
      *

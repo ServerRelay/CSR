@@ -492,6 +492,10 @@ function generateEmbed(message) {
 	if(externalembed) {
 		externalembed.title ? externalembed.description ? relayEmbed.addField(`${externalembed.title}`, externalembed.description) : '' : '';
 		externalembed.thumbnail.url ? relayEmbed.setThumbnail(externalembed.thumbnail.url) : '';
+		if(externalembed.type == 'image' && !relayEmbed.image) {
+			relayEmbed.setImage(externalembed.url);
+		}
+
 	}
 	return relayEmbed;
 }

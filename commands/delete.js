@@ -76,6 +76,7 @@ module.exports = {
 				i++;
 			});
 		}
+		message.client.lockdown = false;
 	},
 
 };

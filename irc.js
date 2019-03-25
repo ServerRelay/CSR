@@ -488,15 +488,11 @@ function generateEmbed(message) {
 
 	}
 	// fetch external embeds and place them there
-	const externalembed = message.embeds[0];
-	if(externalembed) {
+	const externalembed = new Discord.RichEmbed(message.embeds[0]);
+	//if(externalembed) {
 		externalembed.title ? externalembed.description ? relayEmbed.addField(`${externalembed.title}`, externalembed.description) : '' : '';
-		//externalembed.thumbnail.url ? relayEmbed.setThumbnail(externalembed.thumbnail.url) : '';
-		if(externalembed.type == 'image' && !relayEmbed.image) {
-			relayEmbed.setImage(externalembed.url);
-		}
-
-	}
+		externalembed.thumbnail.url ? relayEmbed.setThumbnail(externalembed.thumbnail.url) : '';
+	//}
 	return relayEmbed;
 }
 // /////////////////////////////////////////////////////////////////////////////////

@@ -2,7 +2,6 @@
 const { Message } = require('discord.js');
 const ms = require('ms');
 
-const warner = 'Deleting Last Messages, this might take a while!';
 module.exports = {
 	name: 'delete',
 	/**
@@ -13,7 +12,7 @@ module.exports = {
      * @returns
      */
 	async execute(message, args) {
-		if(!args[0] || isNaN(args[0]) || args[0] > 50 || args[0] < 0) args[0] = 1;
+		if(!args[0] || isNaN(args[0])) args[0] = 50;
 		if(!args[1] || isNaN(args[1])) args[1] = 5000;
 
 
@@ -24,6 +23,7 @@ module.exports = {
 
 		message.client.lockdown = true;
 		message.channel.send(`Enabled Lockdown, procceding to delete Messages, this may take up to ${ms(args[1] * message.client.guilds.size, { long: true })}!`);
+		const warner = `Deleting Last Messages, this might take up to ${ms(args[1] * message.client.guilds.size, { long: true })}!`;
 		let i = 0;
 		message.client.csrchannels.forEach((ch) => {
 			ch.send(warner);

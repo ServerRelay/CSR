@@ -67,7 +67,7 @@ module.exports = {
 
 			const filter = (reaction, user)=>(reaction.emoji.name === '✅' || reaction.emoji.name === '❎') && !user.bot;
 			const collector = await perm.awaitReactions(filter);// {time:60000}
-
+			console.log(collector)
 			if(collector.has('❎')) {
 				// sv.owner.send('sending refusal')
 				message.author.send('denied permission');

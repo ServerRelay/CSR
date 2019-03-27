@@ -66,43 +66,35 @@ module.exports = {
 			await perm.react('❎');
 
 			const filter = (reaction, user)=>(reaction.emoji.name === '✅' || reaction.emoji.name === '❎') && !user.bot;
-			const cll = perm.createReactionCollector(filter);// {time:60000}
+			const collector = await perm.awaitReactions(filter);// {time:60000}
 
+			if(collector.has('❎')) {
+				// sv.owner.send('sending refusal')
+				message.author.send('denied permission');
+				rq.delete();
+				return;
+			}
+			if(collector.has('✅')) {
 
-			// console.log(kl)
-			// let filter=(reaction,user)=>(reaction.emoji.name==='✅'||reaction.emoji.name==='❎')&&!user.bot
-			// let cll=kl.createReactionCollector(filter,{time:20000})
+				ch.createInvite('someone requested to join this server')
+					.then((invite)=>{
+						message.author.send(`${sv.name}'s invite code:${invite.url}`);
 
-			cll.on('collect', (rec)=>{
-				if(rec.emoji.name == '❎') {
-					// sv.owner.send('sending refusal')
-					message.author.send('denied permission');
-					rq.delete();
-					cll.stop();
-				}
-				if(rec.emoji.name == '✅') {
+					})
+					.catch((err)=>{
+						console.log(err);
+					});
+				rq.delete();
+				return;
+			}
 
-					ch.createInvite('someone requested to join this server')
-						.then((invite)=>{
-							message.author.send(`${sv.name}'s invite code:${invite.url}`);
-
-						})
-						.catch((err)=>{
-							console.log(err);
-						});
-					rq.delete();
-					cll.stop();
-				}
-
-			});
 			// sv.owner.send(RichEmbed=ed)
-			cll.on('end', (t)=>{
-				if(!t.size > 0) {
 
-					message.author.send('no response try again later');
-					rq.delete();
-				}
-			});
+			if(!collector.size) {
+
+				message.author.send('no response try again later');
+				rq.delete();
+			}
 
 		}
 		catch(err) {

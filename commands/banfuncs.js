@@ -1,8 +1,7 @@
 module.exports.CSRBan = async function(client, usr, db) {
 	client.banlist.set(usr.id, true);
 	const data = await db.secure('bans', {});
-	data[usr.id] = usr.tag;
-	console.log(data);
+	data[usr.id] = escape(usr.tag);
 	await db.set('bans', data);
 };
 

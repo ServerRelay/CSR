@@ -7,7 +7,7 @@ module.exports = {
      * @param {Discord.Message} message
      */
 	execute(message) {
-		let text;
+		let text = '';
 		if(message.author.id != '298258003470319616') {
 			return;
 		}

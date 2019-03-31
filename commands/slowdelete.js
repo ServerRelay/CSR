@@ -4,6 +4,7 @@ const ms = require('ms');
 
 module.exports = {
 	name: 'slowdelete',
+	staff:'f',
 	/**
      *
      *

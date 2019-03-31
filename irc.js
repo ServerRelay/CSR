@@ -277,7 +277,7 @@ async function boadcastToAllCSRChannels(message) {
 		message.delete(1000);
 	}
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-	await wait(2000);
+	await wait(700);
 	const embed = generateEmbed(message);
 	client.csrchannels.forEach(async (ch) => {
 		try{

@@ -9,7 +9,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 
 client.banlist = new Discord.Collection();
 client.lockdown = false;
-const prefix = process.env.prefix || 'c-'
+const prefix = process.env.prefix || 'c-';
 client.cooldowns = new Discord.Collection();
 client.csrchannels = new Discord.Collection();
 const novites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
@@ -154,7 +154,6 @@ client.on('channelUpdate', (oldch, newch)=>{
 });
 // ///////////////////////////////////////////
 client.on('message', (message)=>{
-
 	const prefixRegex = new RegExp(`^(<@!?${client.user.id}>|${prefix})\\s*`);
 	if (!prefixRegex.test(message.content)) return;
 	const [, matchedPrefix] = message.content.match(prefixRegex);

@@ -16,7 +16,7 @@ module.exports = {
 	/**
      *
      * @param {Discord.Message} message
-     * @param {[]} args
+     * @param {Array} args
      */
 	async execute(message, args) {
 		if(!args[0]) return message.channel.send('please specify a server name');

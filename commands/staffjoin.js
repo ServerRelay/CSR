@@ -5,7 +5,7 @@ module.exports = {
 	/**
      *
      * @param {Discord.Message} message
-     * @param {[]} args
+     * @param {Array} args
      */
 	async execute(message, args) {
 		if(!message.client.staff.has(message.author.id)) {

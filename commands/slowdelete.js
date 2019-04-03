@@ -9,7 +9,7 @@ module.exports = {
      *
      *
      * @param {Message} message
-     * @param {*} args
+     * @param {Array} args
      * @returns
      */
 	async execute(message, args) {

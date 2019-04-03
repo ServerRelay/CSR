@@ -108,13 +108,10 @@ client.on('guildDelete', (guild)=>{
 // ///////////MAIN MESSAGE EVENT/////////////////////////////////////////////
 client.on('message', (message)=>{
 
-	if (message.author == client.user) {return;}
-	if(!message.guild) {return;}
-	if(message.system) { return;}
-	if(message.author.bot) {return;}
-	if(novites.test(message.content)) {return;}
+	if (message.author == client.user || message.author.bot || !message.guild || message.system) return;
+	if(novites.test(message.content)) return;
 	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;
-	if(client.lockdown && !client.staff.has(message.author.id)) { return;}
+	if(client.lockdown && !client.staff.has(message.author.id)) return;
 
 	if(client.csrchannels.has(message.channel.id)) {
 		if(!client.cooldowns.has(message.author.id)) {
@@ -160,8 +157,6 @@ client.on('message', (message)=>{
 	const [, matchedPrefix] = message.content.match(prefixRegex);
 	const args = message.content.slice(matchedPrefix.length).trim().split(/ +/);
 	const commandName = args.shift().toLowerCase();
-
-	// if(!client.commands.has(commandName)){return;}
 
 	const command = client.commands.get(commandName) || client.commands.find(x=>x.alias && x.alias.includes(commandName));
 	if(!command) {return;}

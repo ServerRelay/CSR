@@ -18,8 +18,6 @@ module.exports = {
 		await csr.CSRUnban(message.client, banee, db);
 		message.channel.send('removed from DB');
 		await db.end();
-
-
 	},
 
 };

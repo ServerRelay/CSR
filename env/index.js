@@ -18,7 +18,7 @@ function load(file) {
 	data = data.split('\n');
 	for(const i of data) {
 		const vals = i.split('=');
-		process.env[vals[0]] = vals[1];
+		process.env[vals[0]] = vals[1].replace(/[\n\r]/g, '');
 	}
 }
 exports.load = load;

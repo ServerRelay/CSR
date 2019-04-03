@@ -9,7 +9,7 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 
 client.banlist = new Discord.Collection();
 client.lockdown = false;
-const { prefix } = require('./config.json');
+const prefix = process.env.prefix || 'c-';
 client.cooldowns = new Discord.Collection();
 client.csrchannels = new Discord.Collection();
 const novites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
@@ -151,7 +151,6 @@ client.on('channelUpdate', (oldch, newch)=>{
 });
 // ///////////////////////////////////////////
 client.on('message', (message)=>{
-
 	const prefixRegex = new RegExp(`^(<@!?${client.user.id}>|${prefix})\\s*`);
 	if (!prefixRegex.test(message.content)) return;
 	const [, matchedPrefix] = message.content.match(prefixRegex);
@@ -352,34 +351,6 @@ function sendPrivate(message) {
 
 client.on('error', (err)=>{
 	console.log(err);
-	if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized') return process.exit();
-
-	if(err.name == 'DiscordAPIError') {
-		let addInfo = 'None Found!';
-		if(err.path !== undefined) {
-			const split = err.path.split('/');
-			const info = getDebugInfo(split);
-			addInfo = `Additional Debug Info:\n\tChannel: ${info.channel.name ? info.channel.name : 'Unknown'}\n\tGuild: ${info.channel.guild ? info.channel.guild.name : 'Unknown'}\n\tmessage content:${info.message ? info.message.cleanContent : 'None Found!'}`;
-		}
-
-		return (client.channels.get('543167247330312232')).send(`
-	\`\`\`js
-	Error: ${require('util').inspect(err).slice(0, 1800)}
-
-	${addInfo}
-		\`\`\`
-		`);
-	}
-
-
-	return (client.channels.get('543167247330312232')).send(`
-\`\`\`xs
-Client Error:
-Error: ${err.name}
-    ${err.message}
-    ${err.stack}
-    \`\`\`
-    `);
 });
 
 // unhandled rej ///////////////////////////////////////////////////////////////////////

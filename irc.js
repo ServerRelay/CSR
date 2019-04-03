@@ -462,8 +462,6 @@ function generateEmbed(message) {
 	// }
 	return relayEmbed;
 }
-function waitfor(time) {
-	const sleep = require('child_process').spawnSync(process.argv[0], ['-e', 'setTimeout(function(){},' + time + ')']);
-}
+
 // /////////////////////////////////////////////////////////////////////////////////
 client.login(process.env.token);

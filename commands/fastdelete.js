@@ -1,8 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 const { Message } = require('discord.js');
-const ms = require('ms');
 
-const warner = 'Deleting Last Messages, this might take a while!';
 module.exports = {
 	name: 'fastdelete',
 	staff:'deletes last messages from #irc',

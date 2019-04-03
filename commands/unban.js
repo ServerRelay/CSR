@@ -1,6 +1,5 @@
 const dmap = require('dmap-postgres');
 const csr = require('./banfuncs.js');
-const { staff } = require('./stafflist.json');
 module.exports = {
 	name: 'unban',
 	staff:'removes someone from the database How to use: --unban (@mention)',

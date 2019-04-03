@@ -107,7 +107,7 @@ client.on('guildDelete', (guild)=>{
 });
 // ///////////MAIN MESSAGE EVENT/////////////////////////////////////////////
 client.on('message', (message)=>{
-
+	if(message.content.startsWith(prefix)) return;
 	if (message.author == client.user || message.author.bot || !message.guild || message.system) return;
 	if(novites.test(message.content)) return;
 	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;

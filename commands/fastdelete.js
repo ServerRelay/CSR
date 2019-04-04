@@ -54,7 +54,7 @@ module.exports = {
 			message.client.csrchannels.forEach(async (ch) => {
 				try{
 					if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES') && ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
-						const messages_delete = ch.messages.last(3);
+						const messages_delete = ch.messages.last(Number(args[0]));
 						messages_delete.forEach(message_delete => {
 							if(!message_delete && error === false) {
 								error = true;

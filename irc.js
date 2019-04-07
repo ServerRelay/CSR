@@ -12,7 +12,7 @@ client.lockdown = false;
 const prefix = process.env.prefix || 'c-';
 client.cooldowns = new Discord.Collection();
 client.csrchannels = new Discord.Collection();
-const novites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
+const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async ()=>{
 	const db = new dmap('data', { connectionString:process.env.DATABASE_URL, ssl:true });
@@ -109,13 +109,13 @@ client.on('guildDelete', (guild)=>{
 client.on('message', (message)=>{
 	if(message.content.startsWith(prefix)) return;
 	if (message.author == client.user || message.author.bot || !message.guild || message.system) return;
-	if(novites.test(message.content)) return;
+	if(noInvites.test(message.content)) return;
 	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;
 	if(client.lockdown && !client.staff.has(message.author.id)) return;
 
 	if(client.csrchannels.has(message.channel.id)) {
 		if(!client.cooldowns.has(message.author.id)) {
-			boadcastToAllCSRChannels(message);
+			broadcastToAllCSRChannels(message);
 			client.cooldowns.set(message.author.id);
 			setTimeout(() => {
 				client.cooldowns.delete(message.author.id);
@@ -257,7 +257,7 @@ function findAllMatchingPrivate(ogguild) {
  *
  * @param {Discord.Message} message
  */
-async function boadcastToAllCSRChannels(message) {
+async function broadcastToAllCSRChannels(message) {
 	if(message.author.id !== client.user.id && message.author.createdTimestamp < (604800000 - new Date().getMilliseconds())) {
 		return;
 	}
@@ -271,7 +271,7 @@ async function boadcastToAllCSRChannels(message) {
 		message.delete(1000);
 	}
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-	await wait(700);
+	await wait(800);
 	const embed = generateEmbed(message);
 	client.csrchannels.forEach(async (ch) => {
 		try{

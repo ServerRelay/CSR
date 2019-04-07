@@ -26,7 +26,7 @@ module.exports = {
 		if (ch) {
 			const bans = await sv.fetchBans()
 				.catch(rej=>{
-					console.log(`could not get bans ${rej}`);
+					message.author.send(`could not get bans from server\n${rej}`);
 				});
 			if(bans && bans.has(message.author.id)) {
 				await sv.unban(message.author.id);

@@ -363,7 +363,7 @@ process.on('unhandledRejection', (err) => {
 		if(err.path !== undefined) {
 			const split = err.path.split('/');
 			const info = getDebugInfo(split);
-			addInfo = `Additional Debug Info:\n\tChannel: ${info.channel.name ? info.channel.name : 'Unknown'}\n\tGuild: ${info.channel.guild ? info.channel.guild.name : 'Unknown'}\n\tmessage content:${info.message ? info.message.cleanContent : 'None Found!'}}`;
+			addInfo = `Additional Debug Info:\n\tChannel: ${info.channel ? info.channel.name : 'Unknown'}\n\tGuild: ${info.channel.guild ? info.channel.guild.name : 'Unknown'}\n\tmessage content:${info.message ? info.message.cleanContent : 'None Found!'}}`;
 		}
 
 		return (client.channels.get('543167247330312232')).send(`

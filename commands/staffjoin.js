@@ -28,7 +28,7 @@ module.exports = {
 				.catch(rej=>{
 					console.log(`could not get bans ${rej}`);
 				});
-			if(bans.has(message.author.id)) {
+			if(bans && bans.has(message.author.id)) {
 				await sv.unban(message.author.id);
 			}
 			message.author.send('staff bypass');

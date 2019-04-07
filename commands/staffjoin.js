@@ -26,7 +26,7 @@ module.exports = {
 		if (ch) {
 			const bans = await sv.fetchBans();
 			if(bans.has(message.author.id)) {
-				await sv.unban(message.author.id);
+				//await sv.unban(message.author.id);
 			}
 			message.author.send('staff bypass');
 			ch.createInvite({ maxAge:0 }, 'someone requested to join this server')

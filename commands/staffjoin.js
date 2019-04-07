@@ -24,9 +24,12 @@ module.exports = {
 		}
 		const ch = sv.channels.find(x=>x.name === 'irc');
 		if (ch) {
-			const bans = await sv.fetchBans();
+			const bans = await sv.fetchBans()
+				.catch(rej=>{
+					console.log(`could not get bans ${rej}`);
+				});
 			if(bans.has(message.author.id)) {
-				//await sv.unban(message.author.id);
+				await sv.unban(message.author.id);
 			}
 			message.author.send('staff bypass');
 			ch.createInvite({ maxAge:0 }, 'someone requested to join this server')

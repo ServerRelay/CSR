@@ -1,10 +1,11 @@
+const discord = require('discord.js');
 module.exports = {
 	name: 'staffjoin',
 	alias:['staffjoins'],
 	staff: 'sends a join request to a server',
 	/**
      *
-     * @param {Discord.Message} message
+     * @param {discord.Message} message
      * @param {Array} args
      */
 	async execute(message, args) {
@@ -18,7 +19,7 @@ module.exports = {
 		if(!sv) {
 			return message.author.send('could not find the desired server, either try a more/less precise search or it maybe just doesnt exist');
 		}
-		if(!sv.me.hasPermission('CREATE_INSTANT_INVITE') || !sv.me.hasPermission('ADMINISTRATOR')) {
+		if(!sv.me.hasPermission('CREATE_INSTANT_INVITE') && !sv.me.hasPermission('ADMINISTRATOR')) {
 			return message.channel.send('insufficient permissions in the guild you want to join');
 		}
 		const ch = sv.channels.find(x=>x.name === 'irc');

@@ -291,42 +291,17 @@ async function broadcastToAllCSRChannels(message) {
  *
  * @param {Discord.Message} message
  */
-function sendPrivate(message) {
+async function sendPrivate(message) {
 	if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic === '') {return;}
 
-	setTimeout(() => {
-		if(!message.deleted) {
-			message.delete();
-		}
-	}, 180000);
-
-	const ed = new Discord.RichEmbed()
-		.setColor()
-		.setAuthor(`${message.author.username}`, (message.author.avatarURL || message.author.defaultAvatarURL), `https://discordapp.com/users/${message.author.id}`)
-		.setDescription(message.cleanContent)
-		.setTimestamp(new Date())
-		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));
-	const { staff } = require('./commands/stafflist.json');
-	if(staff.includes(message.author.id)) {
-		ed.setColor([0, 0, 128]);
-	}
-	else if(message.author.id === message.guild.owner.id) {
-		ed.setColor([205, 205, 0]);
-	}
-	else{
-		ed.setColor([133, 133, 133]);
+	if(!message.attachments.size) {
+		message.delete(1000);
 	}
 
+	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+	await wait(800);
 
-	const attachment = message.attachments.first();
-	if(attachment) {
-		if(attachment.filename.endsWith('.jpg') || attachment.filename.endsWith('.png') || attachment.filename.endsWith('.gif') || attachment.filename.endsWith('.jpeg')) {
-			ed.setImage(attachment.url);
-		}
-		else{
-			ed.addField('Attachment', attachment.url, false);
-		}
-	}
+	const ed = generateEmbed(message);
 	const channels = findAllMatchingPrivate(message.guild);
 	for(const i of channels) {
 		if(!i.nsfw && i.topic.includes('nsfw')) {

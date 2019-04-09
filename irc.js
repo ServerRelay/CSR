@@ -267,7 +267,7 @@ async function broadcastToAllCSRChannels(message) {
 
 	}
 
-	if(!message.attachments.size) {
+	if(!message.attachments.size && !message.deleted) {
 		message.delete(1000);
 	}
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -294,7 +294,7 @@ async function broadcastToAllCSRChannels(message) {
 async function sendPrivate(message) {
 	if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic === '') {return;}
 
-	if(!message.attachments.size) {
+	if(!message.attachments.size && !message.deleted) {
 		message.delete(1000);
 	}
 

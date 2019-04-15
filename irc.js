@@ -266,12 +266,11 @@ async function broadcastToAllCSRChannels(message) {
 		return;
 
 	}
-
 	if(!message.attachments.size && !message.deleted) {
-		message.delete(1000);
+		message.delete();
 	}
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-	await wait(800);
+	await wait(900);
 	const embed = generateEmbed(message);
 	client.csrchannels.forEach(async (ch) => {
 		try{
@@ -295,11 +294,11 @@ async function sendPrivate(message) {
 	if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic === '') {return;}
 
 	if(!message.attachments.size && !message.deleted) {
-		message.delete(1000);
+		message.delete();
 	}
 
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-	await wait(800);
+	await wait(900);
 
 	const ed = generateEmbed(message);
 	const channels = findAllMatchingPrivate(message.guild);

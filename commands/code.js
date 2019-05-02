@@ -1,9 +1,6 @@
 const helper = require('../helper');
-module.exports = {
-	name: 'code',
-	alias:['rules'],
-	description: 'sends the rules to using the #irc channel',
-	execute(message) {
-		message.channel.send(helper.insertRules(message.client));
-	},
-};
+const { Command } = require('easy-djs-commandhandler');
+const code = new Command({ name: 'code', aliases: ['rules'] });
+module.exports = code.execute((client, message) => {
+	message.channel.send(helper.insertRules(client));
+});

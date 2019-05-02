@@ -1,7 +1,7 @@
 const dmap = require('dmap-postgres');
-const csr = require('./banfuncs.js');
+const csr = require('../../banfuncs.js');
 const { Command } = require('easy-djs-commandhandler');
-let guildunban = new Command({
+const guildunban = new Command({
 	name: 'guildunban',
 	description: '(staff) unban a whole guild by id or name',
 });

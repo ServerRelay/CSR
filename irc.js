@@ -4,15 +4,15 @@ const client = new Discord.Client();
 const dmap = require('dmap-postgres');
 const commandHandler = require('easy-djs-commandhandler');
 require('./env').load('.env');
+const prefix = process.env.prefix || 'c-';
 const cmdHandler = new commandHandler.Handler(client,
 	{
-		prefix:process.env.prefix || 'c-',
+		prefix:prefix,
 		owner:'298258003470319616',
 		defaultcmds:true,
 	});
 client.banlist = new Discord.Collection();
 client.lockdown = false;
-const prefix = process.env.prefix || 'c-';
 client.cooldowns = new Discord.Collection();
 client.csrchannels = new Discord.Collection();
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;

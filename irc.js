@@ -1,12 +1,15 @@
 const Discord = require('discord.js');
 const helper = require('./helper');
 const client = new Discord.Client();
-const fs = require('fs');
 const dmap = require('dmap-postgres');
+const commandHandler = require('easy-djs-commandhandler');
 require('./env').load('.env');
-client.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-
+const cmdHandler = new commandHandler.Handler(client,
+	{
+		prefix:process.env.prefix || 'c-',
+		owner:'298258003470319616',
+		defaultcmds:true,
+	});
 client.banlist = new Discord.Collection();
 client.lockdown = false;
 const prefix = process.env.prefix || 'c-';
@@ -43,16 +46,6 @@ function findemoji(name) {
 		new Error('no emoji found');
 	}
 }
-
-
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-
-	// set a new item in the Collection
-	// with the key as the command name and the value as the exported module
-	client.commands.set(command.name, command);
-}
-
 
 // ////////////////////////////////////////////////////////
 client.on('guildCreate', (guild)=>{
@@ -142,26 +135,7 @@ client.on('channelUpdate', (oldch, newch)=>{
 });
 // ///////////////////////////////////////////
 client.on('message', (message)=>{
-	const prefixRegex = new RegExp(`^(<@!?${client.user.id}>|${prefix})\\s*`);
-	if (!prefixRegex.test(message.content)) return;
-	const [, matchedPrefix] = message.content.match(prefixRegex);
-	const args = message.content.slice(matchedPrefix.length).trim().split(/ +/);
-	const commandName = args.shift().toLowerCase();
-
-	const command = client.commands.get(commandName) || client.commands.find(x=>x.alias && x.alias.includes(commandName));
-	if(!command) {return;}
-	try {
-
-		command.execute(message, args);
-
-	}
-	catch (error) {
-
-		console.error(error);
-		message.channel.send(`there was an error trying to execute that command![${error}]`);
-
-	}
-
+	cmdHandler.handle(client, message);
 });
 // /RATE LIMIT EVENT/////////////////////////////////////////////////////////////
 let limitcount = 0;

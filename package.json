@@ -23,8 +23,9 @@
     "bufferutil": "^4.0.1",
     "discord.js": "^11.4.2",
     "dmap-postgres": "git+https://github.com/DeltaRade/dmap.git#postgresql",
+    "easy-djs-commandhandler": "^2.1.1",
     "erlpack": "github:hammerandchisel/erlpack",
     "ms": "^2.1.1",
-    "pg": "^7.9.0"
+    "pg": "^7.10.0"
   }
 }

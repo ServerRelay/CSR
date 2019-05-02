@@ -9,7 +9,7 @@ module.exports = {
 			connectionString:process.env.DATABASE_URL,
 			ssl:true,
 		});
-		await db.prepared;
+		await db.connect();
 		if(!args[0]) {
 			return message.channel.send('please specify a server, we dont want accidental unbans');
 		}

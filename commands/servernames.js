@@ -1,20 +1,18 @@
-module.exports = {
+const { Command } = require('easy-djs-commandhandler');
+const servernames = new Command({
 	name: 'servernames',
-	alias:['snames'],
-	staff: 'fetch all server names(delta only)',
-	/**
-     *
-     * @param {Discord.Message} message
-     */
-	execute(message) {
-		let text = '';
-		if(message.author.id != '298258003470319616') {
-			return;
-		}
+	description: '(owner) fetch all server names',
+	requires: ['botowner'],
+	aliases: ['snames'],
+});
+module.exports = servernames.execute((client, message) => {
+	let text = '';
+	if (message.author.id != '298258003470319616') {
+		return;
+	}
 
-		message.client.guilds.forEach((guild)=>{
-			text += guild.name + '\n';
-		});
-		message.author.send(text, { split:true });
-	},
-};
+	message.client.guilds.forEach(guild => {
+		text += guild.name + '\n';
+	});
+	message.author.send(text, { split: true });
+});

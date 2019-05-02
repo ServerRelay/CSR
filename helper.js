@@ -15,7 +15,7 @@ function insertRules(client) {
 }
 
 function loadStaff() {
-	const { staff } = require('./commands/stafflist.json');
+	const { staff } = require('./stafflist.json');
 	const arr = new Map();
 	for(const i of staff) {
 		arr.set(i, '');

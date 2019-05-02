@@ -69,7 +69,8 @@ client.on('guildCreate', (guild)=>{
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has joined the chat ${findemoji('join')}`);
 
-	client.csrchannels.forEach(async (ch) => {
+	client.guilds.forEach(async (guild) => {
+		const ch = getChannel(guild);
 		ch.send(ed)
 			.catch(e=>{
 				console.log('on join error ' + e.message + ch.guild.name);
@@ -84,7 +85,8 @@ client.on('guildDelete', (guild)=>{
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has left the chat ${findemoji('leave')}`);
 
-	client.csrchannels.forEach(async (ch) => {
+	client.guilds.forEach(async (guild) => {
+		const ch = getChannel(guild);
 		ch.send(ed)
 			.catch(e=>{
 				console.log('on leave error ' + e.message + ch.guild.name);

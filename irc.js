@@ -29,10 +29,6 @@ client.on('ready', async ()=>{
 	await db.end();
 
 	client.staff = helper.loadStaff();
-	cacheCSRChannels();
-	console.log('cached all csr channels');
-	cachePrivateChannels();
-	console.log('cached private channels');
 
 });
 
@@ -68,8 +64,6 @@ client.on('guildCreate', (guild)=>{
 	guild.createChannel('irc', 'text')
 		.then((channel)=>{
 			channel.send('**make sure you read the rules before proceding**', cd);
-			cacheCSRChannels();
-			cachePrivateChannels();
 		})
 		.catch(()=>{
 			return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
@@ -112,8 +106,9 @@ client.on('message', (message)=>{
 	if(noInvites.test(message.content)) return;
 	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;
 	if(client.lockdown && !client.staff.has(message.author.id)) return;
-
-	if(client.csrchannels.has(message.channel.id)) {
+	const channel = getChannel(message.guild);
+	const privchannel = getPrivateChannel(message.guild);
+	if(channel && message.channel.id === channel.id) {
 		if(!client.cooldowns.has(message.author.id)) {
 			broadcastToAllCSRChannels(message);
 			client.cooldowns.set(message.author.id);
@@ -125,7 +120,7 @@ client.on('message', (message)=>{
 			console.log('ignoring');
 		}
 	}
-	else if(message.guild.privateCSRChannel && message.channel.id === message.guild.privateCSRChannel.id) {
+	else if(privchannel && message.channel.id === privchannel.id) {
 		sendPrivate(message);
 	}
 });
@@ -137,8 +132,6 @@ client.on('channelCreate', (channel)=>{
 	if(channel.name && channel.name !== 'irc' && channel.name !== 'privateirc') {
 		return;
 	}
-	cacheCSRChannels();
-	cachePrivateChannels();
 });
 // //////////////////////////////////////////////////
 client.on('channelUpdate', (oldch, newch)=>{
@@ -146,8 +139,6 @@ client.on('channelUpdate', (oldch, newch)=>{
 	if(newch.name && newch.name !== 'irc' && newch.name !== 'privateirc') {
 		return;
 	}
-	cacheCSRChannels();
-	cachePrivateChannels();
 });
 // ///////////////////////////////////////////
 client.on('message', (message)=>{
@@ -196,7 +187,7 @@ function cacheCSRChannels() {
 		if(!guild.available) {
 			return;
 		}
-		const ch = guild.channels.find(x=>x.name === 'irc');
+		const ch = guild.channels.find(x=>x.name === 'testirc');
 		if(ch) {
 			client.csrchannels.set(ch.id, ch);
 		}
@@ -217,37 +208,18 @@ function cachePrivateChannels() {
 }
 
 function findAllMatchingPrivate(ogguild) {
-	if(!ogguild.privateCSRChannel || !ogguild.privateCSRChannel.topic || ogguild.privateCSRChannel.topic === '') {
+	const ogChannel = getPrivateChannel(ogguild);
+	if(!ogChannel || !ogChannel.topic || ogChannel.topic === '') {
 		return;
 	}
 	const arr = [];
 	client.guilds.forEach(guild=>{
-		if(!guild.privateCSRChannel || !guild.privateCSRChannel.topic || guild.privateCSRChannel.topic === '') {
+		const channel = getPrivateChannel(guild);
+		if(!channel || !channel.topic || channel.topic === '') {
 			return;
 		}
-
-		if(guild.privateCSRChannel.topic === ogguild.privateCSRChannel.topic) {
-			arr.push(guild.privateCSRChannel);
-			/* guild.privateCSRChannel.fetchWebhooks()
-            .then(wbs=>{
-                let wb=wbs.find(x=>x.name=="csr")
-                if(!wb){
-                    try{
-                    wb=guild.privateCSRChannel.createWebhook('csr')
-                        .then(w=>{
-                            guild.privateCSRChannel.CSRwebhook=w
-                        })
-                    }
-                    catch(err){
-                        console.log('wb err creating')
-                    }
-                    if(!wb){
-                        //console.log('returning')
-                        return
-                    }
-            }
-
-            })*/
+		if(channel.topic === ogChannel.topic) {
+			arr.push(channel);
 		}
 	});
 	return arr;
@@ -272,16 +244,10 @@ async function broadcastToAllCSRChannels(message) {
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 	await wait(900);
 	const embed = generateEmbed(message);
-	client.csrchannels.forEach(async (ch) => {
-		try{
-			await ch.send(embed);
-		}
-		catch(e) {
-			console.log(e.name + '[]' + e.message);
-			if(e.message == 'Unknown Channel') {
-				cacheCSRChannels();
-			}
-		}
+	client.guilds.forEach(async (guild) => {
+		const ch = getChannel(guild);
+		if(!ch) {return;}
+		await ch.send(embed);
 	});
 }
 
@@ -291,7 +257,8 @@ async function broadcastToAllCSRChannels(message) {
  * @param {Discord.Message} message
  */
 async function sendPrivate(message) {
-	if(!message.guild.privateCSRChannel.topic || message.guild.privateCSRChannel.topic === '') {return;}
+	const channel = getPrivateChannel(message.guild);
+	if(!channel || !channel.topic || channel.topic === '') {return;}
 
 	if(!message.attachments.size && !message.deleted) {
 		message.delete();
@@ -307,7 +274,7 @@ async function sendPrivate(message) {
 			return i.send('Received new Message\nBut this Channel is not NSFW').catch(e=>{
 				console.log(e);
 				if(e.message == 'Unknown Channel') {
-					cachePrivateChannels();
+					// cachePrivateChannels();
 				}
 			});
 		}
@@ -316,7 +283,7 @@ async function sendPrivate(message) {
 			.catch(e=>{
 				console.log(e);
 				if(e.message == 'Unknown Channel') {
-					cachePrivateChannels();
+					// cachePrivateChannels();
 				}
 			});
 	}
@@ -394,7 +361,21 @@ function getDebugInfo(arr) {
 	}
 	return data;
 }
-
+/**
+ *
+ * @param {Discord.Guild} guild
+ */
+function getChannel(guild) {
+	const channel = guild.channels.find(x=>x.type == 'text' && x.name == 'irc');
+	return channel || undefined;
+}
+/**
+ * @param {Discord.Guild} guild
+ */
+function getPrivateChannel(guild) {
+	const channel = guild.channels.find(x=>x.type == 'text' && x.name == 'privateirc');
+	return channel;
+}
 /**
  *
  *

@@ -1,30 +1,17 @@
 const Discord = require('discord.js');
+const { Command } = require('easy-djs-commandhandler');
+const helper = require('../helper');
+const sysmsg = new Command({ name: 'sysmsg', requires: ['botowner'] });
+module.exports = sysmsg.execute((client, message, args) => {
+	if (message.author.id != '298258003470319616') {
+		return;
+	}
+	const ed = new Discord.RichEmbed().setColor([255, 0, 0]);
+	ed.addField('**IMPORTANT MESSAGE**', args.join(' '), false);
 
-function rgbToHex(R, G, B) {return toHex(R) + toHex(G) + toHex(B);}
-
-function toHex(n) {
-	n = parseInt(n, 10);
-	if (isNaN(n)) return '00';
-	n = Math.max(0, Math.min(n, 255));
-	return '0123456789ABCDEF'.charAt((n - n % 16) / 16)
-         + '0123456789ABCDEF'.charAt(n % 16);
-}
-
-module.exports = {
-	name: 'sysmsg',
-	execute(message, args) {
-		if(message.author.id != '298258003470319616') {return;}
-		const ed = new Discord.RichEmbed()
-			.setColor(rgbToHex(255, 0, 0));
-		ed.addField('**IMPORTANT MESSAGE**', args.join(' '), false);
-
-		message.client.csrchannels.forEach(async ch => {
-			await ch.send(ed)
-				.catch(e=> {
-					console.log(e.name + '[]' + e.message);
-					if(e.message == 'Unknown Channel') {
-					}
-				});
-		});
-	},
-};
+	client.guilds.forEach(async guild => {
+		const ch = helper.getChannel(guild);
+		if (!ch) return;
+		await ch.send(ed);
+	});
+});

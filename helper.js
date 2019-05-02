@@ -22,5 +22,14 @@ function loadStaff() {
 	}
 	return arr;
 }
+/**
+ *
+ * @param {discord.Guild} guild
+ */
+function getChannel(guild) {
+	const channel = guild.channels.find(x=>x.type == 'text' && x.name == 'irc');
+	return channel || undefined;
+}
 exports.insertRules = insertRules;
 exports.loadStaff = loadStaff;
+exports.getChannel = getChannel;

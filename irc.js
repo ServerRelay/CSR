@@ -18,7 +18,7 @@ client.on('ready', async ()=>{
 	const db = new dmap('data', { connectionString:process.env.DATABASE_URL, ssl:true });
 	console.log('irc connected');
 	client.user.setActivity(`${prefix}help`);
-	await db.prepared;
+	await db.connect();
 	const rows = await db.get('bans');
 	if(rows) {
 		for(const i in rows) {

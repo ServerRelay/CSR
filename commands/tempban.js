@@ -12,7 +12,7 @@ module.exports = {
 			connectionString:process.env.DATABASE_URL,
 			ssl:true,
 		});
-		await db.prepared;
+		await db.connect();
 		if(!message.client.staff.has(message.author.id)) {
 			message.channel.send('no permission');
 			return;

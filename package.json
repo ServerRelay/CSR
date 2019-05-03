@@ -24,7 +24,6 @@
     "discord.js": "^11.4.2",
     "dmap-postgres": "git+https://github.com/DeltaRade/dmap.git#postgresql",
     "easy-djs-commandhandler": "github:PLASMAchicken/easy-djs-commandhandler",
-    "erlpack": "github:hammerandchisel/erlpack",
     "ms": "^2.1.1",
     "pg": "^7.10.0"
   }

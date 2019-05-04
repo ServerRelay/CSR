@@ -1,5 +1,5 @@
 const dmap = require('dmap-postgres');
-const csr = require('../../banfuncs.js/index.js');
+const csr = require('../../banfuncs.js');
 const { Command } = require('easy-djs-commandhandler');
 const ban = new Command({
 	name: 'ban',

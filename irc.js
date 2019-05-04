@@ -71,7 +71,7 @@ client.on('guildCreate', (guild)=>{
 
 	client.guilds.forEach(async (guild) => {
 		const ch = getChannel(guild);
-                if(!ch){return};
+		if(!ch) {return;}
 		ch.send(ed)
 			.catch(e=>{
 				console.log('on join error ' + e.message + ch.guild.name);
@@ -88,7 +88,7 @@ client.on('guildDelete', (guild)=>{
 
 	client.guilds.forEach(async (guild) => {
 		const ch = getChannel(guild);
-                if(!ch){return};
+		if(!ch) {return;}
 		ch.send(ed)
 			.catch(e=>{
 				console.log('on leave error ' + e.message + ch.guild.name);

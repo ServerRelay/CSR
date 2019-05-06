@@ -24,12 +24,30 @@ function loadStaff() {
 }
 /**
  *
+ * @param {discord.Client} client
+ * @param {string|discord.RichEmbed} message
+ */
+function sendMessage(client, message) {
+	client.guilds.forEach(async (guild) => {
+		const ch = getChannel(guild);
+		if(!ch) {return;}
+		ch.send(message)
+			.catch(e=>{
+				console.log('error ' + e.message + ch.guild.name);
+			});
+	});
+}
+/**
+ *
  * @param {discord.Guild} guild
  */
 function getChannel(guild) {
 	const channel = guild.channels.find(x=>x.type == 'text' && x.name == 'irc');
 	return channel || undefined;
 }
-exports.insertRules = insertRules;
-exports.loadStaff = loadStaff;
-exports.getChannel = getChannel;
+module.exports = {
+	insertRules,
+	loadStaff,
+	getChannel,
+	sendMessage,
+};

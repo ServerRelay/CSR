@@ -1,4 +1,3 @@
-const discord = require('discord.js');
 const { Command } = require('easy-djs-commandhandler');
 const staffjoin = new Command({
 	name: 'staffjoin',
@@ -51,6 +50,7 @@ module.exports = staffjoin.execute(async (client, message, args) => {
 			'server has no #irc channel for me to get an invite from, using another channel'
 		);
 		const backupChannel = sv.channels.first();
+		message.author.send(`using ${backupChannel.name}`);
 		const invite = await backupChannel.createInvite({ maxAge:0 }, 'staff requested to join this server');
 		message.author.send(`${sv.name}'s invite code:${invite.url}`);
 	}

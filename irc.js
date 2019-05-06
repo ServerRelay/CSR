@@ -13,7 +13,7 @@ const cmdHandler = new commandHandler.Handler(client,
 	});
 client.banlist = new Discord.Collection();
 client.lockdown = false;
-client.cooldowns = new Discord.Collection();
+client.csrCooldowns = new Discord.Collection();
 client.csrchannels = new Discord.Collection();
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
@@ -68,15 +68,7 @@ client.on('guildCreate', (guild)=>{
 		.setColor([0, 255, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has joined the chat ${findemoji('join')}`);
-
-	client.guilds.forEach(async (guild) => {
-		const ch = getChannel(guild);
-		if(!ch) {return;}
-		ch.send(ed)
-			.catch(e=>{
-				console.log('on join error ' + e.message + ch.guild.name);
-			});
-	});
+	helper.sendMessage(client, ed);
 });
 // ////////////////////////////////////////////////////////////////////////////
 client.on('guildDelete', (guild)=>{
@@ -85,15 +77,7 @@ client.on('guildDelete', (guild)=>{
 		.setColor([255, 0, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has left the chat ${findemoji('leave')}`);
-
-	client.guilds.forEach(async (guild) => {
-		const ch = getChannel(guild);
-		if(!ch) {return;}
-		ch.send(ed)
-			.catch(e=>{
-				console.log('on leave error ' + e.message + ch.guild.name);
-			});
-	});
+	helper.sendMessage(client, ed);
 
 });
 // ///////////MAIN MESSAGE EVENT/////////////////////////////////////////////
@@ -106,35 +90,15 @@ client.on('message', (message)=>{
 	const channel = getChannel(message.guild);
 	const privchannel = getPrivateChannel(message.guild);
 	if(channel && message.channel.id === channel.id) {
-		if(!client.cooldowns.has(message.author.id)) {
-			broadcastToAllCSRChannels(message);
-			client.cooldowns.set(message.author.id);
-			setTimeout(() => {
-				client.cooldowns.delete(message.author.id);
-			}, 2000);
-		}
-		else{
-			console.log('ignoring');
-		}
+		if(client.csrCooldowns.has(message.author.id)) {return;}
+		broadcastToAllCSRChannels(message);
+		client.csrCooldowns.set(message.author.id);
+		setTimeout(() => {
+			client.csrCooldowns.delete(message.author.id);
+		}, 2000);
 	}
 	else if(privchannel && message.channel.id === privchannel.id) {
 		sendPrivate(message);
-	}
-});
-// ////////////RECACHE TO ChANNEL CREATE//////////////////////////////////
-client.on('channelCreate', (channel)=>{
-	if(channel.type != 'text') {
-		return;
-	}
-	if(channel.name && channel.name !== 'irc' && channel.name !== 'privateirc') {
-		return;
-	}
-});
-// //////////////////////////////////////////////////
-client.on('channelUpdate', (oldch, newch)=>{
-	if(newch.type != 'text') {return;}
-	if(newch.name && newch.name !== 'irc' && newch.name !== 'privateirc') {
-		return;
 	}
 });
 // ///////////////////////////////////////////
@@ -158,32 +122,6 @@ client.on('rateLimit', (ratelimit)=>{
 		}
 	}
 });
-// //////////////////
-function cacheCSRChannels() {
-	client.csrchannels.clear();
-	client.guilds.forEach(async (guild)=>{
-		if(!guild.available) {
-			return;
-		}
-		const ch = guild.channels.find(x=>x.name === 'testirc');
-		if(ch) {
-			client.csrchannels.set(ch.id, ch);
-		}
-	});
-}
-
-function cachePrivateChannels() {
-	client.guilds.forEach(async (guild)=>{
-		if(!guild.available) {
-			return;
-		}
-		const ch = guild.channels.find(x=>x.name === 'privateirc');
-		if(ch) {
-			guild.privateCSRChannel = ch;
-		}
-
-	});
-}
 
 function findAllMatchingPrivate(ogguild) {
 	const ogChannel = getPrivateChannel(ogguild);

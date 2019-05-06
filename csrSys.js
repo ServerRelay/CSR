@@ -105,3 +105,5 @@ class CSRSystem {
 		return channels;
 	}
 }
+
+module.exports = CSRSystem;

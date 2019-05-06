@@ -1,6 +1,6 @@
 const discord = require('discord.js');
 const { Command } = require('easy-djs-commandhandler');
-let staffjoin = new Command({
+const staffjoin = new Command({
 	name: 'staffjoin',
 	hideinhelp: true,
 	description: '(staff) allows a staff member to join a server',
@@ -38,7 +38,7 @@ module.exports = staffjoin.execute(async (client, message, args) => {
 			await sv.unban(message.author.id);
 		}
 		message.author.send('staff bypass');
-		ch.createInvite({ maxAge: 0 }, 'someone requested to join this server')
+		ch.createInvite({ maxAge: 0 }, 'staff requested to join this server')
 			.then(invite => {
 				message.author.send(`${sv.name}'s invite code:${invite.url}`);
 			})
@@ -47,8 +47,11 @@ module.exports = staffjoin.execute(async (client, message, args) => {
 			});
 	}
 	else {
-		return message.author.send(
-			'server has no #irc channel for me to get an invite from'
+		message.author.send(
+			'server has no #irc channel for me to get an invite from, using another channel'
 		);
+		const backupChannel = sv.channels.first();
+		const invite = await backupChannel.createInvite({ maxAge:0 }, 'staff requested to join this server');
+		message.author.send(`${sv.name}'s invite code:${invite.url}`);
 	}
 });

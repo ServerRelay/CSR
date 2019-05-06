@@ -51,6 +51,9 @@ module.exports = staffjoin.execute(async (client, message, args) => {
 		);
 		const backupChannels = sv.channels.filter(x=>x.type == 'text');
 		const backupChannel = backupChannels.first();
+		if(!backupChannel) {
+			return message.author.send('no channel to create invite from');
+		}
 		message.author.send(`using ${backupChannel.name}`);
 		const invite = await backupChannel.createInvite({ maxAge:0 }, 'staff requested to join this server');
 		message.author.send(`${sv.name}'s invite code:${invite.url}`);

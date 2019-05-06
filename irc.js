@@ -49,10 +49,6 @@ function findemoji(name) {
 
 // ////////////////////////////////////////////////////////
 client.on('guildCreate', (guild)=>{
-	guild.owner.send('Thanks for adding me\nfor information use the help command')
-		.catch(()=>{
-			console.log(`${guild.owner} doesnt have dms on`);
-		});
 	const cd = helper.insertRules(client);
 	guild.createChannel('irc', 'text')
 		.then((channel)=>{

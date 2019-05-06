@@ -155,7 +155,7 @@ async function broadcastToAllCSRChannels(message) {
 
 	}
 	if(!message.attachments.size && !message.deleted) {
-		message.delete();
+		message.delete(500);
 	}
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 	await wait(1000);
@@ -177,7 +177,7 @@ async function sendPrivate(message) {
 	if(!channel || !channel.topic || channel.topic === '') {return;}
 
 	if(!message.attachments.size && !message.deleted) {
-		message.delete();
+		message.delete(500);
 	}
 
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));

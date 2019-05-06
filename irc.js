@@ -158,7 +158,7 @@ async function broadcastToAllCSRChannels(message) {
 		message.delete();
 	}
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-	await wait(900);
+	await wait(1000);
 	const embed = generateEmbed(message);
 	client.guilds.forEach(async (guild) => {
 		const ch = getChannel(guild);
@@ -181,7 +181,7 @@ async function sendPrivate(message) {
 	}
 
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-	await wait(900);
+	await wait(1000);
 
 	const ed = generateEmbed(message);
 	const channels = findAllMatchingPrivate(message.guild);

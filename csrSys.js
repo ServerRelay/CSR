@@ -26,6 +26,23 @@ class CSRSystem {
 	}
 	/**
 	 *
+	 * @readonly
+	 * @returns {Map<string,discord.TextChannel}
+	 */
+	get privateChannels() {
+		const channels = new Map();
+		this.client.guilds.forEach(guild => {
+			const pch = guild.channels.find(
+				x => x.type == 'text' && x.name == 'privateirc'
+			);
+			if(pch) {
+				channels.set(guild.id, pch);
+			}
+		});
+		return channels;
+	}
+	/**
+	 *
 	 * @param {string|discord.RichEmbed} message
 	 */
 	sendAll(message) {
@@ -35,5 +52,11 @@ class CSRSystem {
 				console.log('error sending message in sendAll:\n' + e);
 			});
 		});
+	}
+	/**
+	 * @param {string|discord.RichEmbed} message
+	 */
+	sendAllPrivate(message) {
+
 	}
 }

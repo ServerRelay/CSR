@@ -49,9 +49,9 @@ module.exports = staffjoin.execute(async (client, message, args) => {
 		message.author.send(
 			'server has no #irc channel for me to get an invite from, using another channel'
 		);
-		const backupChannel = sv.channels.first();
-		message.author.send(`using ${backupChannel.name}`);
-		const invite = await backupChannel.createInvite({ maxAge:0 }, 'staff requested to join this server');
+		const backupChannels = sv.channels.filter(x=>x.type == 'text');
+		message.author.send(`using ${backupChannels[0].name}`);
+		const invite = await backupChannels[0].createInvite({ maxAge:0 }, 'staff requested to join this server');
 		message.author.send(`${sv.name}'s invite code:${invite.url}`);
 	}
 });

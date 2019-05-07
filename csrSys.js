@@ -84,7 +84,7 @@ class CSRSystem {
 	}
 	/**
 	 *
-	 * @param {discord.guild} guild
+	 * @param {discord.Guild} guild
 	 * @returns {Map<string,discord.TextChannel}
 	 */
 	getMatchingPrivate(guild) {
@@ -103,6 +103,25 @@ class CSRSystem {
 			}
 		});
 		return channels;
+	}
+	/**
+	 *
+	 * @param {string|discord.RichEmbed} message
+	 * @param {discord.guild} guild
+	 */
+	sendPrivate(message, guild) {
+		const channel = this.getPrivateChannel(guild);
+		if(!channel || !channel.topic || channel.topic === '') {return;}
+		const channels = this.getMatchingPrivate(guild);
+		channels.forEach(ch=>{
+			ch.send(message)
+				.catch(e=>{
+					console.log(e);
+					if(e.message == 'Unknown Channel') {
+					// cachePrivateChannels();
+					}
+				});
+		});
 	}
 }
 

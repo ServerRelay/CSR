@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const helper = require('./helper');
+const system = require('./csrSys');
 const client = new Discord.Client();
 const dmap = require('dmap-postgres');
 const commandHandler = require('easy-djs-commandhandler');
@@ -11,6 +12,7 @@ const cmdHandler = new commandHandler.Handler(client,
 		owner:'298258003470319616',
 		defaultcmds:true,
 	});
+const System = new system(client);
 client.banlist = new Discord.Collection();
 client.lockdown = false;
 client.csrCooldowns = new Discord.Collection();
@@ -32,6 +34,7 @@ client.on('ready', async ()=>{
 	await db.end();
 
 	client.staff = helper.loadStaff();
+	client.system = System;
 
 });
 
@@ -48,15 +51,13 @@ function findemoji(name) {
 }
 
 // ////////////////////////////////////////////////////////
-client.on('guildCreate', (guild)=>{
+client.on('guildCreate', async (guild)=>{
 	const cd = helper.insertRules(client);
-	guild.createChannel('irc', 'text')
-		.then((channel)=>{
-			channel.send('**make sure you read the rules before proceding**', cd);
-		})
-		.catch(()=>{
-			return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
-		});
+	const ch = await guild.createChannel('irc', 'text').catch(()=>{
+		return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
+	});
+
+	ch ? ch.send('**make sure you read the rules before proceding**', cd) : '';
 
 	console.log('joined server ' + guild.name);
 
@@ -64,7 +65,7 @@ client.on('guildCreate', (guild)=>{
 		.setColor([0, 255, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has joined the chat ${findemoji('join')}`);
-	helper.sendMessage(client, ed);
+	System.sendAll(ed);
 });
 // ////////////////////////////////////////////////////////////////////////////
 client.on('guildDelete', (guild)=>{
@@ -73,7 +74,7 @@ client.on('guildDelete', (guild)=>{
 		.setColor([255, 0, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has left the chat ${findemoji('leave')}`);
-	helper.sendMessage(client, ed);
+	System.sendAll(ed);
 
 });
 // ///////////MAIN MESSAGE EVENT/////////////////////////////////////////////
@@ -83,7 +84,7 @@ client.on('message', (message)=>{
 	if(noInvites.test(message.content)) return;
 	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;
 	if(client.lockdown && !client.staff.has(message.author.id)) return;
-	const channel = getChannel(message.guild);
+	const channel = System.getChannel(message.guild);
 	const privchannel = getPrivateChannel(message.guild);
 	if(channel && message.channel.id === channel.id) {
 		if(client.csrCooldowns.has(message.author.id)) {return;}
@@ -119,24 +120,6 @@ client.on('rateLimit', (ratelimit)=>{
 	}
 });
 
-function findAllMatchingPrivate(ogguild) {
-	const ogChannel = getPrivateChannel(ogguild);
-	if(!ogChannel || !ogChannel.topic || ogChannel.topic === '') {
-		return;
-	}
-	const arr = [];
-	client.guilds.forEach(guild=>{
-		const channel = getPrivateChannel(guild);
-		if(!channel || !channel.topic || channel.topic === '') {
-			return;
-		}
-		if(channel.topic === ogChannel.topic) {
-			arr.push(channel);
-		}
-	});
-	return arr;
-}
-
 /**
  *
  * @param {Discord.Message} message
@@ -156,11 +139,7 @@ async function broadcastToAllCSRChannels(message) {
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 	await wait(1000);
 	const embed = generateEmbed(message);
-	client.guilds.forEach(async (guild) => {
-		const ch = getChannel(guild);
-		if(!ch) {return;}
-		await ch.send(embed);
-	});
+	System.sendAll(embed);
 }
 
 
@@ -180,10 +159,10 @@ async function sendPrivate(message) {
 	await wait(1000);
 
 	const ed = generateEmbed(message);
-	const channels = findAllMatchingPrivate(message.guild);
-	for(const i of channels) {
-		if(!i.nsfw && i.topic.includes('nsfw')) {
-			return i.send('Received new Message\nBut this Channel is not NSFW').catch(e=>{
+	const channels = System.getMatchingPrivate(message.guild);
+	channels.forEach(ch=>{
+		if(!ch.nsfw && ch.topic.includes('nsfw')) {
+			return ch.send('Received new Message\nBut this Channel is not NSFW').catch(e=>{
 				console.log(e);
 				if(e.message == 'Unknown Channel') {
 					// cachePrivateChannels();
@@ -191,14 +170,14 @@ async function sendPrivate(message) {
 			});
 		}
 
-		i.send(ed)
+		ch.send(ed)
 			.catch(e=>{
 				console.log(e);
 				if(e.message == 'Unknown Channel') {
 					// cachePrivateChannels();
 				}
 			});
-	}
+	});
 }
 // ///error event./////////////////
 
@@ -272,14 +251,6 @@ function getDebugInfo(arr) {
 		}
 	}
 	return data;
-}
-/**
- *
- * @param {Discord.Guild} guild
- */
-function getChannel(guild) {
-	const channel = guild.channels.find(x=>x.type == 'text' && x.name == 'irc');
-	return channel || undefined;
 }
 /**
  * @param {Discord.Guild} guild

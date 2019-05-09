@@ -112,8 +112,10 @@ client.on('rateLimit', (ratelimit)=>{
 			client.lockdown = true;
 			client.user.setActivity(`${prefix}help | locking down due to ratelimits`);
 			setTimeout(() => {
-				client.lockdown = false;
-				client.user.setActivity(`${prefix}help`);
+				if(limitcount < 3) {
+					client.lockdown = false;
+					client.user.setActivity(`${prefix}help`);
+				}
 			}, 4000);
 			limitcount = 0;
 		}

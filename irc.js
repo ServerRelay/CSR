@@ -83,6 +83,9 @@ client.on('message', (message)=>{
 	if (message.author == client.user || message.author.bot || !message.guild || message.system) return;
 	if(noInvites.test(message.content)) return;
 	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;
+	if(lockdownExpired(limitTime)) {
+		client.lockdown = false;
+	}
 	if(client.lockdown && !client.staff.has(message.author.id)) return;
 	const channel = System.getChannel(message.guild);
 	const privchannel = getPrivateChannel(message.guild);
@@ -104,19 +107,15 @@ client.on('message', (message)=>{
 });
 // /RATE LIMIT EVENT/////////////////////////////////////////////////////////////
 let limitcount = 0;
+let limitTime = 0;
 client.on('rateLimit', (ratelimit)=>{
 	console.log(ratelimit);
 	if(ratelimit) {
 		limitcount += 1;
 		if(limitcount >= 3) {
+			limitTime += 5000;
 			client.lockdown = true;
 			client.user.setActivity(`${prefix}help | locking down due to ratelimits`);
-			setTimeout(() => {
-				if(limitcount < 3) {
-					client.lockdown = false;
-					client.user.setActivity(`${prefix}help`);
-				}
-			}, 4000);
 			limitcount = 0;
 		}
 	}
@@ -301,6 +300,17 @@ function generateEmbed(message) {
 	externalembed.thumbnail ? relayEmbed.setThumbnail(externalembed.thumbnail.url) : '';
 	// }
 	return relayEmbed;
+}
+
+function lockdownExpired(time) {
+	const x = new Date().getTime;
+	const timeleft = x - time;
+	if (timeleft > time || !time) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 // /////////////////////////////////////////////////////////////////////////////////

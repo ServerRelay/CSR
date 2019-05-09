@@ -18,10 +18,10 @@ module.exports = slodelete.execute((client, message, args)=>{
 	message.channel.send(`Enabled Lockdown, procceding to delete Messages, this may take up to ${ms(args[1] * message.client.guilds.size, { long: true })}!`);
 	const warner = `Deleting Last Messages, this might take up to ${ms(args[1] * message.client.guilds.size, { long: true })}!`;
 	let i = 0;
-	message.client.csrchannels.forEach((ch) => {
+	message.client.system.channels.forEach((ch) => {
 		ch.send(warner);
 	});
-	message.client.csrchannels.forEach(async (ch) => {
+	message.client.system.channels.forEach(async (ch) => {
 		setTimeout(async function() {
 			try{
 				if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES') && ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {

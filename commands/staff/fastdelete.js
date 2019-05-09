@@ -15,7 +15,7 @@ module.exports = fastdelete.execute((client, message, args)=> {
 	if(args[0] == 1) {
 		let i = 0;
 		let error = false;
-		message.client.csrchannels.forEach(async (ch) => {
+		message.client.system.channels.forEach(async (ch) => {
 			setTimeout(async function() {
 				try{
 					if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES') && ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
@@ -41,7 +41,7 @@ module.exports = fastdelete.execute((client, message, args)=> {
 	else if (args[0] <= 3) {
 		let i = 0;
 		let error = false;
-		message.client.csrchannels.forEach(async (ch) => {
+		message.client.system.channels.forEach(async (ch) => {
 			try{
 				if(ch.permissionsFor(ch.guild.me).has('MANAGE_MESSAGES') && ch.permissionsFor(ch.guild.me).has('VIEW_CHANNEL')) {
 					const messages_delete = ch.messages.last(Number(args[0]));

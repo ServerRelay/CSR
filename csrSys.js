@@ -62,10 +62,14 @@ class CSRSystem {
 	/**
 	 *
 	 * @param {string|discord.RichEmbed} message
+	 * @param {{ignoreGuilds:string[]}} param1
 	 */
-	sendAll(message) {
+	sendAll(message, { ignoreGuilds = [] } = { ignoreGuilds:[] }) {
 		const channels = this.channels;
 		channels.forEach(ch => {
+			if (ignoreGuilds.length && ignoreGuilds.includes(ch.guild.id)) {
+				return;
+			}
 			ch.send(message).catch(e => {
 				console.log('error sending message in sendAll:\n' + e);
 			});
@@ -111,16 +115,17 @@ class CSRSystem {
 	 */
 	sendPrivate(message, guild) {
 		const channel = this.getPrivateChannel(guild);
-		if(!channel || !channel.topic || channel.topic === '') {return;}
+		if (!channel || !channel.topic || channel.topic === '') {
+			return;
+		}
 		const channels = this.getMatchingPrivate(guild);
-		channels.forEach(ch=>{
-			ch.send(message)
-				.catch(e=>{
-					console.log(e);
-					if(e.message == 'Unknown Channel') {
+		channels.forEach(ch => {
+			ch.send(message).catch(e => {
+				console.log(e);
+				if (e.message == 'Unknown Channel') {
 					// cachePrivateChannels();
-					}
-				});
+				}
+			});
 		});
 	}
 }

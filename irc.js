@@ -85,6 +85,7 @@ client.on('message', (message)=>{
 	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;
 	if(lockdownExpired(limitTime)) {
 		client.lockdown = false;
+		client.user.setActivity(`${prefix}help`);
 	}
 	if(client.lockdown && !client.staff.has(message.author.id)) return;
 	const channel = System.getChannel(message.guild);
@@ -113,7 +114,7 @@ client.on('rateLimit', (ratelimit)=>{
 	if(ratelimit) {
 		limitcount += 1;
 		if(limitcount >= 3) {
-			limitTime += 5000;
+			limitTime += 7000;
 			client.lockdown = true;
 			client.user.setActivity(`${prefix}help | locking down due to ratelimits`);
 			limitcount = 0;

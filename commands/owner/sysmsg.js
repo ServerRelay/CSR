@@ -1,17 +1,31 @@
 const Discord = require('discord.js');
 const { Command } = require('easy-djs-commandhandler');
-const helper = require('../../helper');
 const sysmsg = new Command({ name: 'sysmsg', requires: ['botowner'] });
 module.exports = sysmsg.execute((client, message, args) => {
 	if (message.author.id != '298258003470319616') {
 		return;
 	}
-	const ed = new Discord.RichEmbed().setColor([255, 0, 0]);
-	ed.addField('**IMPORTANT MESSAGE**', args.join(' '), false);
 
-	client.guilds.forEach(async guild => {
-		const ch = helper.getChannel(guild);
-		if (!ch) return;
-		await ch.send(ed);
-	});
+	const relayEmbed = new Discord.RichEmbed()
+		.setTimestamp(new Date())
+		.setColor([255, 0, 0])
+		.addField('**IMPORTANT MESSAGE**', args.join(' '), false);
+	// find and add image
+	if(message.attachments.array()[0]) {
+		const img = message.attachments.array()[0];
+		if(img.filename.endsWith('.jpg') || img.filename.endsWith('.png') || img.filename.endsWith('.gif') || img.filename.endsWith('.jpeg') || img.filename.endsWith('.PNG')) {
+			relayEmbed.setImage(img.url);
+		}
+		else{
+			relayEmbed.addField('Attachment', img.url, false);
+		}
+
+	}
+	// fetch external embeds and place them there
+	const externalembed = new Discord.RichEmbed(message.embeds[0]);
+	// if(externalembed) {
+	externalembed.title && externalembed.description ? relayEmbed.addField(`${externalembed.title}`, externalembed.description) : '';
+	externalembed.thumbnail ? relayEmbed.setThumbnail(externalembed.thumbnail.url) : '';
+
+	client.system.sendAll(relayEmbed);
 });

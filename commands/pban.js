@@ -22,10 +22,15 @@ module.exports = Pban.execute(async (client, message) => {
 	}
 
 	const privateCh = client.system.getPrivateChannel(guild);
-	if (!privateCh) {
-		return;
+	const channel = client.system.getChannel(guild);
+	if (privateCh) {
+		await privateCh.overwritePermissions(member.id, {
+			SEND_MESSAGES: false,
+		});
 	}
-	await privateCh.overwritePermissions(member.id, {
-		SEND_MESSAGES: false,
-	});
+	if (channel) {
+		await channel.overwritePermissions(member.id, {
+			SEND_MESSAGES: false,
+		});
+	}
 });

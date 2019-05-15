@@ -135,13 +135,13 @@ async function broadcastToAllCSRChannels(message) {
 		return;
 
 	}
-	if(!message.attachments.size && !message.deleted) {
-		message.delete(500);
-	}
+	// if(!message.attachments.size && !message.deleted) {
+	//	message.delete(500);
+	// }
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 	await wait(1000);
 	const embed = generateEmbed(message);
-	System.sendAll(embed);
+	System.sendAll(embed, { ignoreGuilds:[message.guild.id] });
 }
 
 

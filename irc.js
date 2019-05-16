@@ -14,7 +14,10 @@ const cmdHandler = new commandHandler.Handler(client,
 	});
 const System = new system(client);
 client.banlist = new Discord.Collection();
-client.lockdown = false;
+client.lockdown = {
+	enabled:false,
+	time:0,
+};
 client.csrCooldowns = new Discord.Collection();
 client.csrchannels = new Discord.Collection();
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
@@ -86,8 +89,7 @@ client.on('message', (message)=>{
 	if(noInvites.test(message.content)) return;
 	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;
 	if(lockdownExpired(limitTime)) {
-		client.lockdown = false;
-		client.user.setActivity(`${prefix}help`);
+		endLockdown();
 	}
 	if(client.lockdown && !client.staff.has(message.author.id)) return;
 	const channel = System.getChannel(message.guild);
@@ -110,16 +112,15 @@ client.on('message', (message)=>{
 });
 // /RATE LIMIT EVENT/////////////////////////////////////////////////////////////
 let limitcount = 0;
-let limitTime = 0;
+const limitTime = 0;
 client.on('rateLimit', (ratelimit)=>{
 	console.log(ratelimit);
 	if(ratelimit) {
 		limitcount += 1;
 		if(limitcount >= 3) {
-			limitTime += 7000;
-			client.lockdown = true;
-			client.user.setActivity(`${prefix}help | locking down due to ratelimits`);
+			client.lockdown.time += 7000;
 			limitcount = 0;
+			initLockdown();
 		}
 	}
 });
@@ -306,6 +307,7 @@ function generateEmbed(message) {
 }
 
 function lockdownExpired(time) {
+	console.log(client.lockdown.time);
 	const x = new Date().getTime;
 	const timeleft = x - time;
 	if (timeleft > time || !time) {
@@ -315,6 +317,14 @@ function lockdownExpired(time) {
 		return false;
 	}
 }
+function initLockdown() {
+	client.lockdown.enabled = true;
+	client.user.setActivity(`${prefix}help | locking down due to ratelimits`);
+}
 
+function endLockdown() {
+	client.lockdown.enabled = false;
+	client.user.setActivity(`${prefix}help`);
+}
 // /////////////////////////////////////////////////////////////////////////////////
 client.login(process.env.token);

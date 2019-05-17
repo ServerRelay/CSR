@@ -37,13 +37,12 @@ module.exports = staffjoin.execute(async (client, message, args) => {
 			await sv.unban(message.author.id);
 		}
 		message.author.send('staff bypass');
-		ch.createInvite({ maxAge: 0 }, 'staff requested to join this server')
-			.then(invite => {
-				message.author.send(`${sv.name}'s invite code:${invite.url}`);
-			})
-			.catch(err => {
-				console.log(err);
-			});
+		const invite = await ch.createInvite({ maxAge: 0 }, 'staff requested to join this server').catch(rej=>{
+			message.author.send('cannot get a server invite');
+		});
+		if(invite) {
+			message.author.send(`${sv.name}'s invite code:${invite.url}`);
+		}
 	}
 	else {
 		message.author.send(

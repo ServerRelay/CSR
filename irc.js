@@ -91,7 +91,7 @@ client.on('message', (message)=>{
 	if(lockdownExpired(limitTime)) {
 		endLockdown();
 	}
-	if(client.lockdown && !client.staff.has(message.author.id)) return;
+	if(client.lockdown.enabled && !client.staff.has(message.author.id)) return;
 	const channel = System.getChannel(message.guild);
 	const privchannel = getPrivateChannel(message.guild);
 	if(channel && message.channel.id === channel.id) {
@@ -118,9 +118,9 @@ client.on('rateLimit', (ratelimit)=>{
 	if(ratelimit) {
 		limitcount += 1;
 		if(limitcount >= 3) {
+			initLockdown();
 			client.lockdown.time += 7000;
 			limitcount = 0;
-			initLockdown();
 		}
 	}
 });

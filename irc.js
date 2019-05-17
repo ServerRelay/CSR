@@ -324,6 +324,7 @@ function initLockdown() {
 
 function endLockdown() {
 	client.lockdown.enabled = false;
+	client.lockdown.time = 0;
 	client.user.setActivity(`${prefix}help`);
 }
 // /////////////////////////////////////////////////////////////////////////////////

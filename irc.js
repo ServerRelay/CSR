@@ -12,7 +12,7 @@ const cmdHandler = new commandHandler.Handler(client,
 		owner:'298258003470319616',
 		defaultcmds:true,
 	});
-const System = new system(client);
+const System = new system(client, process.env.channel);
 client.banlist = new Discord.Collection();
 client.lockdown = {
 	enabled:false,
@@ -68,7 +68,7 @@ client.on('guildCreate', async (guild)=>{
 	const ed = new Discord.RichEmbed()
 		.setColor([0, 255, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
-		.setDescription(`has joined the chat ${findemoji('join')}`);
+		.setDescription(`has joined the chat ${System.findEmoji('join')}`);
 	System.sendAll(ed);
 });
 // ////////////////////////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ client.on('guildDelete', (guild)=>{
 	const ed = new Discord.RichEmbed()
 		.setColor([255, 0, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
-		.setDescription(`has left the chat ${findemoji('leave')}`);
+		.setDescription(`has left the chat ${System.findEmoji('leave')}`);
 	System.sendAll(ed);
 
 });
@@ -144,6 +144,7 @@ async function broadcastToAllCSRChannels(message) {
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 	await wait(1000);
 	const embed = generateEmbed(message);
+	message.channel.send(embed);
 	System.sendAll(embed, { ignoreGuilds:[message.guild.id] });
 }
 

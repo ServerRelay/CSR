@@ -4,8 +4,9 @@ class CSRSystem {
 	 *
 	 * @param {discord.Client} client
 	 */
-	constructor(client) {
+	constructor(client, channel = 'irc') {
 		this.client = client;
+		this.channel = channel;
 	}
 	/**
 	 *
@@ -16,7 +17,7 @@ class CSRSystem {
 		const chs = new Map();
 		this.client.guilds.forEach(guild => {
 			const channel = guild.channels.find(
-				x => x.type == 'text' && x.name == 'irc'
+				x => x.type == 'text' && x.name == this.channel
 			);
 			if (channel) {
 				chs.set(guild.id, channel);
@@ -127,6 +128,15 @@ class CSRSystem {
 				}
 			});
 		});
+	}
+	/**
+	 *
+	 * @param {string} name
+	 * @returns {discord.Emoji}
+	 */
+	findEmoji(name) {
+		const res = this.client.emojis.find(x=>x.name == name);
+		return res;
 	}
 }
 

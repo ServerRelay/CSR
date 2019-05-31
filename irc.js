@@ -87,7 +87,7 @@ client.on('message', (message)=>{
 	if(message.content.startsWith(prefix)) return;
 	if (message.author == client.user || message.author.bot || !message.guild || message.system) return;
 	if(noInvites.test(message.content)) return;
-	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽')) return;
+	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽') || message.content.includes('privatepage.vip') || message.content.includes('81ZH2Y'))  return;
 	if(lockdownExpired(limitTime)) {
 		endLockdown();
 	}

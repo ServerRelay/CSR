@@ -49,46 +49,46 @@ module.exports = staffjoin.execute(async (client, message, args) => {
 		);
 	}
 	if (
-		!sv.me.hasPermission('CREATE_INSTANT_INVITE') &&
-		!sv.me.hasPermission('ADMINISTRATOR')
+		!guild.me.hasPermission('CREATE_INSTANT_INVITE') &&
+		!guild.me.hasPermission('ADMINISTRATOR')
 	) {
 		return message.channel.send(
 			'insufficient permissions in the guild you want to join'
 		);
 	}
-	const ch = sv.channels.find(x => x.name === 'irc');
+	const ch = guild.channels.find(x => x.name === 'irc');
 	if (ch) {
-		const bans = await sv.fetchBans().catch(rej => {
+		const bans = await guild.fetchBans().catch(rej => {
 			message.author.send(`could not get bans from server\n${rej}`);
 		});
 		if (bans && bans.has(message.author.id)) {
-			await sv.unban(message.author.id);
+			await guild.unban(message.author.id);
 		}
 		message.author.send('staff bypass');
 		const invite = await ch.createInvite({ maxAge: 0 }, 'staff requested to join this server').catch(rej=>{
 			message.author.send('cannot get a server invite');
 		});
 		if(invite) {
-			message.author.send(`${sv.name}'s invite code:${invite.url}`);
+			message.author.send(`${guild.name}'s invite code:${invite.url}`);
 		}
 	}
 	else {
 		message.author.send(
 			'server has no #irc channel for me to get an invite from, using another channel'
 		);
-		const bans = await sv.fetchBans().catch(rej => {
+		const bans = await guild.fetchBans().catch(rej => {
 			message.author.send(`could not get bans from server\n${rej}`);
 		});
 		if (bans && bans.has(message.author.id)) {
-			await sv.unban(message.author.id);
+			await guild.unban(message.author.id);
 		}
-		const backupChannels = sv.channels.filter(x=>x.type == 'text');
+		const backupChannels = guild.channels.filter(x=>x.type == 'text');
 		const backupChannel = backupChannels.first();
 		if(!backupChannel) {
 			return message.author.send('no channel to create invite from');
 		}
 		message.author.send(`using ${backupChannel.name}`);
 		const invite = await backupChannel.createInvite({ maxAge:0 }, 'staff requested to join this server');
-		message.author.send(`${sv.name}'s invite code:${invite.url}`);
+		message.author.send(`${guild.name}'s invite code:${invite.url}`);
 	}
 });

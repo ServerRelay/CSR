@@ -61,7 +61,9 @@ client.on('guildCreate', async (guild)=>{
 		return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
 	});
 
-	ch ? ch.send('**make sure you read the rules before proceding**', cd) : '';
+	if(ch){
+		ch.send('**make sure you read the rules before proceding**', cd)
+	}
 
 	console.log('joined server ' + guild.name);
 
@@ -87,7 +89,7 @@ client.on('message', (message)=>{
 	if(message.content.startsWith(prefix)) return;
 	if (message.author == client.user || message.author.bot || !message.guild || message.system) return;
 	if(noInvites.test(message.content)) return;
-	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('﷽') || message.author.tag.includes('﷽') || message.content.includes('privatepage.vip') || message.content.includes('81ZH2Y'))  return;
+	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('naked photo'))  return;
 	if(lockdownExpired(limitTime)) {
 		endLockdown();
 	}

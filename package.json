@@ -23,7 +23,7 @@
     "bufferutil": "^4.0.1",
     "discord.js": "^11.5.0",
     "dmap-postgres": "git+https://github.com/DeltaRade/dmap.git#postgresql",
-    "easy-djs-commandhandler": "github:PLASMAchicken/easy-djs-commandhandler",
+    "easy-djs-commandhandler": "^2.3.1",
     "ms": "^2.1.1",
     "pg": "^7.11.0"
   }

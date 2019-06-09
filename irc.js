@@ -8,8 +8,8 @@ require('./env').load('.env');
 const prefix = process.env.prefix || 'c-';
 const cmdHandler = new commandHandler.Handler(client,
 	{
-		prefix:prefix,
-		owner:'298258003470319616',
+		prefix: prefix,
+		owners: ['298258003470319616', '193406800614129664'],
 		defaultcmds:true,
 	});
 const System = new system(client, process.env.channel);

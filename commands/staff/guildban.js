@@ -4,6 +4,7 @@ const { Command } = require('easy-djs-commandhandler');
 const guildban = new Command({
 	name: 'guildban',
 	description: '(staff) bans a whole guild from using CSR services',
+	hideinhelp:true
 });
 module.exports = guildban.execute(async (client, message, args) => {
 	const db = new dmap('data', {

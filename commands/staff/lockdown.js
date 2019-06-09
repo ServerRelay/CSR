@@ -2,6 +2,7 @@ const { Command } = require('easy-djs-commandhandler');
 const lockdown = new Command({
 	name: 'lockdown',
 	description: '(staff) locks down the whole irc chat',
+	hideinhelp:true
 });
 module.exports = lockdown.execute((client, message) => {
 	if (!message.client.staff.has(message.author.id)) {

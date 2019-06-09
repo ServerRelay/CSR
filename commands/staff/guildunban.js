@@ -4,6 +4,7 @@ const { Command } = require('easy-djs-commandhandler');
 const guildunban = new Command({
 	name: 'guildunban',
 	description: '(staff) unban a whole guild by id or name',
+	hideinhelp:true,
 });
 module.exports = guildunban.execute(async (client, message, args) => {
 	const db = new dmap('data', {

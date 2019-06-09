@@ -7,6 +7,7 @@ const tempban = new Command({
 	name: 'tempban',
 	aliases: ['tban'],
 	description: '(staff) bans an user for a set amount of time',
+	hideinhelp:true
 });
 module.exports = tempban.execute(async (client, message, args) => {
 	const db = new dmap('data', {

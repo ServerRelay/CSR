@@ -4,6 +4,7 @@ const sinfo = new Command({
 	name: 'sinfo',
 	aliases: ['serverinfo'],
 	description: '(staff) gets info on a given server',
+	hideinhelp:true
 });
 module.exports = sinfo.execute((client, message, args) => {
 	if (message.client.staff.has(message.author.id)) {

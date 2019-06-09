@@ -2,7 +2,7 @@
 const { Message } = require('discord.js');
 const ms = require('ms');
 const { Command } = require('easy-djs-commandhandler');
-const slodelete = new Command({ name:'slowdelete' });
+const slodelete = new Command({ name:'slowdelete', hideinhelp:true });
 module.exports = slodelete.execute((client, message, args)=>{
 
 	if(!args[0] || isNaN(args[0])) args[0] = 50;

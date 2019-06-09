@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 const { Command } = require('easy-djs-commandhandler');
-const fastdelete = new Command({ name:'fastdelete', description:'(staff only) deletes last messages from #irc' });
+const fastdelete = new Command({ name:'fastdelete', description:'(staff only) deletes last messages from #irc', hideinhelp:true});
 module.exports = fastdelete.execute((client, message, args)=> {
 	if(!args[0] || isNaN(args[0]) || args[0] > 3 || args[0] < 0) args[0] = 1;
 	if(!args[1] || isNaN(args[1])) args[1] = 100;

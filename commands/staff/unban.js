@@ -1,7 +1,7 @@
 const dmap = require('dmap-postgres');
 const csr = require('../../banfuncs.js');
 const { Command } = require('easy-djs-commandhandler');
-const unban = new Command({ name: 'unban' });
+const unban = new Command({ name: 'unban', hideinhelp:true  });
 module.exports = unban.execute(async (client, message, args) => {
 	const db = new dmap('data', {
 		connectionString: process.env.DATABASE_URL,

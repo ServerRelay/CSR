@@ -20,7 +20,21 @@ client.lockdown = {
 };
 client.csrCooldowns = new Discord.Collection();
 client.csrchannels = new Discord.Collection();
+//Restrict shet that is ghey
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
+const nakedPhotoMyAss=["naked",'18+','+18','18+ photos','privatepage',]
+/**
+ * @param {Discord.Message} message
+ */
+function isGhey(message){
+	let words=message.cleanContent.split(' ')
+	for(let word of words){
+		if(nakedPhotoMyAss.includes(word)){
+			return true
+		}
+	}
+	return false
+}
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async ()=>{
 	const db = new dmap('data', { connectionString:process.env.DATABASE_URL, ssl:true });
@@ -89,7 +103,7 @@ client.on('message', (message)=>{
 	if(message.content.startsWith(prefix)) return;
 	if (message.author == client.user || message.author.bot || !message.guild || message.system) return;
 	if(noInvites.test(message.content)) return;
-	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('naked photo'))  return;
+	if(isGhey(message),message.content.includes('﷽') || message.guild.name.includes('﷽'))  return;
 	if(lockdownExpired(limitTime)) {
 		endLockdown();
 	}

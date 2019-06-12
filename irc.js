@@ -132,7 +132,7 @@ client.on('rateLimit', (ratelimit)=>{
  * @param {Discord.Message} message
  */
 async function broadcastToAllCSRChannels(message) {
-	if(message.author.id !== client.user.id && message.author.createdTimestamp < (604800000 - new Date().getMilliseconds())) {
+	if(message.author.id !== client.user.id && message.author.createdAt < new Date()) {
 		return;
 	}
 

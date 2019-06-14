@@ -163,8 +163,7 @@ async function broadcastToAllCSRChannels(message) {
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 	await wait(1000);
 	const embed = generateEmbed(message);
-	let msg=await message.channel.send(embed);
-	msg.react('❌');
+	message.channel.send(embed);
 	System.sendAll(embed, { ignoreGuilds:[message.guild.id] });
 }
 

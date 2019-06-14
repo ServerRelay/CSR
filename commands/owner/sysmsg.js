@@ -7,9 +7,12 @@ module.exports = sysmsg.execute((client, message, args) => {
 	}
 
 	const relayEmbed = new Discord.RichEmbed()
+		.setTitle('**Message**')
 		.setTimestamp(new Date())
-		.setColor([255, 0, 0])
-		.addField('**IMPORTANT MESSAGE**', args.join(' '), false);
+		.setColor([20,110,164,0.62])
+		if(args.length){
+			relayEmbed.setDescription(args.join(' '));
+		}
 	// find and add image
 	if(message.attachments.array()[0]) {
 		const img = message.attachments.array()[0];

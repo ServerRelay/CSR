@@ -108,6 +108,23 @@ client.on('message', (message)=>{
 		sendPrivate(message);
 	}
 });
+/////////////////////////
+client.on('messageReactionAdd',(reaction,user)=>{
+	let message=reaction.message
+	let guild=message.guild
+	let channel=message.channel
+	let ircChannel=System.getChannel(guild)
+	if(!message.embeds[0] || message.author.id!=client.user.id||!(ircChannel&&ircChannel.id===channel.id)){
+		return
+	}
+	let CSRMessageAuthor=client.users.find(x=>x.tag==message.embeds[0].author.name)
+	if(!CSRMessageAuthor||CSRMessageAuthor.id!=user.id){
+		return 
+	}
+	let messages=System.findMatchingMessages(CSRMessageAuthor.tag,message.embeds[0].description)
+	
+	messages.forEach(msg=>msg.delete())
+})
 // ///////////////////////////////////////////
 client.on('message', (message)=>{
 	cmdHandler.handle(client, message);
@@ -146,7 +163,8 @@ async function broadcastToAllCSRChannels(message) {
 	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 	await wait(1000);
 	const embed = generateEmbed(message);
-	message.channel.send(embed);
+	let msg=await message.channel.send(embed);
+	msg.react('❌');
 	System.sendAll(embed, { ignoreGuilds:[message.guild.id] });
 }
 

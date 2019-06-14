@@ -138,6 +138,20 @@ class CSRSystem {
 		const res = this.client.emojis.find(x=>x.name == name);
 		return res;
 	}
+	/**
+	 * 
+	 * @param {string} tag 
+	 * @param {string} content 
+	 * @returns {discord.Collection<string,discord.Message>}
+	 */
+	findMatchingMessages(tag,content){
+		let messages=new discord.Collection()
+		this.channels.forEach((channel)=>{
+			let msg=channel.messages.filter(msg=>msg.author.id==this.client.user.id&&(msg.embeds&&msg.embeds[0].author.name==tag&&msg.embeds[0].description==content)).last()
+			messages.set(msg.id,msg)
+		})
+		return messages;
+	}
 }
 
 module.exports = CSRSystem;

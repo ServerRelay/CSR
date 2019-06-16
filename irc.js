@@ -118,7 +118,7 @@ client.on('messageReactionAdd',(reaction,user)=>{
 		return
 	}
 	let CSRMessageAuthor=client.users.find(x=>x.tag==message.embeds[0].author.name)
-	if(!CSRMessageAuthor||CSRMessageAuthor.id!=user.id){
+	if(!CSRMessageAuthor||(CSRMessageAuthor.id!=user.id && !client.staff.has(user.id))){
 		return 
 	}
 	let messages=System.findMatchingMessages(CSRMessageAuthor.tag,message.embeds[0].description)

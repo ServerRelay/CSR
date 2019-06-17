@@ -123,7 +123,7 @@ client.on('messageReactionAdd',(reaction,user)=>{
 	}
 	let messages=System.findMatchingMessages(CSRMessageAuthor.tag,message.embeds[0].description)
 	
-	messages.forEach(msg=>msg.delete())
+	messages.forEach(msg=>msg.delete().catch(e=>{}))
 })
 // ///////////////////////////////////////////
 client.on('message', (message)=>{

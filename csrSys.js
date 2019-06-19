@@ -152,6 +152,19 @@ class CSRSystem {
 		})
 		return messages;
 	}
+	/**
+	 * 
+	 * @param {string} string 
+	 * @returns {discord.Guild[]}
+	 */
+	findCloseServers(string){
+		const svs=[]
+		this.client.guilds.forEach(guild => {
+			if (guild.name.toLowerCase().includes(string.toLowerCase())) {
+				svs.push(guild);
+			}
+		})
+	}
 }
 
 module.exports = CSRSystem;

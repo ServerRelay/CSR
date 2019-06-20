@@ -20,6 +20,7 @@ client.lockdown = {
 };
 client.csrCooldowns = new Discord.Collection();
 client.csrchannels = new Discord.Collection();
+client.filter=[];
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async ()=>{
@@ -35,7 +36,17 @@ client.on('ready', async ()=>{
 	}
 
 	await db.end();
-
+	let filterDB=new dmap('filter',{ connectionString:process.env.DATABASE_URL, ssl:true })
+	await filterDB.connect()
+	/**
+	 * @type {string[]}
+	 */
+	let words=await filterDB.secure('words',[])
+	if(words.length){
+		for(let word of words){
+			client.filter.push(word)
+		}
+	}
 	client.staff = helper.loadStaff();
 	client.system = System;
 
@@ -152,7 +163,9 @@ async function broadcastToAllCSRChannels(message) {
 	if(message.author.createdAt>(new Date().getTime()-604800000)) {
 		return;
 	}
-
+	if(client.filter.some(word=>message.cleanContent.includes(word))){
+		return
+	}
 	if(client.banlist.has(message.author.id)) {
 		return;
 

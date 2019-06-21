@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const helper = require('./helper');
 const system = require('./csrSys');
 const client = new Discord.Client();
-const dmap = require('dmap-postgres');
+const jndb = require('jndb');
 const commandHandler = require('easy-djs-commandhandler');
 require('./env').load('.env');
 const prefix = process.env.prefix || 'c-';
@@ -23,25 +23,22 @@ client.csrchannels = new Discord.Collection();
 client.filter=[];
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
-client.on('ready', async ()=>{
-	const db = new dmap('data', { connectionString:process.env.DATABASE_URL, ssl:true });
+client.on('ready', ()=>{
+	const db = new jndb.Connection();
 	console.log('irc connected');
 	client.user.setActivity(`${prefix}help`);
-	await db.connect();
-	const rows = await db.get('bans');
+	db.use('data');
+	const rows = db.fetch('bans');
 	if(rows) {
 		for(const i in rows) {
 			client.banlist.set(i, rows[i]);
 		}
 	}
-
-	await db.end();
-	let filterDB=new dmap('filter',{ connectionString:process.env.DATABASE_URL, ssl:true })
-	await filterDB.connect()
+	db.use('filter')
 	/**
 	 * @type {string[]}
 	 */
-	let words=await filterDB.secure('words',[])
+	let words=db.secure('words',[])
 	if(words.length){
 		for(let word of words){
 			client.filter.push(word)

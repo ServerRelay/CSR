@@ -1,17 +1,11 @@
-const dmap = require('dmap-postgres');
 const csr = require('../../banfuncs.js');
 const { Command } = require('easy-djs-commandhandler');
 const guildban = new Command({
 	name: 'guildban',
 	description: '(staff) bans a whole guild from using CSR services',
-	hideinhelp:true
+	hideinhelp: true,
 });
-module.exports = guildban.execute(async (client, message, args) => {
-	const db = new dmap('data', {
-		connectionString: process.env.DATABASE_URL,
-		ssl: true,
-	});
-	await db.connect();
+module.exports = guildban.execute((client, message, args) => {
 	if (!args[0]) {
 		return message.channel.send(
 			'please specify a server, we dont want accidental bans'
@@ -24,11 +18,10 @@ module.exports = guildban.execute(async (client, message, args) => {
 	const guild =
 		message.client.guilds.get(args[0]) ||
 		message.client.guilds.find(
-			x =>
+			(x) =>
 				x.name.toLowerCase().indexOf(args.join(' ').toLowerCase()) != -1
 		);
 	if (!guild) {
-		await db.end();
 		return message.channel.send('not found');
 	}
 	let o = 0;
@@ -37,8 +30,7 @@ module.exports = guildban.execute(async (client, message, args) => {
 			continue;
 		}
 		o += 1;
-		await csr.CSRBan(message.client, i, db);
+		csr.CSRBan(message.client, i);
 	}
 	message.channel.send(`${guild.name}:banned ${o} members`);
-	await db.end();
 });

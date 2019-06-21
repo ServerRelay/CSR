@@ -1,5 +1,5 @@
 const { Command } = require('easy-djs-commandhandler');
-const dmap = require('dmap-postgres');
+const jndb = require('jndb');
 const Filter = new Command({
 	name: 'filter',
 	description: 'adds, deletes or clears the filter, flags are `add`, `remove`, `clear`',
@@ -9,11 +9,8 @@ module.exports = Filter.execute(async (client, message, args) => {
 	let flag = args[0];
 	args.splice(0,1)
 	let restrictee = args.join(' ');
-	let db = new dmap('filter', {
-		connectionString: process.env.DATABASE_URL,
-		ssl: true,
-	});
-	await db.connect();
+	let db = new jndb.Connection()
+	db.use('filter')
 	if (flag == 'add') {
 		client.filter.push(restrictee);
 		message.channel.send(`added \`${restrictee}\` to the filter`);
@@ -28,6 +25,5 @@ module.exports = Filter.execute(async (client, message, args) => {
 		client.filter.splice(0);
 		message.channel.send('cleared filter list');
 	}
-	await db.set('words', client.filter);
-	await db.end();
+	db.insert('words', client.filter);
 });

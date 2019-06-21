@@ -1,13 +1,18 @@
-module.exports.CSRBan = async function(client, usr, db) {
+const jndb=require('jndb')
+module.exports.CSRBan = function(client, usr) {
+	let db=new jndb.Connection()
+	db.use('data')
 	client.banlist.set(usr.id, usr.tag.replace('\'', ''));
-	const data = await db.secure('bans', {});
+	const data = db.secure('bans', {});
 	data[usr.id] = usr.tag.replace('\'', '');
-	await db.set('bans', data);
+	db.indert('bans', data);
 };
 
-module.exports.CSRUnban = async function(client, usr, db) {
+module.exports.CSRUnban = function(client, usr) {
+	let db=new jndb.Connection()
+	db.use('data')
 	client.banlist.delete(usr.id);
-	const data = await db.get('bans');
+	const data = db.fetch('bans');
 	data[usr.id] ? delete data[usr.id] : '';
-	await db.set('bans', data);
+	db.insert('bans', data);
 };

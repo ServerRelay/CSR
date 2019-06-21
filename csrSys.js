@@ -148,6 +148,7 @@ class CSRSystem {
 		let messages=new discord.Collection()
 		this.channels.forEach((channel)=>{
 			let msg=channel.messages.filter(msg=>msg.author.id==this.client.user.id&&(msg.embeds&&msg.embeds[0].author.name==tag&&msg.embeds[0].description==content)).last()
+			if(!msg){return}
 			messages.set(msg.id,msg)
 		})
 		return messages;

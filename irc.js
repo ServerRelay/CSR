@@ -34,11 +34,10 @@ client.on('ready', ()=>{
 			client.banlist.set(i, rows[i]);
 		}
 	}
-	db.use('filter')
 	/**
 	 * @type {string[]}
 	 */
-	let words=db.secure('words',[])
+	let words=db.secure('filter',[])
 	if(words.length){
 		for(let word of words){
 			client.filter.push(word)

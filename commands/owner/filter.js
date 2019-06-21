@@ -10,7 +10,7 @@ module.exports = Filter.execute(async (client, message, args) => {
 	args.splice(0,1)
 	let restrictee = args.join(' ');
 	let db = new jndb.Connection()
-	db.use('filter')
+	db.use('data')
 	if (flag == 'add') {
 		client.filter.push(restrictee);
 		message.channel.send(`added \`${restrictee}\` to the filter`);
@@ -25,5 +25,5 @@ module.exports = Filter.execute(async (client, message, args) => {
 		client.filter.splice(0);
 		message.channel.send('cleared filter list');
 	}
-	db.insert('words', client.filter);
+	db.insert('filter', client.filter);
 });

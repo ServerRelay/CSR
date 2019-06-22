@@ -31,4 +31,5 @@ module.exports = sysmsg.execute((client, message, args) => {
 	externalembed.thumbnail ? relayEmbed.setThumbnail(externalembed.thumbnail.url) : '';
 
 	client.system.sendAll(relayEmbed);
+	client.system.sendAllPrivate(relayEmbed);
 });

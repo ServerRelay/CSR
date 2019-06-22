@@ -54,6 +54,8 @@ module.exports = Connect.execute((client, message, args) => {
 	chs.name = message.guild.name;
 	if (type == 'public') {
 		chs.public = { id: channel.id, name: channel.name };
+		let rules=helper.insertRules(client)
+		channel.send('**make sure you read the rules before proceding**',rules)
 	} else {
 		if (!args[2] || args[2] == '') {
 			return message.channel.send('passcode is empty or invalid');

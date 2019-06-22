@@ -102,7 +102,7 @@ client.on('message', (message)=>{
 	}
 	if(client.lockdown.enabled && !client.staff.has(message.author.id)) return;
 	const channel = System.getChannel(message.guild);
-	const privchannel = getPrivateChannel(message.guild);
+	const privchannel = System.getPrivateChannel(message.guild);
 	if(channel && message.channel.id === channel.id) {
 		if(client.csrCooldowns.has(message.author.id)) {return;}
 		broadcastToAllCSRChannels(message);
@@ -183,7 +183,7 @@ async function broadcastToAllCSRChannels(message) {
  */
 async function sendPrivate(message) {
 	const channel = getPrivateChannel(message.guild);
-	if(!channel || !channel.topic || channel.topic === '') {return;}
+	if(!channel) {return;}
 
 	if(!message.attachments.size && !message.deleted) {
 		message.delete(500);
@@ -195,14 +195,14 @@ async function sendPrivate(message) {
 	const ed = generateEmbed(message);
 	const channels = System.getMatchingPrivate(message.guild);
 	channels.forEach(ch=>{
-		if(!ch.nsfw && ch.topic.includes('nsfw')) {
+		/*if(!ch.nsfw && ch.topic.includes('nsfw')) {
 			return ch.send('Received new Message\nBut this Channel is not NSFW').catch(e=>{
 				console.log(e);
 				if(e.message == 'Unknown Channel') {
 					// cachePrivateChannels();
 				}
 			});
-		}
+		}*/
 
 		ch.send(ed)
 			.catch(e=>{

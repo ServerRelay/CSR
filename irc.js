@@ -63,15 +63,6 @@ function findemoji(name) {
 // ////////////////////////////////////////////////////////
 client.on('guildCreate', async (guild)=>{
 	if(!guild.available) {return;}
-	const cd = helper.insertRules(client);
-	const ch = await guild.createChannel('irc', 'text').catch(()=>{
-		return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
-	});
-
-	if(ch){
-		ch.send('**make sure you read the rules before proceding**', cd)
-	}
-
 	console.log('joined server ' + guild.name);
 
 	const ed = new Discord.RichEmbed()

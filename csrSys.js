@@ -45,6 +45,11 @@ class CSRSystem {
 			}
 			let guild = this.client.guilds.get(i);
 			let channel = guild.channels.get(channels[i].private.id);
+			if(!channel){
+				channels[i].private={id:null,name:null,passcode:null}
+				db.insert(channels)
+				continue
+			}
 			channel.passcode = channels[i].private.passcode;
 			chs.set(i, channel);
 		}

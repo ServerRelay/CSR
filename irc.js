@@ -75,6 +75,7 @@ client.on('guildCreate', async (guild)=>{
 client.on('guildDelete', (guild)=>{
 	if(!guild.available) {return;}
 	let db=new jndb.Connection()
+	db.use('channels')
 	db.delete(guild.id)
 	console.log('bot removed from server ' + guild.name);
 	const ed = new Discord.RichEmbed()

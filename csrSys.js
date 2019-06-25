@@ -24,7 +24,16 @@ class CSRSystem {
 				continue;
 			}
 			let guild = this.client.guilds.get(i);
+			if (!guild) {
+				db.delete(i);
+				continue;
+			}
 			let channel = guild.channels.get(channels[i].public.id);
+			if (!channel) {
+				channels[i].public = { id: null, name: null };
+				db.insert(channels);
+				continue;
+			}
 			chs.set(i, channel);
 		}
 		return chs;
@@ -44,11 +53,15 @@ class CSRSystem {
 				continue;
 			}
 			let guild = this.client.guilds.get(i);
+			if (!guild) {
+				db.delete(i);
+				continue;
+			}
 			let channel = guild.channels.get(channels[i].private.id);
-			if(!channel){
-				channels[i].private={id:null,name:null,passcode:null}
-				db.insert(channels)
-				continue
+			if (!channel) {
+				channels[i].private = { id: null, name: null, passcode: null };
+				db.insert(channels);
+				continue;
 			}
 			channel.passcode = channels[i].private.passcode;
 			chs.set(i, channel);

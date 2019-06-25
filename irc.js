@@ -175,7 +175,7 @@ async function broadcastToAllCSRChannels(message) {
  * @param {Discord.Message} message
  */
 async function sendPrivate(message) {
-	const channel = getPrivateChannel(message.guild);
+	const channel = System.getPrivateChannel(message.guild);
 	if(!channel) {return;}
 
 	if(!message.attachments.size && !message.deleted) {
@@ -279,13 +279,7 @@ function getDebugInfo(arr) {
 	}
 	return data;
 }
-/**
- * @param {Discord.Guild} guild
- */
-function getPrivateChannel(guild) {
-	const channel = guild.channels.find(x=>x.type == 'text' && x.name == 'privateirc');
-	return channel;
-}
+
 /**
  *
  *

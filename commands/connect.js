@@ -5,7 +5,7 @@ const Connect = new Command({
 	name: 'connect',
 	requiresBotPermissions: ['EMBED_LINKS'],
 	description: "connects to CSR's main chat",
-	usage: 'c-connnect [channel] [public | private] [passcode]',
+	usage: 'c-connect [channel] [public | private] [passcode]',
 });
 let allowedTypes = ['public', 'private'];
 module.exports = Connect.execute((client, message, args) => {

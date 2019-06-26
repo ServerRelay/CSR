@@ -56,8 +56,8 @@ module.exports = join.execute(async (client, message, args) => {
 			`request to join \`${guild.name}\` has been aproved\n${inv}`
 		);
 	}
-	const ch = guild.channels.find(x => x.name === 'irc');
-	if (!ch) return authchannel.send('Server has no #irc channel!');
+	const ch = client.system.getChannel(guild);
+	if (!ch) return authchannel.send('Server has no public channel!');
 
 	message.author.send(`awaiting aproval from ${guild.name}...`);
 	const rq = await guild

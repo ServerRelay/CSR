@@ -201,6 +201,41 @@ class CSRSystem {
 				svs.push(guild);
 			}
 		});
+		return svs;
+	}
+	/**
+	 * @param {discord.Guild[]} svs
+	 * @param {discord.Message} message
+	 * @returns {discord.Guild}
+	 */
+	async obtainServer(message, svs) {
+		const msg =
+			svs.length > 1
+				? await message.author.send(
+						`this is a list of possible servers that were found:\`\`\`\n${svs
+							.map((x, idx) => idx + '. ' + x.name)
+							.join(
+								'\n'
+							)}\`\`\`\nplease type the number that corresponds with the server to select it`,
+						{ split: true }
+				  )
+				: await message.author.send('there was only 1 server found');
+		const filter = (m) => !m.author.bot;
+		const collector =
+			svs.length > 1
+				? await msg.channel.awaitMessages(filter, {
+						max: 1,
+						time: 60000,
+				  })
+				: '';
+		if (svs.length > 1 && !collector.size) {
+			return message.author.send('no choice made');
+		}
+		/**
+		 * @type {Discord.Guild}
+		 */
+		const guild = svs.length > 1 ? svs[collector.first().content] : svs[0];
+		return guild;
 	}
 }
 

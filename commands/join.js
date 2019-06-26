@@ -12,52 +12,34 @@ module.exports = join.execute(async (client, message, args) => {
 	}
 
 	const ed = new Discord.RichEmbed().setColor([138, 0, 138]);
-	const svs = [];
-	message.client.guilds.forEach(guild => {
-		if (guild.name.toLowerCase().includes(args.join(' ').toLowerCase())) {
-			svs.push(guild);
-		}
-	});
+	/**
+	 * @type {Discord.Guild[]}
+	 */
+	const svs = client.system.findCloseServers(args.join(' ').toLowerCase())
 	if (!svs.length) {
 		return message.author.send(
 			'could not find the desired server, either try a more/less precise search or it maybe just doesnt exist'
 		);
 	}
-	const msg =
-		svs.length > 1
-			? await message.author.send(
-				`this is a list of possible servers that were found:\`\`\`\n${svs
-					.map((x, idx) => idx + '. ' + x.name)
-					.join(
-						'\n'
-					)}\`\`\`\nplease type the number that corresponds with the server to select it`,
-				{ split: true }
-			)
-			: await message.author.send('there was only 1 server found');
-	const filter = m => !m.author.bot;
-	const collector =
-		svs.length > 1
-			? await msg.channel.awaitMessages(filter, { max: 1, time: 60000 })
-			: '';
-	if (svs.length > 1 && !collector.size) {
-		return message.author.send('no choice made');
-	}
-	const guild = svs.length > 1 ? svs[collector.first().content] : svs[0];
-	const authchannel = msg.channel;
+	
+	/**
+	 * @type {Discord.Guild}
+	 */
+	const guild =await client.system.obtainServer(message,svs);
+	const authchannel = await message.author.createDM();
+	let joinChannel=guild.channels.filter(x=>x.type=="text").first()
 	if (!guild) {
 		return authchannel.send('invalid index');
 	}
 	if (guild.id == '495583899104182275') {
-		const ch = guild.channels.find(x => x.name === 'irc');
-		const inv = await ch.createInvite(
+		const inv = await joinChannel.createInvite(
 			'someone requested to join this server'
 		);
 		return await message.author.send(
 			`request to join \`${guild.name}\` has been aproved\n${inv}`
 		);
 	}
-	const ch = client.system.getChannel(guild);
-	if (!ch) return authchannel.send('Server has no public channel!');
+	if (!joinChannel) return authchannel.send('Server has no public channel!');
 
 	message.author.send(`awaiting aproval from ${guild.name}...`);
 	const rq = await guild
@@ -78,10 +60,10 @@ module.exports = join.execute(async (client, message, args) => {
 				.send(
 					`Somebody tried to join ${
 						guild.name
-					} server but i could not create a #irc-requests channel!`
+					} but i could not create a #irc-requests channel!`
 				)
 				.catch(() => {
-					ch.send(
+					joinChannel.send(
 						'Somebody tried to join this server but i could not create a #irc-requests channel!'
 					);
 				});
@@ -124,7 +106,7 @@ module.exports = join.execute(async (client, message, args) => {
 			return;
 		}
 		if (reqcollector.has('✅')) {
-			ch.createInvite('someone requested to join this server')
+			joinChannel.createInvite('someone requested to join this server')
 				.then(invite => {
 					message.author.send(
 						`${guild.name}'s invite code:${invite.url}`

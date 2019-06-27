@@ -4,6 +4,7 @@ const servernames = new Command({
 	description: '(owner) fetch all server names',
 	requires: ['botowner'],
 	aliases: ['snames'],
+	hideinhelp:true,
 });
 module.exports = servernames.execute((client, message) => {
 	let text = '';

@@ -4,6 +4,7 @@ const uinfo = new Command({
 	name: 'userinfo',
 	aliases: ['uinfo'],
 	description: '(staff) gets info on a user',
+	hideinhelp:true
 });
 module.exports = uinfo.execute((client, message, args) => {
 	if (client.staff.has(message.author.id)) {

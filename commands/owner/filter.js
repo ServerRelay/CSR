@@ -4,6 +4,7 @@ const Filter = new Command({
 	name: 'filter',
 	description: 'adds, deletes or clears the filter, flags are `add`, `remove`, `clear`',
 	requires: ['botowner'],
+	hideinhelp:true,
 });
 module.exports = Filter.execute(async (client, message, args) => {
 	let flag = args[0];

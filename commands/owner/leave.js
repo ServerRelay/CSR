@@ -3,6 +3,7 @@ const leave = new Command({
 	name: 'leave',
 	description: '(owner) makes the bot leave a server',
 	requires: ['botowner'],
+	hideinhelp:true,
 });
 module.exports = leave.execute((client, message, args) => {
 	if (message.author.id !== '298258003470319616') {

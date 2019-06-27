@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const { Command } = require('easy-djs-commandhandler');
-const sysmsg = new Command({ name: 'sysmsg', requires: ['botowner'] });
+const sysmsg = new Command({ name: 'sysmsg', requires: ['botowner'],hideinhelp:true });
 module.exports = sysmsg.execute((client, message, args) => {
 	if (message.author.id != '298258003470319616') {
 		return;

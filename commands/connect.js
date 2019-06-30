@@ -3,6 +3,7 @@ const jndb = require('jndb');
 const { Command } = require('easy-djs-commandhandler');
 const Connect = new Command({
 	name: 'connect',
+	requires:['guild'],
 	requiresBotPermissions: ['EMBED_LINKS'],
 	description: "connects to CSR's main chat",
 	usage: 'c-connect [channel] [public | private] [passcode]',

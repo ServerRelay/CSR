@@ -3,6 +3,7 @@ const jndb = require('jndb');
 const { Command } = require('easy-djs-commandhandler');
 const Disconnect = new Command({
 	name: 'disconnect',
+	requires:['guild'],
 	requiresBotPermissions: ['EMBED_LINKS'],
 	description: 'disconnects channel from csr',
 	usage: 'c-disconnect [public | private]',

@@ -15,19 +15,22 @@ module.exports = join.execute(async (client, message, args) => {
 	/**
 	 * @type {Discord.Guild[]}
 	 */
-	const svs = client.system.findCloseServers(args.join(' ').toLowerCase())
+	const svs = client.system.findCloseServers(args.join(' ').toLowerCase());
 	if (!svs.length) {
 		return message.author.send(
 			'could not find the desired server, either try a more/less precise search or it maybe just doesnt exist'
 		);
 	}
-	
+
 	/**
 	 * @type {Discord.Guild}
 	 */
-	const guild =await client.system.obtainServer(message,svs);
+	const guild = await client.system.obtainServer(message, svs);
+	if (!guild) {
+		return;
+	}
 	const authchannel = await message.author.createDM();
-	let joinChannel=guild.channels.filter(x=>x.type=="text").first()
+	let joinChannel = guild.channels.filter((x) => x.type == 'text').first();
 	if (!guild) {
 		return authchannel.send('invalid index');
 	}
@@ -71,7 +74,7 @@ module.exports = join.execute(async (client, message, args) => {
 	if (!rq) return;
 	try {
 		await rq.overwritePermissions(guild.id, { VIEW_CHANNEL: false });
-		guild.roles.forEach(async role => {
+		guild.roles.forEach(async (role) => {
 			if (!role.hasPermission('KICK_MEMBERS')) {
 				return;
 			}
@@ -106,13 +109,14 @@ module.exports = join.execute(async (client, message, args) => {
 			return;
 		}
 		if (reqcollector.has('✅')) {
-			joinChannel.createInvite('someone requested to join this server')
-				.then(invite => {
+			joinChannel
+				.createInvite('someone requested to join this server')
+				.then((invite) => {
 					message.author.send(
 						`${guild.name}'s invite code:${invite.url}`
 					);
 				})
-				.catch(err => {
+				.catch((err) => {
 					console.log(err);
 				});
 			rq.delete();
@@ -125,8 +129,7 @@ module.exports = join.execute(async (client, message, args) => {
 			message.author.send('no response try again later');
 			rq.delete();
 		}
-	}
-	catch (err) {
+	} catch (err) {
 		message.channel.send(
 			'While trying to join the Server an error occured!'
 		);

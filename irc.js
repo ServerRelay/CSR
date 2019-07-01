@@ -64,7 +64,20 @@ function findemoji(name) {
 client.on('guildCreate', async (guild)=>{
 	if(!guild.available) {return;}
 	console.log('joined server ' + guild.name);
-
+	let irc=await guild.createChannel('irc',{type:'text'}).catch(()=>{});
+	await irc.send(helper.insertRules(client)).catch(()=>{});
+	if(irc){
+		let db=new jndb.Connection()
+		db.use('channels')
+		let data=db.secure(guild.id,{
+			name: null,
+			public: { id: null, name: null },
+			private: { id: null, name: null, passcode: null },
+		})
+		data.name=guild.name
+		data.public={id:irc.id,name:irc.name}
+		db.insert(guild.id,data)
+	}
 	const ed = new Discord.RichEmbed()
 		.setColor([0, 255, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))

@@ -1,7 +1,8 @@
 const Discord = require('discord.js');
 const helper = require('./helper');
 const system = require('./csrSys');
-const client = new Discord.Client();
+const Bot=require('./bot')
+const client = new Bot();
 const jndb = require('jndb');
 const commandHandler = require('easy-djs-commandhandler');
 require('./env').load('.env');
@@ -12,23 +13,14 @@ const cmdHandler = new commandHandler.Handler(client,
 		owners: ['298258003470319616', '193406800614129664'],
 		defaultcmds:true,
 	});
-const System = new system(client, process.env.channel);
-client.banlist = new Discord.Collection();
-client.lockdown = {
-	enabled:false,
-	time:0,
-};
-client.csrCooldowns = new Discord.Collection();
-client.csrchannels = new Discord.Collection();
 client.filter=[];
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', ()=>{
-	const db = new jndb.Connection();
 	console.log('irc connected');
 	client.user.setActivity(`${prefix}help`);
-	db.use('data');
-	const rows = db.fetch('bans');
+	client.db.use('data');
+	const rows = client.db.fetch('bans');
 	if(rows) {
 		for(const i in rows) {
 			client.banlist.set(i, rows[i]);
@@ -37,7 +29,7 @@ client.on('ready', ()=>{
 	/**
 	 * @type {string[]}
 	 */
-	let words=db.secure('filter',[])
+	let words=client.db.secure('filter',[])
 	if(words.length){
 		for(let word of words){
 			client.filter.push(word)
@@ -67,35 +59,33 @@ client.on('guildCreate', async (guild)=>{
 	let irc=await guild.createChannel('irc',{type:'text'}).catch(()=>{});
 	await irc.send(helper.insertRules(client)).catch(()=>{});
 	if(irc){
-		let db=new jndb.Connection()
-		db.use('channels')
-		let data=db.secure(guild.id,{
+		client.db.use('channels')
+		let data=client.db.secure(guild.id,{
 			name: null,
 			public: { id: null, name: null },
 			private: { id: null, name: null, passcode: null },
 		})
 		data.name=guild.name
 		data.public={id:irc.id,name:irc.name}
-		db.insert(guild.id,data)
+		client.db.insert(guild.id,data)
 	}
 	const ed = new Discord.RichEmbed()
 		.setColor([0, 255, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has joined the chat ${System.findEmoji('join')}`);
-	System.sendAll(ed);
+	client.system.sendAll(ed);
 });
 // ////////////////////////////////////////////////////////////////////////////
 client.on('guildDelete', (guild)=>{
 	if(!guild.available) {return;}
-	let db=new jndb.Connection()
-	db.use('channels')
-	db.delete(guild.id)
+	client.db.use('channels')
+	client.db.delete(guild.id)
 	console.log('bot removed from server ' + guild.name);
 	const ed = new Discord.RichEmbed()
 		.setColor([255, 0, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has left the chat ${System.findEmoji('leave')}`);
-	System.sendAll(ed);
+	client.system.sendAll(ed);
 
 });
 // ///////////MAIN MESSAGE EVENT/////////////////////////////////////////////
@@ -127,7 +117,7 @@ client.on('messageReactionAdd',(reaction,user)=>{
 	let message=reaction.message
 	let guild=message.guild
 	let channel=message.channel
-	let ircChannel=System.getChannel(guild)
+	let ircChannel=client.getPublicChannel(guild)
 	if(!message.embeds[0] || message.author.id!=client.user.id||!(ircChannel&&ircChannel.id===channel.id)){
 		return
 	}
@@ -180,7 +170,7 @@ async function broadcastToAllCSRChannels(message) {
 	await wait(1000);
 	const embed = generateEmbed(message);
 	message.channel.send(embed);
-	System.sendAll(embed, { ignoreGuilds:[message.guild.id] });
+	client.system.sendAll(embed, { ignoreGuilds:[message.guild.id] });
 }
 
 
@@ -189,7 +179,7 @@ async function broadcastToAllCSRChannels(message) {
  * @param {Discord.Message} message
  */
 async function sendPrivate(message) {
-	const channel = System.getPrivateChannel(message.guild);
+	const channel = client.system.getPrivateChannel(message.guild);
 	if(!channel) {return;}
 
 	if(!message.attachments.size && !message.deleted) {
@@ -200,7 +190,7 @@ async function sendPrivate(message) {
 	await wait(1000);
 
 	const ed = generateEmbed(message);
-	const channels = System.getMatchingPrivate(message.guild);
+	const channels = client.system.getMatchingPrivate(message.guild);
 	channels.forEach(ch=>{
 		/*if(!ch.nsfw && ch.topic.includes('nsfw')) {
 			return ch.send('Received new Message\nBut this Channel is not NSFW').catch(e=>{

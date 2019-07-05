@@ -14,9 +14,6 @@ class Bot extends discord.Client {
 	 */
 	constructor(options) {
 		super(options);
-		/**
-		 * @api private
-		 */
 		this.db = new jndb.Connection();
 		this.system = new CSRSystem(this, process.env.channel);
 		/**

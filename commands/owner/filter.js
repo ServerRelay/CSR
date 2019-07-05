@@ -2,16 +2,16 @@ const { Command } = require('easy-djs-commandhandler');
 const jndb = require('jndb');
 const Filter = new Command({
 	name: 'filter',
-	description: 'adds, deletes or clears the filter, flags are `add`, `remove`, `clear`',
-	hideinhelp:true,
+	description:
+		'adds, deletes or clears the filter, flags are `add`, `remove`, `clear`',
+	hideinhelp: true,
 	requires: ['botowner'],
 });
 module.exports = Filter.execute(async (client, message, args) => {
 	let flag = args[0];
-	args.splice(0,1)
+	args.splice(0, 1);
 	let restrictee = args.join(' ');
-	let db = new jndb.Connection()
-	db.use('data')
+	client.db.use('data');
 	if (flag == 'add') {
 		client.filter.push(restrictee);
 		message.channel.send(`added \`${restrictee}\` to the filter`);
@@ -26,5 +26,5 @@ module.exports = Filter.execute(async (client, message, args) => {
 		client.filter.splice(0);
 		message.channel.send('cleared filter list');
 	}
-	db.insert('filter', client.filter);
+	client.db.insert('filter', client.filter);
 });

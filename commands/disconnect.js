@@ -20,14 +20,13 @@ module.exports = Disconnect.execute((client, message, args) => {
 	if (!allowedTypes.includes(type)) {
 		return message.channel.send('invalid type');
 	}
-	let db = new jndb.Connection();
-	db.use('channels');
-	if (!db.has(message.guild.id)) {
+	client.db.use('channels');
+	if (!client.db.has(message.guild.id)) {
 		return message.channel.send(
 			'this server doesnt have configured channels'
 		);
 	}
-	let channels = db.fetch(message.guild.id);
+	let channels = client.db.fetch(message.guild.id);
 	let replacer = {};
 	if (type == 'public') {
 		replacer = { id: null, name: null };
@@ -35,6 +34,6 @@ module.exports = Disconnect.execute((client, message, args) => {
 		replacer = { id: null, name: null, passcode: null };
 	}
 	channels[type] = replacer;
-	db.insert(message.guild.id, channels);
+	client.db.insert(message.guild.id, channels);
 	message.channel.send('successfully disconnected');
 });

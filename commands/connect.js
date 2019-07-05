@@ -43,12 +43,11 @@ module.exports = Connect.execute((client, message, args) => {
 			);
 		}
 	}
-	let db = new jndb.Connection();
-	db.use('channels');
+	client.db.use('channels');
 	/**
 	 * @type {{name:string,public: { id: string, name: string },private: { id: string, name: string,passcode:string }})}
 	 */
-	let chs = db.secure(message.guild.id, {
+	let chs = client.db.secure(message.guild.id, {
 		name: null,
 		public: { id: null, name: null },
 		private: { id: null, name: null, passcode: null },
@@ -68,6 +67,6 @@ module.exports = Connect.execute((client, message, args) => {
 			passcode: passcode,
 		};
 	}
-	db.insert(message.guild.id, chs);
+	client.db.insert(message.guild.id, chs);
 	message.channel.send('successfully set');
 });

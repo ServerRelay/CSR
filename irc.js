@@ -36,7 +36,6 @@ client.on('ready', ()=>{
 		}
 	}
 	client.staff = helper.loadStaff();
-	client.system = System;
 
 });
 

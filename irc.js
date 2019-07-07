@@ -70,7 +70,7 @@ client.on('guildCreate', async (guild)=>{
 	const ed = new Discord.RichEmbed()
 		.setColor([0, 255, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
-		.setDescription(`has joined the chat ${System.findEmoji('join')}`);
+		.setDescription(`has joined the chat ${client.system.findEmoji('join')}`);
 	client.system.sendAll(ed);
 });
 // ////////////////////////////////////////////////////////////////////////////

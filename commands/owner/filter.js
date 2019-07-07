@@ -1,5 +1,4 @@
 const { Command } = require('easy-djs-commandhandler');
-const jndb = require('jndb');
 const Filter = new Command({
 	name: 'filter',
 	description:

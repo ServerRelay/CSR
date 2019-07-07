@@ -35,7 +35,6 @@ client.on('ready', ()=>{
 			client.filter.push(word)
 		}
 	}
-	client.staff = helper.loadStaff();
 
 });
 

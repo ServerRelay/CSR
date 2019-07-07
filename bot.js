@@ -28,14 +28,23 @@ class Bot extends discord.Client {
 		 * @type {discord.Collection<string,string>}
 		 */
 		this.csrCooldowns = new discord.Collection();
-		/**
-		 * @type {Map<string,string>}
-		 */
-		this.staff = new Map();
+
 		/**
 		 * @type {string[]}
 		 */
-		this.filter=[]
+		this.filter = [];
+	}
+	/**
+	 * @returns {Map<string,string>}
+	 */
+	get staff() {
+		let map = new Map();
+		this.db.use('staff');
+		let staff = this.db.fetchAll();
+		for (let i in staff) {
+			map.set(i, staff[i]);
+		}
+		return map;
 	}
 	/**
 	 *

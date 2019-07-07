@@ -47,18 +47,6 @@ class Bot extends discord.Client {
 		return map;
 	}
 	/**
-	 * @returns {Map<string,{tag:string,color:number[]}}
-	 */
-	get customColors() {
-		this.db.use('data');
-		let colors = this.db.secure('custom_colors', {});
-		let map = new Map();
-		for (let i in colors) {
-			map.set(i, colors[i]);
-		}
-		return map;
-	}
-	/**
 	 *
 	 *
 	 * @param {discord.Guild} guild

@@ -96,8 +96,8 @@ client.on('message', (message)=>{
 		endLockdown();
 	}
 	if(client.lockdown.enabled && !client.staff.has(message.author.id)) return;
-	const channel = System.getChannel(message.guild);
-	const privchannel = System.getPrivateChannel(message.guild);
+	const channel = client.system.getChannel(message.guild);
+	const privchannel = client.system.getPrivateChannel(message.guild);
 	if(channel && message.channel.id === channel.id) {
 		if(client.csrCooldowns.has(message.author.id)) {return;}
 		broadcastToAllCSRChannels(message);

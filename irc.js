@@ -1,9 +1,7 @@
 const Discord = require('discord.js');
 const helper = require('./helper');
-const system = require('./csrSys');
 const Bot=require('./bot')
 const client = new Bot();
-const jndb = require('jndb');
 const commandHandler = require('easy-djs-commandhandler');
 require('./env').load('.env');
 const prefix = process.env.prefix || 'c-';
@@ -82,7 +80,7 @@ client.on('guildDelete', (guild)=>{
 	const ed = new Discord.RichEmbed()
 		.setColor([255, 0, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
-		.setDescription(`has left the chat ${System.findEmoji('leave')}`);
+		.setDescription(`has left the chat ${client.system.findEmoji('leave')}`);
 	client.system.sendAll(ed);
 
 });
@@ -96,8 +94,8 @@ client.on('message', (message)=>{
 		endLockdown();
 	}
 	if(client.lockdown.enabled && !client.staff.has(message.author.id)) return;
-	const channel = System.getChannel(message.guild);
-	const privchannel = System.getPrivateChannel(message.guild);
+	const channel = client.system.getChannel(message.guild);
+	const privchannel = client.system.getPrivateChannel(message.guild);
 	if(channel && message.channel.id === channel.id) {
 		if(client.csrCooldowns.has(message.author.id)) {return;}
 		broadcastToAllCSRChannels(message);
@@ -107,7 +105,7 @@ client.on('message', (message)=>{
 		}, 2000);
 	}
 	else if(privchannel && message.channel.id === privchannel.id) {
-		sendPrivate(message);
+		sendPrivate(message,message.guild);
 	}
 });
 /////////////////////////
@@ -294,7 +292,12 @@ function generateEmbed(message) {
 		.setDescription(message.cleanContent)
 		.setTimestamp(new Date())
 		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));
-	if(client.staff.has(message.author.id)) {
+	let customColors=client.customColors
+	if(customColors.has(message.author.id)){
+		relayEmbed.setColor(customColors.get(message.author.id).color);
+		relayembed.setAuthor(`${message.author.tag}`, message.author.displayAvatarURL, `https://discordapp.com/users/${message.author.id}`);
+	}
+	else if(client.staff.has(message.author.id)) {
 		relayEmbed.setColor([0, 0, 128]);
 	}
 	else if(message.author.id === message.guild.owner.id) {

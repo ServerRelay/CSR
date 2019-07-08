@@ -70,24 +70,6 @@ class CSRSystem {
 	}
 	/**
 	 *
-	 * @param {discord.Guild} guild
-	 * @returns {discord.TextChannel}
-	 */
-	getChannel(guild) {
-		const channels = this.channels;
-		return channels.get(guild.id);
-	}
-	/**
-	 *
-	 * @param {discord.Guild} guild
-	 * @returns {discord.TextChannel}
-	 */
-	getPrivateChannel(guild) {
-		const channels = this.privateChannels;
-		return channels.get(guild.id);
-	}
-	/**
-	 *
 	 * @param {string|discord.RichEmbed} message
 	 * @param {{ignoreGuilds:string[]}} param1
 	 */
@@ -120,7 +102,7 @@ class CSRSystem {
 	 */
 	getMatchingPrivate(guild) {
 		const channels = new Map();
-		const channel = this.getPrivateChannel(guild);
+		const channel = this.privateChannels.get(guild);
 		if (!channel) {
 			return;
 		}
@@ -141,7 +123,7 @@ class CSRSystem {
 	 * @param {discord.guild} guild
 	 */
 	sendPrivate(message, guild) {
-		const channel = this.getPrivateChannel(guild);
+		const channel = this.privateChannels.get(guild);
 		if (!channel) {
 			return;
 		}
@@ -232,7 +214,7 @@ class CSRSystem {
 			return message.author.send('no choice made');
 		}
 		/**
-		 * @type {Discord.Guild}
+		 * @type {discord.Guild}
 		 */
 		const guild = svs.length > 1 ? svs[collector.first().content] : svs[0];
 		return guild;

@@ -259,6 +259,7 @@ class CSRSystem {
 			public: { id: null, name: null },
 			private: { id: null, name: null, passcode: null },
 		});
+		data.name = guild.name;
 		if (publicChannel) {
 			data.public = {
 				id: publicChannel.id,

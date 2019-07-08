@@ -43,18 +43,7 @@ module.exports = Connect.execute((client, message, args) => {
 			);
 		}
 	}
-	//client.db.use('channels');
-	/**
-	 * @type {{name:string,public: { id: string, name: string },private: { id: string, name: string,passcode:string }})}
-	 */
-	/*let chs = client.db.secure(message.guild.id, {
-		name: null,
-		public: { id: null, name: null },
-		private: { id: null, name: null, passcode: null },
-	});
-	chs.name = message.guild.name;*/
 	if (type == 'public') {
-		//chs.public = { id: channel.id, name: channel.name };
 		client.system.update(message.guild, channel, 'public');
 		let rules = helper.insertRules(client);
 		channel.send(
@@ -65,14 +54,8 @@ module.exports = Connect.execute((client, message, args) => {
 		if (!args[2] || args[2] == '') {
 			return message.channel.send('passcode is empty or invalid');
 		}
-		/*chs.private = {
-			id: channel.id,
-			name: channel.name,
-			passcode: passcode,
-		};*/
 		channel.passcode = passcode;
 		client.system.update(message.guild, channel, 'private');
 	}
-	//client.db.insert(message.guild.id, chs);
 	message.channel.send('successfully set');
 });

@@ -20,20 +20,16 @@ module.exports = Disconnect.execute((client, message, args) => {
 	if (!allowedTypes.includes(type)) {
 		return message.channel.send('invalid type');
 	}
-	client.db.use('channels');
-	if (!client.db.has(message.guild.id)) {
+	if (!client.system.db.has(message.guild.id)) {
 		return message.channel.send(
 			'this server doesnt have configured channels'
 		);
 	}
-	let channels = client.db.fetch(message.guild.id);
-	let replacer = {};
 	if (type == 'public') {
-		replacer = { id: null, name: null };
+		client.system.delete(message.guild,'public')
 	} else {
-		replacer = { id: null, name: null, passcode: null };
+		client.system.delete(message.guild,'private')
 	}
-	channels[type] = replacer;
-	client.db.insert(message.guild.id, channels);
+	
 	message.channel.send('successfully disconnected');
 });

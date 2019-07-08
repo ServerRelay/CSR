@@ -57,15 +57,7 @@ client.on('guildCreate', async (guild)=>{
 	let irc=await guild.createChannel('irc',{type:'text'}).catch(()=>{});
 	await irc.send(helper.insertRules(client)).catch(()=>{});
 	if(irc){
-		client.db.use('channels')
-		let data=client.db.secure(guild.id,{
-			name: null,
-			public: { id: null, name: null },
-			private: { id: null, name: null, passcode: null },
-		})
-		data.name=guild.name
-		data.public={id:irc.id,name:irc.name}
-		client.db.insert(guild.id,data)
+		client.system.create(guild,{publicChannel:irc})
 	}
 	const ed = new Discord.RichEmbed()
 		.setColor([0, 255, 0])
@@ -76,8 +68,7 @@ client.on('guildCreate', async (guild)=>{
 // ////////////////////////////////////////////////////////////////////////////
 client.on('guildDelete', (guild)=>{
 	if(!guild.available) {return;}
-	client.db.use('channels')
-	client.db.delete(guild.id)
+	client.system.delete(guild,'all')
 	console.log('bot removed from server ' + guild.name);
 	const ed = new Discord.RichEmbed()
 		.setColor([255, 0, 0])

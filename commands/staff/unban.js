@@ -1,4 +1,3 @@
-const csr = require('../../banfuncs.js');
 const { Command } = require('easy-djs-commandhandler');
 const unban = new Command({ name: 'unban', hideinhelp: true });
 module.exports = unban.execute(async (client, message, args) => {
@@ -14,6 +13,6 @@ module.exports = unban.execute(async (client, message, args) => {
 	if (!banee) {
 		return;
 	}
-	csr.CSRUnban(message.client, banee);
+	client.system.unban(message.client, banee);
 	message.channel.send('removed from DB');
 });

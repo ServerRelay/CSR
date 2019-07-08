@@ -1,4 +1,3 @@
-const csr = require('../../banfuncs.js');
 const { Command } = require('easy-djs-commandhandler');
 const guildban = new Command({
 	name: 'guildban',
@@ -30,7 +29,7 @@ module.exports = guildban.execute((client, message, args) => {
 			continue;
 		}
 		o += 1;
-		csr.CSRBan(message.client, i);
+		client.system.ban(message.client, i);
 	}
 	message.channel.send(`${guild.name}:banned ${o} members`);
 });

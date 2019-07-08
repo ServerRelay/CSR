@@ -1,4 +1,4 @@
-const csr = require('../../banfuncs.js');
+
 const { Command } = require('easy-djs-commandhandler');
 const ban = new Command({
 	name: 'ban',
@@ -21,7 +21,7 @@ module.exports = ban.execute((client, message, args) => {
 		message.channel.send('not found');
 		return;
 	}
-	csr.CSRBan(message.client, banee);
+	client.system.ban(banee);
 	message.channel.send(
 		`${message.client.users.get(banee.id).username} has been banned`
 	);

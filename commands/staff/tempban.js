@@ -1,5 +1,4 @@
 const ms = require('ms');
-const Csr = require('../../banfuncs.js');
 const { Command } = require('easy-djs-commandhandler');
 // const {staff}=require('./stafflist.json')
 const tempban = new Command({
@@ -32,14 +31,14 @@ module.exports = tempban.execute(async (client, message, args) => {
 	if (!banee) {
 		return;
 	}
-	Csr.CSRBan(message.client, banee);
+	client.system.ban(message.client, banee);
 	message.channel.send(
 		`Boi <@${banee.id}> you have been temp banned for ${ms(ms(time), {
 			long: true,
 		})}`
 	);
 	setTimeout(async () => {
-		Csr.CSRUnban(message.client, banee);
+		client.system.unban(message.client, banee);
 		message.channel.send(
 			`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`
 		);

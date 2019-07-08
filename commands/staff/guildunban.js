@@ -1,4 +1,3 @@
-const csr = require('../../banfuncs.js');
 const { Command } = require('easy-djs-commandhandler');
 const guildunban = new Command({
 	name: 'guildunban',
@@ -30,7 +29,7 @@ module.exports = guildunban.execute(async (client, message, args) => {
 			continue;
 		}
 		o += 1;
-		csr.CSRUnban(message.client, i);
+		client.system.unban(message.client, i);
 	}
 	message.channel.send(`${guild.name}:unbanned ${o} members`);
 });

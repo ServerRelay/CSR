@@ -3,7 +3,7 @@ const jndb = require('jndb');
 class CSRSystem {
 	/**
 	 *
-	 * @param {discord.Client} client
+	 * @param {import('./bot')} client
 	 */
 	constructor(client, channel = 'irc') {
 		this.client = client;
@@ -218,6 +218,30 @@ class CSRSystem {
 		 */
 		const guild = svs.length > 1 ? svs[collector.first().content] : svs[0];
 		return guild;
+	}
+	/**
+	 * 
+	 * @param {discord.User} user 
+	 */
+	ban(user) {
+		let db=new jndb.Connection()
+		db.use('data');
+		this.client.banlist.set(user.id, user.tag);
+		const data = db.secure('bans', {});
+		data[user.id] = user.tag;
+		db.insert('bans', data);
+	}
+	/**
+	 * 
+	 * @param {discord.User} user 
+	 */
+	unban(user) {
+		let db=new jndb.Connection()
+		db.use('data');
+		banlist.delete(user.id);
+		const data = db.fetch('bans');
+		data[user.id] ? delete data[user.id] : '';
+		db.insert('bans', data);
 	}
 }
 

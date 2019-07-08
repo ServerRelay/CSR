@@ -8,16 +8,16 @@ class CSRSystem {
 	constructor(client, channel = 'irc') {
 		this.client = client;
 		this.channel = channel;
+		this.db = new jndb.Connection();
+		this.db.use('channels');
 	}
 	/**
 	 *
 	 * @readonly
-	 * @returns {Map<string,discord.TextChannel}
+	 * @returns {Map<string,PublicChannel>}
 	 */
 	get channels() {
-		let db = new jndb.Connection();
-		db.use('channels');
-		let channels = db.fetchAll();
+		let channels = this.db.fetchAll();
 		const chs = new Map();
 		for (let i in channels) {
 			if (!channels[i].public.id) {
@@ -25,28 +25,26 @@ class CSRSystem {
 			}
 			let guild = this.client.guilds.get(i);
 			if (!guild) {
-				db.delete(i);
+				this.db.delete(i);
 				continue;
 			}
 			let channel = guild.channels.get(channels[i].public.id);
 			if (!channel) {
 				channels[i].public = { id: null, name: null };
-				db.insert(channels);
+				this.db.insert(channels);
 				continue;
 			}
-			chs.set(i, channel);
+			chs.set(i, new PublicChannel(this, channel));
 		}
 		return chs;
 	}
 	/**
 	 *
 	 * @readonly
-	 * @returns {Map<string,discord.TextChannel}
+	 * @returns {Map<string,PrivateChannel>}
 	 */
 	get privateChannels() {
-		let db = new jndb.Connection();
-		db.use('channels');
-		let channels = db.fetchAll();
+		let channels = this.db.fetchAll();
 		const chs = new Map();
 		for (let i in channels) {
 			if (!channels[i].private.id) {
@@ -54,17 +52,17 @@ class CSRSystem {
 			}
 			let guild = this.client.guilds.get(i);
 			if (!guild) {
-				db.delete(i);
+				this.db.delete(i);
 				continue;
 			}
 			let channel = guild.channels.get(channels[i].private.id);
 			if (!channel) {
 				channels[i].private = { id: null, name: null, passcode: null };
-				db.insert(channels);
+				this.db.insert(channels);
 				continue;
 			}
 			channel.passcode = channels[i].private.passcode;
-			chs.set(i, channel);
+			chs.set(i, new PrivateChannel(this, channel, channel.passcode));
 		}
 		return chs;
 	}
@@ -220,11 +218,11 @@ class CSRSystem {
 		return guild;
 	}
 	/**
-	 * 
-	 * @param {discord.User} user 
+	 *
+	 * @param {discord.User} user
 	 */
 	ban(user) {
-		let db=new jndb.Connection()
+		let db = new jndb.Connection();
 		db.use('data');
 		this.client.banlist.set(user.id, user.tag);
 		const data = db.secure('bans', {});
@@ -232,17 +230,156 @@ class CSRSystem {
 		db.insert('bans', data);
 	}
 	/**
-	 * 
-	 * @param {discord.User} user 
+	 *
+	 * @param {discord.User} user
 	 */
 	unban(user) {
-		let db=new jndb.Connection()
+		let db = new jndb.Connection();
 		db.use('data');
 		banlist.delete(user.id);
 		const data = db.fetch('bans');
 		data[user.id] ? delete data[user.id] : '';
 		db.insert('bans', data);
 	}
+	/**
+	 *
+	 * @param {discord.Guild} guild
+	 * @param {{publicChannel:discord.TextChannel,privateChannel:discord.TextChannel}} param1
+	 * @returns {{public:PublicChannel,private:PrivateChannel}} newly created data for channels
+	 */
+	create(
+		guild,
+		{ publicChannel = null, privateChannel = null } = {
+			publicChannel: undefined,
+			private: undefined,
+		}
+	) {
+		let data = this.db.secure(guild.id, {
+			name: null,
+			public: { id: null, name: null },
+			private: { id: null, name: null, passcode: null },
+		});
+		if (publicChannel) {
+			data.public = {
+				id: publicChannel.id,
+				name: publicChannel.name,
+			};
+		}
+		if (privateChannel) {
+			if (!privateChannel.passcode) {
+				throw new Error('private channel does not have a passcode set');
+			}
+			data.private = {
+				id: privateChannel.id,
+				name: privateChannel.name,
+				passcode: privateChannel.passcode,
+			};
+		}
+		this.db.insert(guild.id, data);
+		let returnObj = {};
+		returnObj.publicChannel = publicChannel
+			? new PublicChannel(this, publicChannel)
+			: undefined;
+		returnObj.privateChannel = privateChannel
+			? new PrivateChannel(this, privateChannel)
+			: undefined;
+		return returnObj;
+	}
+	/**
+	 *
+	 * @param {discord.Guild} guild
+	 * @param {discord.TextChannel} channel
+	 * @param {'public'|'private'} type
+	 */
+	update(guild, channel, type) {
+		if (!type) {
+			return;
+		}
+		let data = this.db.secure(guild.id, {
+			name: null,
+			public: { id: null, name: null },
+			private: { id: null, name: null, passcode: null },
+		});
+		data.name = guild.name;
+		if (type == 'public') {
+			data.public = {
+				id: channel.id,
+				name: channel.name,
+			};
+		} else if (type == 'private') {
+			if (!channel.passcode) {
+				throw new Error('private channel does not have a passcode set');
+			}
+			data.private = {
+				id: channel.id,
+				name: channel.name,
+				passcode: channel.passcode,
+			};
+		}
+		this.db.insert(guild.id, data);
+	}
+	/**
+	 *
+	 * @param {discord.Guild} guild
+	 * @param {'all'|'public'|'private'} type
+	 */
+	delete(guild, type = 'all') {
+		let data = this.db.fetch(guild.id);
+		if (!data) {
+			return this;
+		}
+		if (type == 'all') {
+			this.db.delete(guild.id);
+		} else if (type == 'public') {
+			data.public = { id: null, name: null };
+			this.db.insert(guild.id, data);
+		} else if (type == 'private') {
+			data.private = { id: null, name: null, passcode: null };
+			this.db.insert(guild.id, data);
+		}
+		return this;
+	}
 }
 
 module.exports = CSRSystem;
+class CSRChannel extends discord.TextChannel {
+	/**
+	 *
+	 * @param {discord.TextChannel} channel
+	 * @param {CSRSystem} system
+	 */
+	constructor(system, channel) {
+		super(channel.guild, channel);
+		this.system = system;
+	}
+}
+class PublicChannel extends CSRChannel {
+	/**
+	 *
+	 * @param {discord.TextChannel} channel
+	 * @param {CSRSystem} system
+	 */
+	constructor(system, channel) {
+		super(system, channel);
+		this.csrType = 'public';
+	}
+}
+class PrivateChannel extends CSRChannel {
+	/**
+	 * @param {CSRSystem} system
+	 * @param {discord.TextChannel} channel
+	 * @param {string} passcode
+	 */
+	constructor(system, channel, passcode) {
+		super(system, channel);
+		this.csrType = 'private';
+		this.passcode = passcode;
+	}
+	/**
+	 * @param {string} passcode
+	 */
+	setPasscode(passcode) {
+		this.passcode = passcode;
+		return this;
+	}
+}

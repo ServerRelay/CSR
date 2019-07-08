@@ -82,7 +82,7 @@ client.on('guildDelete', (guild)=>{
 	const ed = new Discord.RichEmbed()
 		.setColor([255, 0, 0])
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
-		.setDescription(`has left the chat ${System.findEmoji('leave')}`);
+		.setDescription(`has left the chat ${client.system.findEmoji('leave')}`);
 	client.system.sendAll(ed);
 
 });

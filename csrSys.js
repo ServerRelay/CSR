@@ -100,7 +100,7 @@ class CSRSystem {
 	 */
 	getMatchingPrivate(guild) {
 		const channels = new Map();
-		const channel = this.privateChannels.get(guild);
+		const channel = this.privateChannels.get(guild.id);
 		if (!channel) {
 			return;
 		}

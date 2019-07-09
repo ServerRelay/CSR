@@ -29,14 +29,14 @@ module.exports = Connect.execute((client, message, args) => {
 		return message.channel.send('invalid type');
 	}
 	if (type == 'public') {
-		let pChannel = client.system.privateChannels.get(message.guild);
+		let pChannel = client.system.privateChannels.get(message.guild.id);
 		if (pChannel && channel.id == pChannel.id) {
 			return message.channel.send(
 				"public channel can't be the same as private channel"
 			);
 		}
 	} else if (type == 'private') {
-		let pChannel = client.system.channels.get(message.guild);
+		let pChannel = client.system.channels.get(message.guild.id);
 		if (pChannel && channel.id == pChannel.id) {
 			return message.channel.send(
 				"private channel can't be the same as the public channel"

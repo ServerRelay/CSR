@@ -87,8 +87,8 @@ client.on('message', (message)=>{
 		endLockdown();
 	}
 	if(client.lockdown.enabled && !client.staff.has(message.author.id)) return;
-	const channel = client.system.channels.get(message.guild);
-	const privchannel = client.system.privateChannels.get(message.guild);
+	const channel = client.system.channels.get(message.guild.id);
+	const privchannel = client.system.privateChannels.get(message.guild.id);
 	if(channel && message.channel.id === channel.id) {
 		if(client.csrCooldowns.has(message.author.id)) {return;}
 		broadcastToAllCSRChannels(message);
@@ -168,7 +168,7 @@ async function broadcastToAllCSRChannels(message) {
  * @param {Discord.Message} message
  */
 async function sendPrivate(message) {
-	const channel = client.system.privateChannels.get(message.guild);
+	const channel = client.system.privateChannels.get(message.guild.id);
 	if(!channel) {return;}
 
 	if(!message.attachments.size && !message.deleted) {

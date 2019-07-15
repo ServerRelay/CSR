@@ -18,6 +18,7 @@ module.exports = Stats.execute((client, message) => {
 	//	}\n <total servers>\n${st}\n <total users/members>\`\`\``
 	//);
 	let embed = new RichEmbed()
+		// @ts-ignore
 		.setColor([20, 110, 164, 0.62])
 		.setTitle('CSR stats')
 		.addField('total servers', message.client.guilds.size, false)

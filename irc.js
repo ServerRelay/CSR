@@ -5,11 +5,13 @@ const Bot=require('./bot')
 const client = new Bot();
 const jndb = require('jndb');
 const commandHandler = require('easy-djs-commandhandler');
+// @ts-ignore
 require('./env').load('.env');
 const prefix = process.env.prefix || 'c-';
 const cmdHandler = new commandHandler.Handler(client,
 	{
 		prefix: prefix,
+		// @ts-ignore
 		owners: ['298258003470319616', '193406800614129664'],
 		defaultcmds:true,
 	});
@@ -61,6 +63,7 @@ client.on('guildCreate', async (guild)=>{
 	}
 	const ed = new Discord.RichEmbed()
 		.setColor([0, 255, 0])
+		// @ts-ignore
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has joined the chat ${client.system.findEmoji('join')}`);
 	client.system.sendAll(ed);
@@ -72,6 +75,7 @@ client.on('guildDelete', (guild)=>{
 	console.log('bot removed from server ' + guild.name);
 	const ed = new Discord.RichEmbed()
 		.setColor([255, 0, 0])
+		// @ts-ignore
 		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
 		.setDescription(`has left the chat ${client.system.findEmoji('leave')}`);
 	client.system.sendAll(ed);
@@ -92,7 +96,7 @@ client.on('message', (message)=>{
 	if(channel && message.channel.id === channel.id) {
 		if(client.csrCooldowns.has(message.author.id)) {return;}
 		broadcastToAllCSRChannels(message);
-		client.csrCooldowns.set(message.author.id);
+		client.csrCooldowns.set(message.author.id,null);
 		setTimeout(() => {
 			client.csrCooldowns.delete(message.author.id);
 		}, 2000);
@@ -114,7 +118,7 @@ client.on('messageReactionAdd',(reaction,user)=>{
 	if(!CSRMessageAuthor||(CSRMessageAuthor.id!=user.id && !client.staff.has(user.id))){
 		return 
 	}
-	let messages=System.findMatchingMessages(CSRMessageAuthor.tag,message.embeds[0].description)
+	let messages=client.system.findMatchingMessages(CSRMessageAuthor.tag,message.embeds[0].description)
 	
 	messages.forEach(msg=>msg.delete().catch(e=>{}))
 })
@@ -142,6 +146,7 @@ client.on('rateLimit', (ratelimit)=>{
  * @param {Discord.Message} message
  */
 async function broadcastToAllCSRChannels(message) {
+	// @ts-ignore
 	if(message.author.createdAt>(new Date().getTime()-604800000)) {
 		return;
 	}
@@ -172,6 +177,7 @@ async function sendPrivate(message) {
 	if(!channel) {return;}
 
 	if(!message.attachments.size && !message.deleted) {
+		// @ts-ignore
 		message.delete(500);
 	}
 
@@ -281,6 +287,7 @@ function getDebugInfo(arr) {
  */
 function generateEmbed(message) {
 	const relayEmbed = new Discord.RichEmbed()
+		// @ts-ignore
 		.setAuthor(`${message.author.tag}`, message.author.displayAvatarURL, `https://discordapp.com/users/${message.author.id}`)
 		.setDescription(message.cleanContent)
 		.setTimestamp(new Date())
@@ -298,7 +305,7 @@ function generateEmbed(message) {
 	// find and add image
 	if(message.attachments.array()[0]) {
 		const img = message.attachments.array()[0];
-		if(img.filename.endsWith('.jpg') || img.filename.endsWith('.png') || img.filename.endsWith('.gif') || img.filename.endsWith('.jpeg') || img.filename.endsWith('.PNG')) {
+		if(img.name.endsWith('.jpg') || img.name.endsWith('.png') || img.name.endsWith('.gif') || img.name.endsWith('.jpeg') || img.name.endsWith('.PNG')) {
 			relayEmbed.setImage(img.url);
 		}
 		else{

@@ -244,14 +244,14 @@ class CSRSystem {
 	/**
 	 *
 	 * @param {discord.Guild} guild
-	 * @param {{publicChannel:discord.TextChannel,privateChannel:discord.TextChannel}} param1
+	 * @param {{publicChannel?:discord.TextChannel,privateChannel?:discord.TextChannel}} param1
 	 * @returns {{public:PublicChannel,private:PrivateChannel}} newly created data for channels
 	 */
 	create(
 		guild,
 		{ publicChannel = null, privateChannel = null } = {
 			publicChannel: undefined,
-			private: undefined,
+			privateChannel: undefined,
 		}
 	) {
 		let data = this.db.secure(guild.id, {

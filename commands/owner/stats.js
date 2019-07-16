@@ -11,12 +11,6 @@ module.exports = Stats.execute((client, message) => {
 	client.guilds.forEach((sv) => {
 		st = st + sv.memberCount;
 	});
-
-	//message.author.send(
-	//	`\`\`\`md\n${
-	//		message.client.guilds.size
-	//	}\n <total servers>\n${st}\n <total users/members>\`\`\``
-	//);
 	let embed = new RichEmbed()
 		// @ts-ignore
 		.setColor([20, 110, 164, 0.62])

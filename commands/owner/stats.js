@@ -17,10 +17,8 @@ module.exports = Stats.execute((client, message) => {
 		.setTitle('CSR stats')
 		.addField('total servers', message.client.guilds.size, false)
 		.addField('total users/members', st, false)
-		.addField('public channels', client.system.channels.size)
-		.addField('private channels', client.system.privateChannels.size)
 		.addField(
-			`total servers connected with CSR ${client.system.channels.size +
+			`total servers connected with CSR: ${client.system.channels.size +
 				client.system.privateChannels.size}`,
 			`servers with public channels: ${
 				client.system.channels.size

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const discord = require('discord.js');
 const jndb = require('jndb');
 class CSRSystem {
@@ -245,7 +246,7 @@ class CSRSystem {
 	 *
 	 * @param {discord.Guild} guild
 	 * @param {{publicChannel?:discord.TextChannel,privateChannel?:discord.TextChannel}} param1
-	 * @returns {{public:PublicChannel,private:PrivateChannel}} newly created data for channels
+	 * @returns {{publicChannel:PublicChannel,privateChannel:PrivateChannel}} newly created data for channels
 	 */
 	create(
 		guild,
@@ -282,7 +283,7 @@ class CSRSystem {
 			? new PublicChannel(this, publicChannel)
 			: undefined;
 		returnObj.privateChannel = privateChannel
-			? new PrivateChannel(this, privateChannel)
+			? new PrivateChannel(this, privateChannel,privateChannel.passcode)
 			: undefined;
 		return returnObj;
 	}

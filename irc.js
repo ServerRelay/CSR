@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const helper = require('./helper');
 const system = require('./csrSys');
 const Bot=require('./bot')
 const client = new Bot();
@@ -249,6 +248,7 @@ function getDebugInfo(arr) {
 		const channel = client.channels.get(arr[4]);
 		if(channel) {
 			data.channel = channel;
+			// @ts-ignore
 			data.guild = channel.guild;
 		}
 	}
@@ -261,6 +261,7 @@ function getDebugInfo(arr) {
 	if(!arr[5])return data;
 
 	if(arr[5] == 'permissions') {
+		// @ts-ignore
 		const role = data.channel.guild.roles.get(arr[6]);
 		if(role) {
 			data.role = role;
@@ -270,6 +271,7 @@ function getDebugInfo(arr) {
 	if(arr[5] == 'messages') {
 		const channel = client.channels.get(arr[4]);
 		if(channel) {
+			// @ts-ignore
 			const msg = channel.messages.get(arr[6]);
 			if(msg) {
 				data.message = msg;
@@ -305,7 +307,8 @@ function generateEmbed(message) {
 	// find and add image
 	if(message.attachments.array()[0]) {
 		const img = message.attachments.array()[0];
-		if(img.name.endsWith('.jpg') || img.name.endsWith('.png') || img.name.endsWith('.gif') || img.name.endsWith('.jpeg') || img.name.endsWith('.PNG')) {
+		let images=['.jpg','.jpeg','.png','.gif','.PNG']
+		if(images.some(x=>img.filename.endsWith(x))) {
 			relayEmbed.setImage(img.url);
 		}
 		else{

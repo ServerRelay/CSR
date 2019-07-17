@@ -1,4 +1,3 @@
-const helper = require('../helper');
 const jndb = require('jndb');
 const { Command } = require('easy-djs-commandhandler');
 const Connect = new Command({
@@ -45,7 +44,7 @@ module.exports = Connect.execute((client, message, args) => {
 	}
 	if (type == 'public') {
 		client.system.update(message.guild, channel, 'public');
-		let rules = helper.insertRules(client);
+		let rules = client.rules;
 		channel.send(
 			'**make sure you read the rules before proceding**',
 			rules

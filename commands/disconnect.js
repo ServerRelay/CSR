@@ -1,4 +1,3 @@
-const helper = require('../helper');
 const jndb = require('jndb');
 const { Command } = require('easy-djs-commandhandler');
 const Disconnect = new Command({

@@ -382,6 +382,7 @@ class PrivateChannel extends CSRChannel {
 	 */
 	setPasscode(passcode) {
 		this.passcode = passcode;
+		this.system.update(this.guild,this,"private")
 		return this;
 	}
 }

@@ -176,7 +176,7 @@ async function sendPrivate(message) {
 	const channel = client.system.privateChannels.get(message.guild.id);
 	if(!channel) {return;}
 
-	if(!message.attachments.size && !message.deleted) {
+	if(!message.attachments.size && message.deletable) {
 		// @ts-ignore
 		message.delete(500);
 	}

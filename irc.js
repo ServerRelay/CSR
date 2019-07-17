@@ -57,7 +57,7 @@ client.on('guildCreate', async (guild)=>{
 	if(!guild.available) {return;}
 	console.log('joined server ' + guild.name);
 	let irc=await guild.createChannel('irc',{type:'text'}).catch(()=>{});
-	await irc.send(helper.insertRules(client)).catch(()=>{});
+	await irc.send(client.rules).catch(()=>{});
 	if(irc){
 		client.system.create(guild,{publicChannel:irc})
 	}

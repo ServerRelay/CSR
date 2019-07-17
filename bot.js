@@ -47,6 +47,17 @@ class Bot extends discord.Client {
 		return map;
 	}
 	/**
+	 * @returns {discord.RichEmbed}
+	 */
+	get rules() {
+		let code = require('./ircrules');
+		const cd = new discord.RichEmbed()
+			.setColor([0, 200, 138])
+			.setDescription(code)
+			.setFooter('IRC Code Of Conduct', this.user.displayAvatarURL);
+		return cd;
+	}
+	/**
 	 *
 	 *
 	 * @param {discord.Guild} guild

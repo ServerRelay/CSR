@@ -1,7 +1,7 @@
 const { Command } = require('easy-djs-commandhandler');
 const Pban = new Command({
 	name: 'pban',
-	description:'disallows an user from sending messages across servers',
+	description: 'disallows an user from sending messages across servers',
 	requires: ['dm'],
 	requiresBotPermissions: ['MANAGE_CHANNELS'],
 });
@@ -25,13 +25,19 @@ module.exports = Pban.execute(async (client, message) => {
 	const privateCh = client.system.channels.get(guild.id);
 	const channel = client.system.privateChannels.get(guild.id);
 	if (privateCh) {
-		await privateCh.overwritePermissions(member.id, {
-			SEND_MESSAGES: false,
+		await privateCh.overwritePermissions({
+			permissionOverwrites: [{ id: member.id, deny: 'SEND_MESSAGES' }],
 		});
+		//await privateCh.overwritePermissions(member.id, {
+		//	SEND_MESSAGES: false,
+		//});
 	}
 	if (channel) {
-		await channel.overwritePermissions(member.id, {
-			SEND_MESSAGES: false,
+		await channel.overwritePermissions({
+			permissionOverwrites: [{ id: member.id, deny: 'SEND_MESSAGES' }],
 		});
+		//await channel.overwritePermissions(member.id, {
+		//	SEND_MESSAGES: false,
+		//});
 	}
 });

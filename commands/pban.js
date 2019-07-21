@@ -2,7 +2,7 @@ const { Command } = require('easy-djs-commandhandler');
 const Pban = new Command({
 	name: 'pban',
 	description:'disallows an user from sending messages across servers',
-	require: 'dm',
+	requires: ['dm'],
 	requiresBotPermissions: ['MANAGE_CHANNELS'],
 });
 
@@ -11,8 +11,8 @@ module.exports = Pban.execute(async (client, message) => {
 	const author = message.member;
 	const member = message.mentions.members.first();
 	if (
-		!author.id == guild.owner.id &&
-		author.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS'])
+		author.id != guild.owner.id &&
+		!author.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS'])
 	) {
 		return message.channel.send(
 			'you do not have the necessary permissions for this command'
@@ -22,8 +22,8 @@ module.exports = Pban.execute(async (client, message) => {
 		return message.channel.send('no member found');
 	}
 
-	const privateCh = client.system.getPrivateChannel(guild);
-	const channel = client.system.getChannel(guild);
+	const privateCh = client.system.channels.get(guild.id);
+	const channel = client.system.privateChannels.get(guild.id);
 	if (privateCh) {
 		await privateCh.overwritePermissions(member.id, {
 			SEND_MESSAGES: false,

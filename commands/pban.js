@@ -1,7 +1,8 @@
 const { Command } = require('easy-djs-commandhandler');
 const Pban = new Command({
 	name: 'pban',
-	description: 'disallows an user from sending messages across servers',
+	description:
+		'disallows an user from sending messages across servers in a specific guild',
 	requires: ['guild'],
 	requiresBotPermissions: ['MANAGE_CHANNELS'],
 });

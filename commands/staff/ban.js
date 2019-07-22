@@ -8,7 +8,7 @@ const ban = new Command({
 });
 module.exports = ban.execute((client, message, args) => {
 	
-	if (!message.client.staff.has(message.author.id)) {
+	if (!client.staff.has(message.author.id)) {
 		message.channel.send('no permission');
 		return;
 	}

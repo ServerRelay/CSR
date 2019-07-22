@@ -62,7 +62,7 @@ declare class BansManager {
 	public client: Bot;
 	private db: Connection;
 
-	public get bans(): Map<string, string>;
+	public get bans(): Map<string, BanInfo>;
 
 	public has(id: string): boolean;
 	public get(id: string): { id: string; tag: string };

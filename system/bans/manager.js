@@ -9,10 +9,15 @@ class BansManager {
 		this.db.use('data');
 	}
 	/**
-	 * @returns {{[id:string]:BanInfo}}
+	 * @returns {Map<string,BanInfo>}
 	 */
 	get bans() {
-		return this.db.fetch('bans');
+		let map=new Map()
+		let bans=this.db.fetch('bans')
+		for(let i in bans){
+			map.set(i,bans[i])
+		}
+		return map;
 	}
 	/**
 	 *
@@ -33,9 +38,6 @@ class BansManager {
 		};
 		bans[user.id] = info;
 		this.db.insert('bans', info);
-		if (this.client.banlist) {
-			this.client.banlist.set(user.id, info);
-		}
 		return this;
 	}
 	/**
@@ -46,9 +48,6 @@ class BansManager {
 		let bans = this.bans;
 		delete bans[id];
 		this.db.insert('bans', bans);
-		if (this.client.banlist) {
-			this.client.banlist.delete(id);
-		}
 		return this;
 	}
 	/**

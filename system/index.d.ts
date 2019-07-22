@@ -38,8 +38,8 @@ declare class ChannelsManager {
 	public client: Bot;
 	private db: Connection;
 
-	public get channels(): Map<string, PublicChannel>;
-	public get privateChannels(): Map<string, PrivateChannel>;
+	public get public(): Map<string, PublicChannel>;
+	public get private(): Map<string, PrivateChannel>;
 
 	create(
 		guild: Guild,
@@ -74,7 +74,7 @@ declare class System {
 	public client: Bot;
 	private db: Connection;
 	public bansManager: BansManager;
-	public channelsManager: ChannelsManager;
+	public channels: ChannelsManager;
 
 	public sendAll(
 		message: string | RichEmbed,

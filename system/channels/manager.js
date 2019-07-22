@@ -15,7 +15,7 @@ class ChannelsManager {
 	/**
 	 * @returns {Map<string,PublicChannel>}
 	 */
-	get channels() {
+	get public() {
 		let channels = this.db.fetchAll();
 		const chs = new Map();
 		for (let i in channels) {
@@ -42,7 +42,7 @@ class ChannelsManager {
 	/**
 	 * @returns {Map<string,PrivateChannel>}
 	 */
-	get privateChannels() {
+	get private() {
 		let channels = this.db.fetchAll();
 		const chs = new Map();
 		for (let i in channels) {

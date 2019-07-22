@@ -23,19 +23,18 @@ class BansManager {
 	}
 	/**
 	 *
-	 * @param {string} id
-	 * @param {string} tag
+	 * @param {import('discord.js').User} user
 	 */
-	set(id, tag) {
+	set(user) {
 		let bans = this.bans;
 		let info = {
-			tag,
+			tag:user.tag,
 			banned_at: getFormattedDate(),
 		};
-		bans[id] = info;
+		bans[user.id] = info;
 		this.db.insert('bans', info);
 		if (this.client.banlist) {
-			this.client.banlist.set(id, info);
+			this.client.banlist.set(user.id, info);
 		}
 		return this;
 	}

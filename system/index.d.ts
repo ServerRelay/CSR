@@ -7,6 +7,7 @@ import {
 	Emoji,
 	Collection,
 	Message,
+	User,
 } from 'discord.js';
 
 declare class BaseChannel extends TextChannel {
@@ -65,7 +66,7 @@ declare class BansManager {
 
 	public has(id: string): boolean;
 	public get(id: string): { id: string; tag: string };
-	public set(id: string, tag: string): this;
+	public set(user:User): this;
 	public delete(id: string): this;
 }
 export = System;

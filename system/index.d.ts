@@ -78,7 +78,7 @@ declare class System {
 
 	public sendAll(
 		message: string | RichEmbed,
-		{ ignoreGuilds = Array<string>() }
+		{ ignoreGuilds = Array<string>() }?
 	): void;
 	public findCloseServers(name: string): Array<Guild>;
 	public findEmoji(name: string): Emoji;

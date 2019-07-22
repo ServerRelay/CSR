@@ -9,8 +9,8 @@ import {
 	Message,
 } from 'discord.js';
 
-declare class BaseChannel {
-	constructor(system: System);
+declare class BaseChannel extends TextChannel {
+	constructor(system: System, channel: TextChannel);
 	public system: System;
 	public client: Bot;
 }

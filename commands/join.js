@@ -7,7 +7,7 @@ const join = new Command({
 });
 module.exports = join.execute(async (client, message, args) => {
 	if (!args[0]) return message.channel.send('please specify a server name');
-	if (message.client.banlist.has(message.author.id)) {
+	if (client.banlist.has(message.author.id)) {
 		return message.channel.send('not allowed');
 	}
 
@@ -125,7 +125,7 @@ module.exports = join.execute(async (client, message, args) => {
 
 		// sv.owner.send(RichEmbed=ed)
 
-		if (!collector.size) {
+		if (!reqcollector.size) {
 			message.author.send('no response try again later');
 			rq.delete();
 		}

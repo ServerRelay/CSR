@@ -46,7 +46,7 @@ declare class ChannelsManager {
 		{
 			publicChannel,
 			privateChannel,
-		}: { publicChannel: TextChannel; privateChannel: TextChannel }
+		}: { publicChannel?: TextChannel; privateChannel?: TextChannel }
 	): { publicChannel: PublicChannel; privateChannel: PrivateChannel };
 	update(
 		guild: Guild,

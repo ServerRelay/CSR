@@ -3,6 +3,7 @@ const discord = require('discord.js');
 const jndb = require('jndb');
 const BansManager = require('./bans/manager');
 const ChannelsManager = require('./channels/manager');
+const WebhookManager = require('./webhooks/manager');
 class System {
 	/**
 	 *
@@ -13,7 +14,8 @@ class System {
 		this.db = new jndb.Connection();
 		this.db.use('channels');
 		this.banManager = new BansManager(client);
-		this.channelsManager = new ChannelsManager(this);
+		this.channels = new ChannelsManager(this);
+		this.webhookManager = new WebhookManager(this);
 	}
 
 	/**

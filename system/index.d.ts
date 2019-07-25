@@ -8,6 +8,7 @@ import {
 	Collection,
 	Message,
 	User,
+	Webhook,
 } from 'discord.js';
 
 declare class BaseChannel extends TextChannel {
@@ -66,8 +67,20 @@ declare class BansManager {
 
 	public has(id: string): boolean;
 	public get(id: string): { id: string; tag: string };
-	public set(user:User): this;
+	public set(user: User): this;
 	public delete(id: string): this;
+}
+declare class WebHookManager {
+	constructor(system: System);
+	async fetchWebhooks(): {
+		public: Map<string, Webhook>;
+		private: Map<string, WebHook>;
+	};
+	public async send(
+		webhook: Webhook,
+		user: User,
+		content: string | RichEmbed
+	): void;
 }
 export = System;
 declare class System {
@@ -76,6 +89,7 @@ declare class System {
 	private db: Connection;
 	public bansManager: BansManager;
 	public channels: ChannelsManager;
+	public webhookManager: WebHookManager;
 
 	public sendAll(
 		message: string | RichEmbed,

@@ -22,9 +22,9 @@ module.exports = Pban.execute(async (client, message) => {
 	if (!member) {
 		return message.channel.send('no member found');
 	}
-
-	const privateCh = client.system.channels.get(guild.id);
-	const channel = client.system.privateChannels.get(guild.id);
+	const channels=client.system.getChannels(guild)
+	const privateCh = channels.private
+	const channel = channels.public;
 	if (privateCh) {
 		await privateCh.overwritePermissions({
 			permissionOverwrites: [{ id: member.id, deny: 'SEND_MESSAGES' }],

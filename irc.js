@@ -17,7 +17,7 @@ const cmdHandler = new commandHandler.Handler(client,
 client.filter=[];
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
-client.on('ready', ()=>{
+client.on('ready', async()=>{
 	console.log('irc connected');
 	client.user.setActivity(`${prefix}help`);
 	client.db.use('data');
@@ -36,7 +36,11 @@ client.on('ready', ()=>{
 			client.filter.push(word)
 		}
 	}
-
+	//let webhooks=await client.system.webhookManager.fetchWebhooks()
+	//webhooks.private.forEach(async wb=>{
+	//	await client.system.webhookManager.send(wb,client.user,'online')
+	//})
+	//console.log(await client.system.webhookManager.fetchWebhooks())
 });
 
 // //////////////////////////////////////////////////////////////////////////////////
@@ -55,10 +59,14 @@ function findemoji(name) {
 client.on('guildCreate', async (guild)=>{
 	if(!guild.available) {return;}
 	console.log('joined server ' + guild.name);
+	/**
+	 * @type {Discord.TextChannel}
+	 */
+	// @ts-ignore
 	let irc=await guild.createChannel('irc',{type:'text'}).catch(()=>{});
 	await irc.send(client.rules).catch(()=>{});
 	if(irc){
-		client.system.create(guild,{publicChannel:irc})
+		client.system.channels.create(guild,{publicChannel:irc})
 	}
 	const ed = new Discord.RichEmbed()
 		.setColor([0, 255, 0])
@@ -70,7 +78,7 @@ client.on('guildCreate', async (guild)=>{
 // ////////////////////////////////////////////////////////////////////////////
 client.on('guildDelete', (guild)=>{
 	if(!guild.available) {return;}
-	client.system.delete(guild,'all')
+	client.system.channels.delete(guild,'all')
 	console.log('bot removed from server ' + guild.name);
 	const ed = new Discord.RichEmbed()
 		.setColor([255, 0, 0])
@@ -90,8 +98,8 @@ client.on('message', (message)=>{
 		endLockdown();
 	}
 	if(client.lockdown.enabled && !client.staff.has(message.author.id)) return;
-	const channel = client.system.channels.get(message.guild.id);
-	const privchannel = client.system.privateChannels.get(message.guild.id);
+	const channel = client.system.getChannels(message.guild).public
+	const privchannel = client.system.getChannels(message.guild).private;
 	if(channel && message.channel.id === channel.id) {
 		if(client.csrCooldowns.has(message.author.id)) {return;}
 		broadcastToAllCSRChannels(message);
@@ -109,7 +117,7 @@ client.on('messageReactionAdd',(reaction,user)=>{
 	let message=reaction.message
 	let guild=message.guild
 	let channel=message.channel
-	let ircChannel=client.getPublicChannel(guild)
+	let ircChannel=client.system.getChannels(guild).public;
 	if(!message.embeds[0] || message.author.id!=client.user.id||!(ircChannel&&ircChannel.id===channel.id)){
 		return
 	}
@@ -172,7 +180,7 @@ async function broadcastToAllCSRChannels(message) {
  * @param {Discord.Message} message
  */
 async function sendPrivate(message) {
-	const channel = client.system.privateChannels.get(message.guild.id);
+	const channel = client.system.getChannels(message.guild).private;
 	if(!channel) {return;}
 
 	if(!message.attachments.size && message.deletable) {

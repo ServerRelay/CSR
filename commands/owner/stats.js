@@ -31,15 +31,18 @@ module.exports = Stats.execute((client, message) => {
 		message.author.send(embed);
 	} else {
 		let chs = client.system.getChannels(message.guild);
+		let connectedGuilds = client.system.getMatchingPrivate(message.guild);
 		let embed = new RichEmbed()
 			// @ts-ignore
 			.setColor([20, 110, 164, 0.62])
 			.setTitle('server stats')
 			.addField(
 				'channels',
-				`public: ${chs.public || 'none'}\nprivate: ${chs.private || 'none'}`,
+				`public: ${chs.public || 'none'}\nprivate: ${chs.private ||
+					'none'}`,
 				false
-			);
+			)
+			.addField('connected servers', connectedGuilds.size, false);
 		message.channel.send(embed);
 	}
 });

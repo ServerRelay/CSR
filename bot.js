@@ -1,5 +1,5 @@
 const discord = require('discord.js');
-const CSRSystem = require('./csrSys');
+const System = require('./system/index');
 const jndb = require('jndb');
 /**
  *
@@ -15,7 +15,7 @@ class Bot extends discord.Client {
 	constructor(options) {
 		super(options);
 		this.db = new jndb.Connection();
-		this.system = new CSRSystem(this, process.env.channel);
+		this.system = new System(this);
 		/**
 		 * @type {discord.Collection<string,string>}
 		 */
@@ -54,28 +54,10 @@ class Bot extends discord.Client {
 		const cd = new discord.RichEmbed()
 			.setColor([0, 200, 138])
 			.setDescription(code)
+			// @ts-ignore
 			.setFooter('IRC Code Of Conduct', this.user.displayAvatarURL);
 		return cd;
 	}
-	/**
-	 *
-	 *
-	 * @param {discord.Guild} guild
-	 * @returns
-	 * @memberof Bot
-	 */
-	getPublicChannel(guild) {
-		return this.system.channels.get(guild.id);
-	}
-	/**
-	 *
-	 *
-	 * @param {discord.Guild} guild
-	 * @returns
-	 * @memberof Bot
-	 */
-	getPrivateChannel(guild) {
-		return this.system.privateChannels.get(guild.id);
-	}
+	
 }
 module.exports = Bot;

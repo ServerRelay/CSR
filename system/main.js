@@ -168,6 +168,16 @@ class System {
 		const guild = svs.length > 1 ? svs[collector.first().content] : svs[0];
 		return guild;
 	}
+	/**
+	 *
+	 * @param {import('discord.js').Guild} guild
+	 */
+	getChannels(guild) {
+		let obj = {};
+		obj.public = this.channels.public.get(guild.id);
+		obj.private = this.channels.private.get(guild.id);
+		return obj;
+	}
 }
 
 module.exports = System;

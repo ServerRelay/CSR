@@ -104,6 +104,9 @@ declare class System {
 	public getMatchingPrivate(guild: Guild): Map<string, PrivateChannel>;
 	public async obtainServer(message: Message, guilds: Array<Guild>): Guild;
 	public sendPrivate(message: string | RichEmbed, guild: Guild): void;
+	public getChannels(
+		guild: Guild
+	): { public: PublicChannel; private: PrivateChannel };
 }
 
 export declare type BanInfo = { tag: string; banned_at: string };

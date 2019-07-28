@@ -9,6 +9,11 @@ class PublicChannel extends Base {
 	constructor(system, channel) {
 		super(system, channel);
 		this.csrType = 'public';
+		/**
+		 * @type {import('discord.js').Collection<string,import('discord.js').Message>}
+		 */
+		// @ts-ignore
+		this.messages = channel.messages;
 	}
 }
 

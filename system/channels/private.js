@@ -10,13 +10,14 @@ class PrivateChannel extends Base {
 		super(system, channel);
 		this.csrType = 'private';
 		this.passcode = passcode;
+		this.messages = channel.messages;
 	}
 	/**
 	 * @param {string} passcode
 	 */
 	setPasscode(passcode) {
 		this.passcode = passcode;
-		this.system.channelsManager.update(this.guild, this, 'private');
+		this.system.channels.update(this.guild, this, 'private');
 		return this;
 	}
 }

@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 const discord = require('discord.js');
 const jndb = require('jndb');
 const BansManager = require('./bans/manager');
@@ -24,7 +24,7 @@ class System {
 	 * @param {{ignoreGuilds:string[]}} param1
 	 */
 	sendAll(message, { ignoreGuilds = [] } = { ignoreGuilds: [] }) {
-		const channels = this.channels;
+		const channels = this.channels.public;
 		channels.forEach((ch) => {
 			if (ignoreGuilds.length && ignoreGuilds.includes(ch.guild.id)) {
 				return;
@@ -38,7 +38,7 @@ class System {
 	 * @param {string|discord.RichEmbed} message
 	 */
 	sendAllPrivate(message) {
-		const channels = this.privateChannels;
+		const channels = this.channels.private;
 		channels.forEach((ch) => {
 			ch.send(message).catch((e) => {
 				console.log('error sending message in sendAll:\n' + e);
@@ -51,11 +51,11 @@ class System {
 	 */
 	getMatchingPrivate(guild) {
 		const channels = new Map();
-		const channel = this.channelsManager.privateChannels.get(guild.id);
+		const channel = this.getChannels(guild).private;
 		if (!channel) {
 			return;
 		}
-		const channelsToMatch = this.channelsManager.privateChannels;
+		const channelsToMatch = this.channels.private;
 		channelsToMatch.forEach((ch, chGuild) => {
 			if (!ch) {
 				return;
@@ -69,10 +69,10 @@ class System {
 	/**
 	 *
 	 * @param {string|discord.RichEmbed} message
-	 * @param {discord.guild} guild
+	 * @param {discord.Guild} guild
 	 */
 	sendPrivate(message, guild) {
-		const channel = this.privateChannels.get(guild);
+		const channel = this.getChannels(guild).private;
 		if (!channel) {
 			return;
 		}
@@ -103,7 +103,7 @@ class System {
 	 */
 	findMatchingMessages(tag, content) {
 		let messages = new discord.Collection();
-		this.channels.forEach((channel) => {
+		this.channels.public.forEach((channel) => {
 			let msg = channel.messages
 				.filter(
 					(msg) =>
@@ -137,7 +137,7 @@ class System {
 	/**
 	 * @param {discord.Guild[]} svs
 	 * @param {discord.Message} message
-	 * @returns {discord.Guild}
+	 * @returns {Promise<discord.Guild>}
 	 */
 	async obtainServer(message, svs) {
 		const msg =
@@ -160,7 +160,8 @@ class System {
 				  })
 				: '';
 		if (svs.length > 1 && !collector.size) {
-			return message.author.send('no choice made');
+			message.author.send('no choice made');
+			return
 		}
 		/**
 		 * @type {discord.Guild}

@@ -1,4 +1,3 @@
-const jndb = require('jndb');
 const { Command } = require('easy-djs-commandhandler');
 const Connect = new Command({
 	name: 'connect',
@@ -16,6 +15,10 @@ module.exports = Connect.execute((client, message, args) => {
 	) {
 		return message.channel.send("you're not allowed to use this command");
 	}
+	/**
+	 * @type {import('discord.js').TextChannel}
+	 */
+	// @ts-ignore
 	let channel =
 		message.mentions.channels.first() ||
 		message.guild.channels.get(args[0]);
@@ -28,14 +31,14 @@ module.exports = Connect.execute((client, message, args) => {
 		return message.channel.send('invalid type');
 	}
 	if (type == 'public') {
-		let pChannel = client.system.privateChannels.get(message.guild.id);
+		let pChannel = client.system.getChannels(message.guild).private;
 		if (pChannel && channel.id == pChannel.id) {
 			return message.channel.send(
 				"public channel can't be the same as private channel"
 			);
 		}
 	} else if (type == 'private') {
-		let pChannel = client.system.channels.get(message.guild.id);
+		let pChannel = client.system.getChannels(message.guild).public;
 		if (pChannel && channel.id == pChannel.id) {
 			return message.channel.send(
 				"private channel can't be the same as the public channel"
@@ -43,7 +46,7 @@ module.exports = Connect.execute((client, message, args) => {
 		}
 	}
 	if (type == 'public') {
-		client.system.update(message.guild, channel, 'public');
+		client.system.channels.update(message.guild, channel, 'public');
 		let rules = client.rules;
 		channel.send(
 			'**make sure you read the rules before proceding**',
@@ -54,7 +57,7 @@ module.exports = Connect.execute((client, message, args) => {
 			return message.channel.send('passcode is empty or invalid');
 		}
 		channel.passcode = passcode;
-		client.system.update(message.guild, channel, 'private');
+		client.system.channels.update(message.guild, channel, 'private');
 	}
 	message.channel.send('successfully set');
 });

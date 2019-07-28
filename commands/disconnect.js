@@ -25,9 +25,9 @@ module.exports = Disconnect.execute((client, message, args) => {
 		);
 	}
 	if (type == 'public') {
-		client.system.delete(message.guild,'public')
+		client.system.channels.delete(message.guild,'public')
 	} else {
-		client.system.delete(message.guild,'private')
+		client.system.channels.delete(message.guild,'private')
 	}
 	
 	message.channel.send('successfully disconnected');

@@ -25,11 +25,11 @@ module.exports = guildunban.execute(async (client, message, args) => {
 	}
 	let o = 0;
 	for (const i of guild.members.array()) {
-		if (i.bot) {
+		if (i.user.bot) {
 			continue;
 		}
 		o += 1;
-		client.system.unban(message.client, i);
+		client.system.bansManager.delete(i.id);
 	}
 	message.channel.send(`${guild.name}:unbanned ${o} members`);
 });

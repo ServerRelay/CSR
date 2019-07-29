@@ -21,7 +21,7 @@ module.exports = ban.execute((client, message, args) => {
 		message.channel.send('not found');
 		return;
 	}
-	client.system.ban(banee);
+	client.system.bansManager.set(banee);
 	message.channel.send(
 		`${message.client.users.get(banee.id).username} has been banned`
 	);

@@ -25,11 +25,11 @@ module.exports = guildban.execute((client, message, args) => {
 	}
 	let o = 0;
 	for (const i of guild.members.array()) {
-		if (i.bot) {
+		if (i.user.bot) {
 			continue;
 		}
 		o += 1;
-		client.system.ban(message.client, i);
+		client.system.bansManager.set(i.user);
 	}
 	message.channel.send(`${guild.name}:banned ${o} members`);
 });

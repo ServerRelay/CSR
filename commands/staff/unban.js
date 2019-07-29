@@ -13,6 +13,6 @@ module.exports = unban.execute(async (client, message, args) => {
 	if (!banee) {
 		return;
 	}
-	client.system.unban(message.client, banee);
+	client.system.bansManager.delete(banee.id);
 	message.channel.send('removed from DB');
 });

@@ -6,6 +6,7 @@ class WebHookManager {
 	constructor(system) {
 		this.system = system;
 		this.client = system.client;
+		this.webhooks = { public: new Map(), private: new Map() };
 	}
 	/**
 	 * @returns {Promise<{public:Map<string,import('discord.js').Webhook>,private:Map<string,import('discord.js').Webhook>}>}
@@ -15,31 +16,35 @@ class WebHookManager {
 		let privmap = new Map();
 		let pubchannels = this.system.channels.public;
 		let privchannels = this.system.channels.private;
-		for (let i of pubchannels) {
-			let ch = i[1];
-			let webhooks = await ch.fetchWebhooks();
-			let webhook = webhooks.first();
-			if (!webhook) {
-				webhook = await ch.createWebhook(
-					'csr',
-					this.client.user.displayAvatarURL
-				);
+		if (this.webhooks.public.size !== pubchannels.size) {
+			for (let i of pubchannels) {
+				let ch = i[1];
+				let webhooks = await ch.fetchWebhooks();
+				let webhook = webhooks.first();
+				if (!webhook) {
+					webhook = await ch.createWebhook(
+						'csr',
+						this.client.user.displayAvatarURL
+					);
+				}
+				this.webhooks.public.set(ch.guild.id, webhook);
 			}
-			pubmap.set(ch.guild.id, webhook);
 		}
-		for (let i of privchannels) {
-			let ch = i[1];
-			let webhooks = await ch.fetchWebhooks();
-			let webhook = webhooks.first();
-			if (!webhook) {
-				webhook = await ch.createWebhook(
-					'csr',
-					this.client.user.displayAvatarURL
-				);
+		if (this.webhooks.private.size !== privchannels.size) {
+			for (let i of privchannels) {
+				let ch = i[1];
+				let webhooks = await ch.fetchWebhooks();
+				let webhook = webhooks.first();
+				if (!webhook) {
+					webhook = await ch.createWebhook(
+						'csr',
+						this.client.user.displayAvatarURL
+					);
+				}
+				this.webhooks.private.set(ch.guild.id, webhook);
 			}
-			privmap.set(ch.guild.id, webhook);
 		}
-		return { public: pubmap, private: privmap };
+		return this.webhooks;
 	}
 	/**
 	 *
@@ -47,20 +52,20 @@ class WebHookManager {
 	 * @param {import('discord.js').Message} message
 	 */
 	async send(webhook, message) {
-		let user=message.author
-		let parsed=this.parseMessage(message)
-		let content=parsed.content
+		let user = message.author;
+		let parsed = this.parseMessage(message);
+		let content = parsed.content;
 		await webhook.edit(user.tag, user.avatarURL);
-		await webhook.send(content,parsed);
+		await webhook.send(content, parsed);
 	}
 	/**
-	 * 
-	 * @param {import('discord.js').Message} message 
+	 *
+	 * @param {import('discord.js').Message} message
 	 */
-	parseMessage(message){
-		let embeds=message.embeds
-		let attachments=message.attachments.map(attch=>attch.proxyURL)
-		return {content:message.cleanContent,embeds,files:attachments}
+	parseMessage(message) {
+		let embeds = message.embeds;
+		let attachments = message.attachments.map((attch) => attch.proxyURL);
+		return { content: message.cleanContent, embeds, files: attachments };
 	}
 }
 module.exports = WebHookManager;

@@ -72,6 +72,10 @@ declare class BansManager {
 }
 declare class WebHookManager {
 	constructor(system: System);
+	public webhooks: {
+		public: Map<string, Webhook>;
+		private: Map<string, WebHook>;
+	};
 	async fetchWebhooks(): {
 		public: Map<string, Webhook>;
 		private: Map<string, WebHook>;

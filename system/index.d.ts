@@ -87,7 +87,7 @@ declare class System {
 	constructor(client: Bot);
 	public client: Bot;
 	private db: Connection;
-	public bansManager: BansManager;
+	public banManager: BansManager;
 	public channels: ChannelsManager;
 	public webhookManager: WebHookManager;
 

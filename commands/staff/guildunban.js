@@ -29,7 +29,7 @@ module.exports = guildunban.execute(async (client, message, args) => {
 			continue;
 		}
 		o += 1;
-		client.system.bansManager.delete(i.id);
+		client.system.banManager.delete(i.id);
 	}
 	message.channel.send(`${guild.name}:unbanned ${o} members`);
 });

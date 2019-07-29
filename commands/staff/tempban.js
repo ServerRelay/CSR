@@ -31,14 +31,14 @@ module.exports = tempban.execute(async (client, message, args) => {
 	if (!banee) {
 		return;
 	}
-	client.system.bansManager.set(banee);
+	client.system.banManager.set(banee);
 	message.channel.send(
 		`Boi <@${banee.id}> you have been temp banned for ${ms(ms(time), {
 			long: true,
 		})}`
 	);
 	setTimeout(async () => {
-		client.system.bansManager.delete(banee.id);
+		client.system.banManager.delete(banee.id);
 		message.channel.send(
 			`Unbanned <@${banee.id}>, Ban duration (${ms(time)})`
 		);

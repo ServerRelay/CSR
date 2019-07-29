@@ -44,12 +44,23 @@ class WebHookManager {
 	/**
 	 *
 	 * @param {import('discord.js').Webhook} webhook
-	 * @param {import('discord.js').User} user
-	 * @param {string |import('discord.js').RichEmbed} content
+	 * @param {import('discord.js').Message} message
 	 */
-	async send(webhook, user, content) {
+	async send(webhook, message) {
+		let user=message.author
+		let parsed=this.parseMessage(message)
+		let content=parsed.content
 		await webhook.edit(user.tag, user.avatarURL);
-		await webhook.send(content);
+		await webhook.send(content,parsed);
+	}
+	/**
+	 * 
+	 * @param {import('discord.js').Message} message 
+	 */
+	parseMessage(message){
+		let embeds=message.embeds
+		let attachments=message.attachments.map(attch=>attch.proxyURL)
+		return {content:message.cleanContent,embeds,files:attachments}
 	}
 }
 module.exports = WebHookManager;

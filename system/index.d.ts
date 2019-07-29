@@ -76,11 +76,10 @@ declare class WebHookManager {
 		public: Map<string, Webhook>;
 		private: Map<string, WebHook>;
 	};
-	public async send(
-		webhook: Webhook,
-		user: User,
-		content: string | RichEmbed
-	): void;
+	public async send(webhook: Webhook, message: Message): void;
+	public static parseMessage(
+		message: Message
+	): { content: string; files: Array<string>; embeds: Array<RichEmbed> };
 }
 export = System;
 declare class System {
@@ -95,10 +94,7 @@ declare class System {
 		message: string | RichEmbed,
 		{ ignoreGuilds = Array<string>() }?
 	): void;
-	public sendAllWebHooks(
-		message: string | RichEmbed,
-		user: User
-	): Promise<void>;
+	public sendAllWebHooks(message: Message): Promise<void>;
 	public findCloseServers(name: string): Array<Guild>;
 	public findEmoji(name: string): Emoji;
 	public findMatchingMessages(

@@ -35,16 +35,16 @@ class System {
 	}
 	/**
 	 *
-	 * @param {string|discord.RichEmbed} message
-	 * @param {discord.User} user
+	 * @param {import('discord.js').Message} message
 	 */
-	async sendAllWebHooks(message, user) {
+	async sendAllWebHooks(message) {
 		const webhooks = await this.webhookManager.fetchWebhooks();
 		webhooks.public.forEach((wb) => {
-			this.webhookManager.send(wb, user, message).catch((e) => {
+			this.webhookManager.send(wb, message).catch((e) => {
 				console.log('error sending message in sendAll:\n' + e);
 			});
 		});
+		message.delete();
 	}
 	/**
 	 * @param {string|discord.RichEmbed} message

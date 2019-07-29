@@ -1,4 +1,3 @@
-
 const discord = require('discord.js');
 const jndb = require('jndb');
 const BansManager = require('./bans/manager');
@@ -30,6 +29,19 @@ class System {
 				return;
 			}
 			ch.send(message).catch((e) => {
+				console.log('error sending message in sendAll:\n' + e);
+			});
+		});
+	}
+	/**
+	 *
+	 * @param {string|discord.RichEmbed} message
+	 * @param {discord.User} user
+	 */
+	async sendAllWebHooks(message, user) {
+		const webhooks = await this.webhookManager.fetchWebhooks();
+		webhooks.public.forEach((wb) => {
+			this.webhookManager.send(wb, user, message).catch((e) => {
 				console.log('error sending message in sendAll:\n' + e);
 			});
 		});
@@ -161,7 +173,7 @@ class System {
 				: '';
 		if (svs.length > 1 && !collector.size) {
 			message.author.send('no choice made');
-			return
+			return;
 		}
 		/**
 		 * @type {discord.Guild}

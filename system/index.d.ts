@@ -95,6 +95,10 @@ declare class System {
 		message: string | RichEmbed,
 		{ ignoreGuilds = Array<string>() }?
 	): void;
+	public sendAllWebHooks(
+		message: string | RichEmbed,
+		user: User
+	): Promise<void>;
 	public findCloseServers(name: string): Array<Guild>;
 	public findEmoji(name: string): Emoji;
 	public findMatchingMessages(

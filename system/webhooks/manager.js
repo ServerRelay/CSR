@@ -12,8 +12,6 @@ class WebHookManager {
 	 * @returns {Promise<{public:Map<string,import('discord.js').Webhook>,private:Map<string,import('discord.js').Webhook>}>}
 	 */
 	async fetchWebhooks() {
-		let pubmap = new Map();
-		let privmap = new Map();
 		let pubchannels = this.system.channels.public;
 		let privchannels = this.system.channels.private;
 		if (this.webhooks.public.size !== pubchannels.size) {

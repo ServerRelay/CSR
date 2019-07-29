@@ -35,11 +35,7 @@ client.on('ready', async () => {
 			client.filter.push(word);
 		}
 	}
-	//let webhooks=await client.system.webhookManager.fetchWebhooks()
-	//webhooks.private.forEach(async wb=>{
-	//	await client.system.webhookManager.send(wb,client.user,'online')
-	//})
-	//console.log(await client.system.webhookManager.fetchWebhooks())
+	//await client.system.webhookManager.fetchWebhooks()
 });
 
 // //////////////////////////////////////////////////////////////////////////////////

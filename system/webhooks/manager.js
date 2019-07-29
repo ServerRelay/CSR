@@ -7,6 +7,9 @@ class WebHookManager {
 		this.system = system;
 		this.client = system.client;
 	}
+	/**
+	 * @returns {Promise<{public:Map<string,import('discord.js').Webhook>,privaye:Map<string,import('discord.js').Webhook>}>}
+	 */
 	async fetchWebhooks() {
 		let pubmap = new Map();
 		let privmap = new Map();

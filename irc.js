@@ -35,6 +35,7 @@ client.on('ready', async () => {
 			client.filter.push(word);
 		}
 	}
+	client.backup()
 	//await client.system.webhookManager.fetchWebhooks()
 });
 

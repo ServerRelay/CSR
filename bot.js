@@ -1,6 +1,7 @@
 const discord = require('discord.js');
 const System = require('./system/index');
 const jndb = require('jndb');
+const fs = require('fs');
 /**
  *
  *
@@ -58,6 +59,11 @@ class Bot extends discord.Client {
 			.setFooter('IRC Code Of Conduct', this.user.displayAvatarURL);
 		return cd;
 	}
-	
+	backup() {
+		//fs.createReadStream('jndb.json').pipe(
+		//	fs.createWriteStream('jndbBackup.json')
+		//);
+		fs.copyFileSync('jndb.json','jndbBackup.json')
+	}
 }
 module.exports = Bot;

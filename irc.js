@@ -64,9 +64,9 @@ client.on('guildCreate', async (guild) => {
 	let irc = await guild
 		.createChannel('irc', { type: 'text' })
 		.catch(() => {});
-	await irc.send(client.rules).catch(() => {});
 	if (irc) {
 		client.system.channels.create(guild, { publicChannel: irc });
+		await irc.send(client.rules).catch(() => {});
 	}
 	const ed = new Discord.RichEmbed()
 		.setColor([0, 255, 0])

@@ -39,10 +39,10 @@ class Bot extends discord.Client {
 	 * @returns {Map<string,string>}
 	 */
 	get staff() {
-		let map = new Map();
+		const map = new Map();
 		this.db.use('staff');
-		let staff = this.db.fetchAll();
-		for (let i in staff) {
+		const staff = this.db.fetchAll();
+		for (const i in staff) {
 			map.set(i, staff[i]);
 		}
 		return map;
@@ -51,7 +51,7 @@ class Bot extends discord.Client {
 	 * @returns {discord.RichEmbed}
 	 */
 	get rules() {
-		let code = require('./ircrules');
+		const code = require('./ircrules');
 		const cd = new discord.RichEmbed()
 			.setColor([0, 200, 138])
 			.setDescription(code)
@@ -60,10 +60,10 @@ class Bot extends discord.Client {
 		return cd;
 	}
 	backup() {
-		//fs.createReadStream('jndb.json').pipe(
+		// fs.createReadStream('jndb.json').pipe(
 		//	fs.createWriteStream('jndbBackup.json')
-		//);
-		fs.copyFileSync('jndb.json','jndbBackup.json')
+		// );
+		fs.copyFileSync('jndb.json', 'jndbBackup.json');
 	}
 }
 module.exports = Bot;

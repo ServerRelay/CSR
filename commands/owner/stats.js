@@ -2,12 +2,12 @@ const { Command } = require('easy-djs-commandhandler');
 const { RichEmbed } = require('discord.js');
 const Stats = new Command({
 	name: 'stats',
-	description: '(owner) fetch all server names',
+	description: 'get CSR guild stats',
 	requires: ['botowner'],
 	hideinhelp: true,
 });
 module.exports = Stats.execute((client, message) => {
-	if (!message.guild) {
+	if (!message.guild && client.owners.includes(message.author.id)) {
 		let st = 0;
 		client.guilds.forEach((sv) => {
 			st = st + sv.memberCount;
@@ -41,8 +41,14 @@ module.exports = Stats.execute((client, message) => {
 				`public: ${chs.public || 'none'}\nprivate: ${chs.private ||
 					'none'}`,
 				false
-			)
-			.addField('connected servers', connectedGuilds.size, false);
+			);
+		let str = '';
+		chs.private
+			? (str += `servers connected to ${chs.private}: ${
+					connectedGuilds.size
+			  }`)
+			: '';
+		embed.addField('private channel stats', str, false);
 		message.channel.send(embed);
 	}
 });

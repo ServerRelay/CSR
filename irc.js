@@ -207,6 +207,7 @@ async function broadcastToAllCSRChannels(message) {
 	const embed = generateEmbed(message);
 	message.channel.send(embed);
 	client.system.sendAll(embed, { ignoreGuilds: [message.guild.id] });
+	//client.system.sendAllWebHooks(message)
 }
 
 /**
@@ -220,8 +221,7 @@ async function sendPrivate(message) {
 	}
 
 	if (!message.attachments.size && message.deletable) {
-		// @ts-ignore
-		message.delete(500);
+		message.delete(500).catch((e)=>{});
 	}
 
 	const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

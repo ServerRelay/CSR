@@ -4,7 +4,7 @@
 		"body": [
 			"const { Command } = require('easy-djs-commandhandler');",
 			"const $1 = new Command({name: '$2',description:'',aliases:[],requires: [],requiresBotPermissions: [],});",
-			"module.exports = $1.execute(async (client, message,args)=>{});"
+			"module.exports = $1.execute((client, message,args)=>{});"
 		],
 		"description": "boilerplate for command"
 	},

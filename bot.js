@@ -15,6 +15,8 @@ class Bot extends discord.Client {
 	 */
 	constructor(options) {
 		super(options);
+
+		this.prefix = process.env.prefix || 'c-';
 		this.db = new jndb.Connection();
 		this.system = new System(this);
 		/**

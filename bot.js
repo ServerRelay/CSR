@@ -34,6 +34,8 @@ class Bot extends discord.Client {
 		 * @type {string[]}
 		 */
 		this.filter = [];
+		this.prefixDB=new jndb.Connection({fileName:'prefixes.json'})
+		this.prefixDB.use('prefixes')
 	}
 	/**
 	 * @returns {Map<string,string>}

@@ -23,7 +23,7 @@
     "bufferutil": "^4.0.1",
     "discord.js": "^11.5.0",
     "easy-djs-commandhandler": "git+https://github.com/PLASMAchicken/easy-djs-commandhandler.git",
-    "jndb": "^3.8.1",
+    "jndb": "git+https://github.com/DeltaRade/jndb.git",
     "ms": "^2.1.1"
   }
 }

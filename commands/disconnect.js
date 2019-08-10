@@ -5,7 +5,7 @@ const Disconnect = new Command({
 	requires:['guild'],
 	requiresBotPermissions: ['EMBED_LINKS'],
 	description: 'disconnects channel from csr',
-	usage: 'c-disconnect [public | private]',
+	usage: '<prefix>disconnect [public | private]',
 });
 let allowedTypes = ['public', 'private'];
 module.exports = Disconnect.execute((client, message, args) => {

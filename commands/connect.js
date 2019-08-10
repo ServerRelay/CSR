@@ -4,7 +4,7 @@ const Connect = new Command({
 	requires: ['guild'],
 	requiresBotPermissions: ['EMBED_LINKS'],
 	description: "connects to CSR's main chat",
-	usage: 'c-connect [channel] [public | private] [passcode]',
+	usage: '<prefix>connect [channel] [public | private] [passcode]',
 });
 let allowedTypes = ['public', 'private'];
 /** @param {import("../bot")} callback */

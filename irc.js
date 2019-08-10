@@ -9,8 +9,7 @@ require('./env').load('.env');
 const prefix = process.env.prefix || 'c-';
 const cmdHandler = new commandHandler.Handler(client, {
 	prefix: prefix,
-	// @ts-ignore
-	owners: ['298258003470319616', '193406800614129664'],
+	owner: ['298258003470319616', '193406800614129664'],
 	defaultcmds: true,
 	prefixFunc:(message)=>{
 		return client.prefixDB.fetch(message.guild.id)||prefix

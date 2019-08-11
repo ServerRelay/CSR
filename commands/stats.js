@@ -3,11 +3,12 @@ const { RichEmbed } = require('discord.js');
 const Stats = new Command({
 	name: 'stats',
 	description: 'get CSR guild stats',
-	requires: ['botowner'],
+	requires: ['guild'],
 	hideinhelp: true,
 });
 module.exports = Stats.execute((client, message) => {
-	if (!message.guild && client.owners.includes(message.author.id)) {
+	if (!message.guild) {
+		if (!client.owners.includes(message.author.id)) return;
 		let st = 0;
 		client.guilds.forEach((sv) => {
 			st = st + sv.memberCount;

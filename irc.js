@@ -12,6 +12,7 @@ const cmdHandler = new commandHandler.Handler(client, {
 	owner: ['298258003470319616', '193406800614129664'],
 	defaultcmds: true,
 	prefixFunc:(message)=>{
+		if(!message.guild) return prefix
 		return client.prefixDB.fetch(message.guild.id)||prefix
 	}
 });

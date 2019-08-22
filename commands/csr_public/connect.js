@@ -7,7 +7,7 @@ const Connect = new Command({
 	usage: '<prefix>connect [channel] [public | private] [passcode]',
 });
 let allowedTypes = ['public', 'private'];
-/** @param {import("../bot")} callback */
+/** @param {import("../../bot")} callback */
 module.exports = Connect.execute((client, message, args) => {
 	if (
 		message.author.id !== message.guild.owner.id &&

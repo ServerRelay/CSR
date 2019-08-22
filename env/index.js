@@ -13,12 +13,11 @@ function load(file) {
 		return;
 	}
 	data = data.toString();
-	data = data.replace('\r', '');
+	data = data.replace(/\r/g, '');
 	data = data.split('\n');
 	for (const i of data) {
 		const vals = i.split('=');
-		if (!vals[0] || !vals[1]) continue;
-		process.env[vals[0]] = vals[1].replace(/[\n\r]/g, '');
+		process.env[vals.shift()] = vals.join('=');
 	}
 }
 exports.load = load;

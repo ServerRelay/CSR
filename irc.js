@@ -44,18 +44,6 @@ client.on('ready', async () => {
 
 // //////////////////////////////////////////////////////////////////////////////////
 
-function findemoji(name) {
-	const em = client.guilds
-		.get('497475921855381525')
-		.emojis.find((x) => x.name === name);
-	if (em) {
-		return em;
-	} else {
-		new Error('no emoji found');
-	}
-}
-
-// ////////////////////////////////////////////////////////
 client.on('guildCreate', async (guild) => {
 	if (!guild.available) {
 		return;

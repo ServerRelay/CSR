@@ -80,7 +80,7 @@ client.on('guildCreate', async (guild) => {
 			guild.iconURL || client.user.defaultAvatarURL
 		)
 		.setDescription(
-			`has joined the chat ${client.system.findEmoji('join')}`
+			`has joined ${client.system.findEmoji('join')}`
 		);
 	client.system.sendAll(ed);
 });
@@ -99,7 +99,7 @@ client.on('guildDelete', (guild) => {
 			guild.iconURL || client.user.defaultAvatarURL
 		)
 		.setDescription(
-			`has left the chat ${client.system.findEmoji('leave')}`
+			`has left ${client.system.findEmoji('leave')}`
 		);
 	client.system.sendAll(ed);
 });

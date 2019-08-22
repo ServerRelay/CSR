@@ -3,7 +3,7 @@ const path = require('path');
 
 /**
  *
- * @param {'path-like'} file
+ * @param {string} file
  */
 function load(file) {
 	let data;

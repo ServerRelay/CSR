@@ -4,7 +4,7 @@ const Stats = new Command({
 	name: 'stats',
 	description: 'get CSR guild stats',
 	requires: ['guild'],
-	requiresBotPermissions:['EMBED_LINKS'],
+	requiresBotPermissions: ['EMBED_LINKS'],
 	hideinhelp: true,
 });
 module.exports = Stats.execute((client, message) => {
@@ -44,12 +44,11 @@ module.exports = Stats.execute((client, message) => {
 					'none'}`,
 				false
 			);
-		let str = '';
-		chs.private
-			? (str += `servers connected to ${chs.private}: ${
-					connectedGuilds.size
-			  }`)
-			: '';
+		if (!chs.private) return message.channel.send(embed);
+		let str = `servers connected to ${chs.private}: ${
+			connectedGuilds.size
+		}`;
+
 		embed.addField('private channel stats', str, false);
 		message.channel.send(embed);
 	}

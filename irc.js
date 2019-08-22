@@ -266,6 +266,7 @@ process.on('unhandledRejection', (err) => {
 			}}`;
 		}
 
+		// @ts-ignore
 		return client.channels.get('543167247330312232').send(`
 	\`\`\`js
 	Error: ${require('util')
@@ -277,6 +278,7 @@ process.on('unhandledRejection', (err) => {
 		`);
 	}
 
+	// @ts-ignore
 	return client.channels.get('543167247330312232').send(`
 \`\`\`xs
 Error: ${err.name}

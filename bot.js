@@ -62,9 +62,6 @@ class Bot extends discord.Client {
 		return cd;
 	}
 	backup() {
-		// fs.createReadStream('jndb.json').pipe(
-		//	fs.createWriteStream('jndbBackup.json')
-		// );
 		fs.copyFileSync('jndb.json', 'jndbBackup.json');
 	}
 }

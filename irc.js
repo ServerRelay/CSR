@@ -392,7 +392,7 @@ function generateEmbed(message) {
 
 function lockdownExpired(time) {
 	// console.log(client.lockdown.time);
-	const x = new Date().getTime;
+	const x = new Date().getTime();
 	const timeleft = x - time;
 	if (timeleft > time || !time) {
 		return true;

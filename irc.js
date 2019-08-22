@@ -11,10 +11,10 @@ const cmdHandler = new commandHandler.Handler(client, {
 	prefix: prefix,
 	owner: ['298258003470319616', '193406800614129664'],
 	defaultcmds: true,
-	prefixFunc:(message)=>{
-		if(!message.guild) return prefix
-		return client.prefixDB.fetch(message.guild.id)||prefix
-	}
+	prefixFunc: (message) => {
+		if (!message.guild) return prefix;
+		return client.prefixDB.fetch(message.guild.id) || prefix;
+	},
 });
 client.filter = [];
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
@@ -38,7 +38,7 @@ client.on('ready', async () => {
 			client.filter.push(word);
 		}
 	}
-	client.backup()
+	client.backup();
 	//await client.system.webhookManager.fetchWebhooks()
 });
 
@@ -79,9 +79,7 @@ client.on('guildCreate', async (guild) => {
 			`${guild.name}`,
 			guild.iconURL || client.user.defaultAvatarURL
 		)
-		.setDescription(
-			`has joined ${client.system.findEmoji('join')}`
-		);
+		.setDescription(`has joined ${client.system.findEmoji('join')}`);
 	client.system.sendAll(ed);
 });
 // ////////////////////////////////////////////////////////////////////////////
@@ -89,9 +87,8 @@ client.on('guildDelete', (guild) => {
 	if (!guild.available) {
 		return;
 	}
-	if(
-		!client.system.channels.public.has(guild.id)
-	)return client.system.channels.delete(guild,'private');
+	if (!client.system.channels.public.has(guild.id))
+		return client.system.channels.delete(guild, 'private');
 	client.system.channels.delete(guild, 'all');
 	console.log('bot removed from server ' + guild.name);
 	const ed = new Discord.RichEmbed()
@@ -101,9 +98,7 @@ client.on('guildDelete', (guild) => {
 			`${guild.name}`,
 			guild.iconURL || client.user.defaultAvatarURL
 		)
-		.setDescription(
-			`has left ${client.system.findEmoji('leave')}`
-		);
+		.setDescription(`has left ${client.system.findEmoji('leave')}`);
 	client.system.sendAll(ed);
 });
 // ///////////MAIN MESSAGE EVENT/////////////////////////////////////////////
@@ -227,7 +222,7 @@ async function sendPrivate(message) {
 	}
 
 	if (!message.attachments.size && message.deletable) {
-		message.delete(500).catch((e)=>{});
+		message.delete(500).catch((e) => {});
 	}
 
 	const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

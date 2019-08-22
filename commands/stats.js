@@ -4,6 +4,7 @@ const Stats = new Command({
 	name: 'stats',
 	description: 'get CSR guild stats',
 	requires: ['guild'],
+	requiresBotPermissions:['EMBED_LINKS'],
 	hideinhelp: true,
 });
 module.exports = Stats.execute((client, message) => {

@@ -34,8 +34,9 @@ class Bot extends discord.Client {
 		 * @type {string[]}
 		 */
 		this.filter = [];
-		this.prefixDB=new jndb.Connection({fileName:'prefixes.json'})
-		this.prefixDB.use('prefixes')
+		this.prefixDB = new jndb.Connection({ fileName: 'prefixes.json' });
+		this.prefixDB.use('prefixes');
+		this.color = [20, 110, 164, 0.62];
 	}
 	/**
 	 * @returns {Map<string,string>}

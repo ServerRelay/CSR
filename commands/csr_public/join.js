@@ -59,17 +59,9 @@ module.exports = join.execute(async (client, message, args) => {
 			},
 		])
 		.catch(() => {
-			guild.owner
-				.send(
-					`Somebody tried to join ${
-						guild.name
-					} but i could not create a #irc-requests channel!`
-				)
-				.catch(() => {
-					joinChannel.send(
-						'Somebody tried to join this server but i could not create a #irc-requests channel!'
-					);
-				});
+			authchannel.send(
+				'unable to create channel in desired server, cancelling'
+			);
 		});
 	if (!rq) return;
 	try {

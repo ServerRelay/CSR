@@ -39,7 +39,7 @@ class Bot extends discord.Client {
 		this.prefixDB = new jndb.Connection({ fileName: 'prefixes.json' });
 		this.prefixDB.use('prefixes');
 		this.color = '#146ea4';
-		let fileWatch = new FileWatch(this);
+		const fileWatch = new FileWatch();
 		fileWatch.watch('commands', (event, file) => {
 			if (event != 'change') return;
 			this.reloadCommands('commands');

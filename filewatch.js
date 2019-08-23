@@ -43,8 +43,7 @@ function reloadCommands(client, folder) {
 			const command = require(`${folder}/${file}`);
 			client.commands.delete(command.help.name);
 			client.commands.set(command.help.name, command);
-		}
-		catch (err) {
+		} catch (err) {
 			console.log(err);
 		}
 	}

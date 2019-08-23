@@ -5,9 +5,8 @@ class FileWatch {
 	 *
 	 * @param {import('./bot')} client
 	 */
-	constructor(client) {
+	constructor() {
 		this.watching = new Map();
-		this.client = client;
 	}
 	/**
 	 *
@@ -20,12 +19,13 @@ class FileWatch {
 			this.watching.set(folder, { last_changed: Date.now() });
 		}
 		const fldr = this.watching.get(folder);
-		fs.watch(path.resolve(folder), (event, file) => {
+		fs.watch(path.resolve(folder),{recursive:true}, (event, file) => {
 			if (fsWait) return;
 			fldr.last_changed = Date.now();
 			this.watching.set(folder, fldr);
 			callback(event, file);
-			fsWait = setTimeout(() => {
+			fsWait = true
+			setTimeout(() => {
 				fsWait = false;
 			}, 1000);
 		});

@@ -61,7 +61,7 @@ client.on('guildCreate', async (guild) => {
 		client.system.channels.create(guild, { publicChannel: irc });
 	}
 	const ed = new Discord.RichEmbed()
-		.setColor([0, 255, 0])
+		.setColor(client.color)
 		// @ts-ignore
 		.setAuthor(
 			`${guild.name}`,
@@ -80,7 +80,7 @@ client.on('guildDelete', (guild) => {
 	client.system.channels.delete(guild, 'all');
 	console.log('bot removed from server ' + guild.name);
 	const ed = new Discord.RichEmbed()
-		.setColor([255, 0, 0])
+		.setColor(client.color)
 		// @ts-ignore
 		.setAuthor(
 			`${guild.name}`,

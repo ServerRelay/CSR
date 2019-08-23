@@ -35,9 +35,10 @@ module.exports = Stats.execute((client, message) => {
 		let chs = client.system.getChannels(message.guild);
 		let connectedGuilds = client.system.getMatchingPrivate(message.guild);
 		let embed = new RichEmbed()
+			.setAuthor('server stats', message.guild.iconURL, '')
 			// @ts-ignore
 			.setColor([20, 110, 164, 0.62])
-			.setTitle('server stats')
+			
 			.addField(
 				'channels',
 				`public: ${chs.public || 'none'}\nprivate: ${chs.private ||

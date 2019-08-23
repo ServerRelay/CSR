@@ -2,6 +2,8 @@ const discord = require('discord.js');
 const System = require('./system/index');
 const jndb = require('jndb');
 const fs = require('fs');
+const path = require('path');
+const FileWatch = require('./filewatch');
 /**
  *
  *
@@ -36,7 +38,13 @@ class Bot extends discord.Client {
 		this.filter = [];
 		this.prefixDB = new jndb.Connection({ fileName: 'prefixes.json' });
 		this.prefixDB.use('prefixes');
-		this.color = [20, 110, 164, 0.62];
+		this.color = '#146ea4';
+		let fileWatch = new FileWatch(this);
+		fileWatch.watch('commands', (event, file) => {
+			if (event != 'change') return;
+			this.reloadCommands('commands');
+		});
+		//this.color = [20, 110, 164, 0.62];
 	}
 	/**
 	 * @returns {Map<string,string>}
@@ -64,6 +72,25 @@ class Bot extends discord.Client {
 	}
 	backup() {
 		fs.copyFileSync('jndb.json', 'jndbBackup.json');
+	}
+	reloadCommands(folder) {
+		folder = path.resolve(folder);
+		const commandFiles = fs
+			.readdirSync(folder)
+			.filter((file) => file.endsWith('.js'));
+
+		for (const file of commandFiles) {
+			delete require.cache[require.resolve(`${folder}/${file}`)];
+			try {
+				const command = require(`${folder}/${file}`);
+				// @ts-ignore
+				this.commands.delete(command.help.name);
+				// @ts-ignore
+				this.commands.set(command.help.name, command);
+			} catch (err) {
+				console.log(err);
+			}
+		}
 	}
 }
 module.exports = Bot;

@@ -58,6 +58,14 @@ module.exports = Connect.execute((client, message, args) => {
 		}
 		channel.passcode = passcode;
 		client.system.channels.update(message.guild, channel, 'private');
+		let embed = new (require('discord.js')).RichEmbed();
+		embed.setColor(client.color);
+		embed.setAuthor(message.guild.name, message.guild.iconURL);
+		embed.setDescription('has connected');
+		let connected = client.system.getMatchingPrivate(message.guild);
+		connected.forEach((element) => {
+			element.send(embed);
+		});
 	}
 	message.channel.send('successfully set');
 });

@@ -42,7 +42,6 @@ class Bot extends discord.Client {
 		const fileWatch = new FileWatch();
 		fileWatch.watch('commands', (event, file) => {
 			if (event != 'change') return;
-			console.log(file, event);
 			this.reloadCommands('commands');
 		});
 		//this.color = [20, 110, 164, 0.62];

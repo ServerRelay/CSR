@@ -80,7 +80,7 @@ class Bot extends discord.Client {
 			.filter((file) => file.endsWith('.js'));
 		const subDirs = fs
 			.readdirSync(folder)
-			.filter((file) => fs.statSync(folder+'/'+file).isDirectory());
+			.filter((file) => fs.statSync(folder + '/' + file).isDirectory());
 		for (const file of commandFiles) {
 			delete require.cache[require.resolve(`${folder}/${file}`)];
 			try {
@@ -105,6 +105,7 @@ class Bot extends discord.Client {
 
 			catfiles.forEach((f, i) => {
 				f = path.resolve(category + '/' + f);
+				delete require.cache[require.resolve(f)];
 				try {
 					const props = require(f); // => load each one
 					props.help.category = category;
@@ -114,7 +115,6 @@ class Bot extends discord.Client {
 						!Array.isArray(props.help.aliases)
 					)
 						props.help.aliases = [props.help.aliases];
-
 					this.commands.set(props.help.name, props); // => add command to command list
 				} catch (err) {
 					console.log(

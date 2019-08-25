@@ -42,6 +42,7 @@ class Bot extends discord.Client {
 		const fileWatch = new FileWatch();
 		fileWatch.watch('commands', (event, file) => {
 			if (event != 'change') return;
+			console.log(file, event);
 			this.reloadCommands('commands');
 		});
 		//this.color = [20, 110, 164, 0.62];
@@ -78,7 +79,9 @@ class Bot extends discord.Client {
 		const commandFiles = fs
 			.readdirSync(folder)
 			.filter((file) => file.endsWith('.js'));
-
+		const subDirs = fs
+			.readdirSync(folder)
+			.filter((file) => fs.statSync(folder+'/'+file).isDirectory());
 		for (const file of commandFiles) {
 			delete require.cache[require.resolve(`${folder}/${file}`)];
 			try {
@@ -91,6 +94,36 @@ class Bot extends discord.Client {
 				console.log(err);
 			}
 		}
+		subDirs.forEach((category) => {
+			category = path.resolve(path.join(folder, category));
+			const catfiles = fs
+				.readdirSync(category)
+				.filter(
+					(f) =>
+						f.split('.').pop() === 'js' &&
+						!fs.statSync(category + '/' + f).isDirectory()
+				);
+
+			catfiles.forEach((f, i) => {
+				f = path.resolve(category + '/' + f);
+				try {
+					const props = require(f); // => load each one
+					props.help.category = category;
+
+					if (
+						props.help.aliases &&
+						!Array.isArray(props.help.aliases)
+					)
+						props.help.aliases = [props.help.aliases];
+
+					this.commands.set(props.help.name, props); // => add command to command list
+				} catch (err) {
+					console.log(
+						`${i} ${f} failed to in ${category} load!\n${err}\n${err.stack}\n`
+					);
+				}
+			});
+		});
 	}
 }
 module.exports = Bot;

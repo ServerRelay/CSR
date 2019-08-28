@@ -99,6 +99,7 @@ declare class System {
 		{ ignoreGuilds = Array<string>() }?
 	): void;
 	public sendAllWebHooks(message: Message): Promise<void>;
+	public sendPrivateWebHooks(guild: Guild, message: Message): Promise<void>;
 	public findCloseServers(name: string): Array<Guild>;
 	public findEmoji(name: string): Emoji;
 	public findMatchingMessages(

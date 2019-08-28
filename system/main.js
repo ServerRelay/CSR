@@ -46,6 +46,19 @@ class System {
 		});
 		message.delete();
 	}
+	async sendPrivateWebHooks(guild,message){
+		const privateChs=this.getMatchingPrivate(guild)
+		const channel=this.getChannels(guild).private
+		if(!channel)return;
+		
+		this.webhookManager.fetchWebhooks()
+		let webhooks=this.webhookManager.webhooks.private
+		privateChs.forEach(ch=>{
+			let webhook=webhooks.get(ch.guild.id)
+			if(!webhook)return;
+			this.webhookManager.send(webhook,message)
+		})
+	}
 	/**
 	 * @param {string|discord.RichEmbed} message
 	 */

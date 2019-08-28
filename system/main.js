@@ -38,7 +38,8 @@ class System {
 	 * @param {import('discord.js').Message} message
 	 */
 	async sendAllWebHooks(message) {
-		const webhooks = await this.webhookManager.fetchWebhooks();
+		this.webhookManager.fetchWebhooks();
+		const webhooks = this.webhookManager.webhooks
 		webhooks.public.forEach((wb) => {
 			this.webhookManager.send(wb, message).catch((e) => {
 				console.log('error sending message in sendAll:\n' + e);

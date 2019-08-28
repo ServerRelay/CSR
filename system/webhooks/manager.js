@@ -20,12 +20,15 @@ class WebHookManager {
 		if (this.webhooks.public.size !== pubchannels.size) {
 			for (let i of pubchannels) {
 				let ch = i[1];
+				// @ts-ignore
 				let webhooks = await ch.fetchWebhooks().catch((e) => {});
 				if (!webhooks) continue;
 				let webhook = webhooks.first();
 				if (!webhook) {
+					// @ts-ignore
 					webhook = await ch
 						.createWebhook('csr', this.client.user.displayAvatarURL)
+						// @ts-ignore
 						.catch((e) => {});
 				}
 				this.webhooks.public.set(ch.guild.id, webhook);
@@ -34,12 +37,15 @@ class WebHookManager {
 		if (this.webhooks.private.size !== privchannels.size) {
 			for (let i of privchannels) {
 				let ch = i[1];
+				// @ts-ignore
 				let webhooks = await ch.fetchWebhooks().catch((e) => {});
 				if (!webhooks) continue;
 				let webhook = webhooks.first();
 				if (!webhook) {
+					// @ts-ignore
 					webhook = await ch
 						.createWebhook('csr', this.client.user.displayAvatarURL)
+						// @ts-ignore
 						.catch((e) => {});
 				}
 				this.webhooks.private.set(ch.guild.id, webhook);

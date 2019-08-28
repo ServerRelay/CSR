@@ -6,6 +6,9 @@ class WebHookManager {
 	constructor(system) {
 		this.system = system;
 		this.client = system.client;
+		/**
+		 * @type {{public:Map<string,import('discord.js').Webhook>,private:Map<string,import('discord.js').Webhook>}}
+		 */
 		this.webhooks = { public: new Map(), private: new Map() };
 	}
 	/**
@@ -17,13 +20,13 @@ class WebHookManager {
 		if (this.webhooks.public.size !== pubchannels.size) {
 			for (let i of pubchannels) {
 				let ch = i[1];
-				let webhooks = await ch.fetchWebhooks();
+				let webhooks = await ch.fetchWebhooks().catch((e) => {});
+				if (!webhooks) continue;
 				let webhook = webhooks.first();
 				if (!webhook) {
-					webhook = await ch.createWebhook(
-						'csr',
-						this.client.user.displayAvatarURL
-					);
+					webhook = await ch
+						.createWebhook('csr', this.client.user.displayAvatarURL)
+						.catch((e) => {});
 				}
 				this.webhooks.public.set(ch.guild.id, webhook);
 			}
@@ -31,13 +34,13 @@ class WebHookManager {
 		if (this.webhooks.private.size !== privchannels.size) {
 			for (let i of privchannels) {
 				let ch = i[1];
-				let webhooks = await ch.fetchWebhooks();
+				let webhooks = await ch.fetchWebhooks().catch((e) => {});
+				if (!webhooks) continue;
 				let webhook = webhooks.first();
 				if (!webhook) {
-					webhook = await ch.createWebhook(
-						'csr',
-						this.client.user.displayAvatarURL
-					);
+					webhook = await ch
+						.createWebhook('csr', this.client.user.displayAvatarURL)
+						.catch((e) => {});
 				}
 				this.webhooks.private.set(ch.guild.id, webhook);
 			}

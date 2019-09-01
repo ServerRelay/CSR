@@ -28,7 +28,7 @@ declare class PrivateChannel extends BaseChannel {
 
 	public system: System;
 	public csrType: string;
-	private passcode: string;
+	public passcode: string;
 
 	public setPasscode(passcode: string): this;
 }

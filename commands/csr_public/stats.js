@@ -22,11 +22,7 @@ module.exports = Stats.execute((client, message) => {
 			.addField(
 				`total servers connected with CSR: ${client.system.channels
 					.public.size + client.system.channels.private.size}`,
-				`servers with public channels: ${
-					client.system.channels.public.size
-				}\nservers with private channels: ${
-					client.system.channels.private.size
-				}`,
+				`servers with public channels: ${client.system.channels.public.size}\nservers with private channels: ${client.system.channels.private.size}`,
 				false
 			);
 		message.author.send(embed);
@@ -37,7 +33,7 @@ module.exports = Stats.execute((client, message) => {
 			.setAuthor('server stats', message.guild.iconURL, '')
 			// @ts-ignore
 			.setColor([20, 110, 164, 0.62])
-			
+
 			.addField(
 				'channels',
 				`public: ${chs.public || 'none'}\nprivate: ${chs.private ||
@@ -47,6 +43,10 @@ module.exports = Stats.execute((client, message) => {
 		if (!chs.private) return message.channel.send(embed);
 		let str = `servers connected to ${chs.private}: ${
 			connectedGuilds.size
+		}\n${
+			message.author.id == message.guild.owner.id
+				? `private passcode: **${chs.private.passcode}**`
+				: ''
 		}`;
 
 		embed.addField('private channel stats', str, false);

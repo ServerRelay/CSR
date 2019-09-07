@@ -20,6 +20,7 @@ class WebHookManager {
 		if (this.webhooks.public.size !== pubchannels.size) {
 			for (let i of pubchannels) {
 				let ch = i[1];
+				if (this.webhooks.public.has(ch.guild.id)) return;
 				// @ts-ignore
 				let webhooks = await ch.fetchWebhooks().catch((e) => {});
 				if (!webhooks) continue;
@@ -37,6 +38,7 @@ class WebHookManager {
 		if (this.webhooks.private.size !== privchannels.size) {
 			for (let i of privchannels) {
 				let ch = i[1];
+				if (this.webhooks.private.has(ch.guild.id)) return;
 				// @ts-ignore
 				let webhooks = await ch.fetchWebhooks().catch((e) => {});
 				if (!webhooks) continue;

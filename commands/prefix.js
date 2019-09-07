@@ -1,8 +1,9 @@
 const { Command } = require('easy-djs-commandhandler');
 module.exports = new Command({
 	name: 'prefix',
-	description: '',
+	description: 'gets or sets prefix for the server',
 	requires: ['guild'],
+	usage:'prefix [new prefix || default to reset]'
 }).execute((client, message, args) => {
 	const currpref = client.prefixDB.fetch(message.guild.id) || client.prefix;
 	if (

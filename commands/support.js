@@ -8,7 +8,7 @@ module.exports = new Command({
 }).execute((client, message, args) => {
 	let embed = new discord.RichEmbed();
 	embed.setColor(client.color);
-	embed.setTitle('have an issue? bot nor working?');
+	embed.setTitle('have an issue? bot not working?');
 	embed.setDescription('join the support server\nhttps://discord.gg/GTkjQFr');
 	message.channel.send(embed);
 });

@@ -108,7 +108,7 @@ class Bot extends discord.Client {
 				delete require.cache[require.resolve(f)];
 				try {
 					const props = require(f); // => load each one
-					props.help.category = category;
+					props.help.category = category.split('\\').pop();
 
 					if (
 						props.help.aliases &&

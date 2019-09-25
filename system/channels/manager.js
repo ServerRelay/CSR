@@ -96,7 +96,7 @@ class ChannelsManager {
 			};
 		}
 		if (privateChannel) {
-			if (!privateChannel.passcode) {
+			if (privateChannel.passcode===undefined) {
 				throw new Error('private channel does not have a passcode set');
 			}
 			data.private = {
@@ -141,7 +141,7 @@ class ChannelsManager {
 				name: channel.name,
 			};
 		} else if (type == 'private') {
-			if (!channel.passcode) {
+			if (channel.passcode===undefined) {
 				throw new Error('private channel does not have a passcode set');
 			}
 			data.private = {

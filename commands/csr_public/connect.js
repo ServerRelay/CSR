@@ -1,10 +1,10 @@
 const { Command } = require('easy-djs-commandhandler');
 const Connect = new Command({
 	name: 'connect',
-	requires: ['guild'],
+	requires: ['guild','guildowner'],
 	requiresBotPermissions: ['EMBED_LINKS'],
 	description: "connects to CSR's main chat",
-	usage: '<prefix>connect [channel] [public | private] [passcode]',
+	usage: '<prefix>connect [channel] [public | private] [passcode](optional, can use channel topic)',
 });
 let allowedTypes = ['public', 'private'];
 /** @param {import("../../bot")} callback */
@@ -53,18 +53,19 @@ module.exports = Connect.execute((client, message, args) => {
 			rules
 		);
 	} else {
-		if (!args[2] || args[2] == '') {
-			return message.channel.send('passcode is empty or invalid');
-		}
-		channel.passcode = passcode;
+		//if (!args[2] || args[2] == '') {
+			//return message.channel.send('passcode is empty or invalid');
+		//}
+		channel.passcode = passcode||null;
 		client.system.channels.update(message.guild, channel, 'private');
 		let embed = new (require('discord.js')).RichEmbed();
 		embed.setColor(client.color);
 		embed.setAuthor(message.guild.name, message.guild.iconURL);
 		embed.setDescription('has connected');
 		let connected = client.system.getMatchingPrivate(message.guild);
-		connected.forEach((element) => {
-			element.send(embed);
+		connected.forEach((pChannel) => {
+			if(pChannel.guild.id==message.guild.id)return
+			pChannel.send(embed);
 		});
 	}
 	message.channel.send('successfully set');

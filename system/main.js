@@ -39,7 +39,7 @@ class System {
 	 */
 	async sendAllWebHooks(message) {
 		this.webhookManager.fetchWebhooks();
-		const webhooks = this.webhookManager.webhooks
+		const webhooks = this.webhookManager.webhooks;
 		webhooks.public.forEach((wb) => {
 			this.webhookManager.send(wb, message).catch((e) => {
 				console.log('error sending message in sendAll:\n' + e);
@@ -47,18 +47,20 @@ class System {
 		});
 		message.delete();
 	}
-	async sendPrivateWebHooks(guild,message){
-		const privateChs=this.getMatchingPrivate(guild)
-		const channel=this.getChannels(guild).private
-		if(!channel)return;
-		
-		this.webhookManager.fetchWebhooks()
-		let webhooks=this.webhookManager.webhooks.private
-		privateChs.forEach(ch=>{
-			let webhook=webhooks.get(ch.guild.id)
-			if(!webhook)return;
-			this.webhookManager.send(webhook,message)
-		})
+	async sendPrivateWebHooks(guild, message) {
+		const privateChs = this.getMatchingPrivate(guild);
+		const channel = this.getChannels(guild).private;
+		if (!channel) return;
+
+		this.webhookManager.fetchWebhooks();
+		let webhooks = this.webhookManager.webhooks.private;
+		privateChs.forEach((ch) => {
+			let webhook = webhooks.get(ch.guild.id);
+			if (!webhook) return;
+			this.webhookManager.send(webhook, message).catch(() => {
+				this.webhookManager.webhooks.private.delete(webhook.guildID);
+			});
+		});
 	}
 	/**
 	 * @param {string|discord.RichEmbed} message
@@ -86,7 +88,16 @@ class System {
 			if (!ch) {
 				return;
 			}
-			if (ch.passcode === channel.passcode) {
+			if (
+				(ch.passcode &&
+					channel.passcode &&
+					ch.passcode === channel.passcode) ||
+				(!ch.passcode && ch.topic === channel.passcode) ||
+				(!channel.passcode && ch.passcode === channel.topic) ||
+				(!ch.passcode &&
+					!channel.passcode &&
+					ch.topic === channel.topic)
+			) {
 				channels.set(chGuild, ch);
 			}
 		});

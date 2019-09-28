@@ -67,7 +67,7 @@ declare class BansManager {
 
 	public has(id: string): boolean;
 	public get(id: string): { id: string; tag: string };
-	public set(user: User): this;
+	public add(user: User): this;
 	public delete(id: string): this;
 }
 declare class WebHookManager {
@@ -115,3 +115,4 @@ declare class System {
 }
 
 export declare type BanInfo = { tag: string; banned_at: string };
+export declare type SystemStyle='embed'|'webhook'|'wembed'

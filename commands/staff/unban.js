@@ -14,5 +14,5 @@ module.exports = unban.execute(async (client, message, args) => {
 		return;
 	}
 	client.system.banManager.delete(banee.id);
-	message.channel.send('removed from DB');
+	message.channel.send(`${banee.tag} has been unbanned`);
 });

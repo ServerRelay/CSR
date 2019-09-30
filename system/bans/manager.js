@@ -9,15 +9,19 @@ class BansManager {
 		this.db.use('data');
 	}
 	/**
-	 * @returns {Map<string,BanInfo>}
+	 * returns {Map<string,BanInfo>}
+	 * @returns {{[key:string]:BanInfo}}
 	 */
 	get bans() {
-		let map=new Map()
+		// let map=new Map()
+		// let bans=this.db.fetch('bans')
+		// for(let i in bans){
+		// 	map.set(i,bans[i])
+		// }
+		// return map;
+		
 		let bans=this.db.fetch('bans')
-		for(let i in bans){
-			map.set(i,bans[i])
-		}
-		return map;
+		return bans;
 	}
 	/**
 	 *
@@ -66,7 +70,16 @@ function getFormattedDate() {
 			[d.getHours(), d.getMinutes(), d.getSeconds()].join(':');
 	return dformat;
 }
-
+/**
+ * @param {Map} map 
+ */
+function toObject(map){
+	let obj={}
+	map.forEach((element,key) => {
+		obj[key]=element;
+	});
+	return obj;
+}
 /**
  * @typedef {Object} BanInfo
  * @property {string} tag

@@ -70,6 +70,17 @@ class Bot extends discord.Client {
 			.setFooter('IRC Code Of Conduct', this.user.displayAvatarURL);
 		return cd;
 	}
+	/**
+	 * 
+	 * @param {string} message 
+	 */
+	debug(message) {
+		const err = new Error();
+		const frame = err.stack.split('\n')[2];
+		const lineNumber = frame.split(':')[1];
+		const functionName = frame.split(' ')[5];
+		console.log(functionName + ':' + lineNumber + ' ' + message);
+	}
 	backup() {
 		fs.copyFileSync('jndb.json', 'jndbBackup.json');
 	}

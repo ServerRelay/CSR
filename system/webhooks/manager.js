@@ -64,7 +64,9 @@ class WebHookManager {
 		let user = message.author;
 		let parsed = this.parseMessage(message);
 		let content = parsed.content;
-		await webhook.edit(user.tag, user.avatarURL);
+		//await webhook.edit(user.tag, user.avatarURL);
+		parsed.username = user.tag;
+		parsed.avatarURL = user.avatarURL;
 		await webhook.send(content, parsed);
 	}
 	/**

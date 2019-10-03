@@ -71,13 +71,14 @@ class Bot extends discord.Client {
 		return cd;
 	}
 	/**
-	 * 
-	 * @param {string} message 
+	 *
+	 * @param {string} message
 	 */
 	debug(message) {
 		const err = new Error();
 		const frame = err.stack.split('\n')[2];
-		const lineNumber = frame.split(':')[1];
+		const numbers = frame.match(/:\d/g).map((x) => x.replace(':', ''));
+		const lineNumber = numbers[0];
 		const functionName = frame.split(' ')[5];
 		console.log(functionName + ':' + lineNumber + ' ' + message);
 	}

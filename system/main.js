@@ -10,6 +10,10 @@ class System {
 	 */
 	constructor(client) {
 		this.client = client;
+		this.style = {
+			public: 'wembed',
+			private: 'webhook',
+		};
 		this.db = new jndb.Connection();
 		this.db.use('channels');
 		this.banManager = new BansManager(client);
@@ -48,15 +52,19 @@ class System {
 		message.delete();
 	}
 	async sendPrivateWebHooks(guild, message) {
+		this.webhookManager.fetchWebhooks();
 		const privateChs = this.getMatchingPrivate(guild);
 		const channel = this.getChannels(guild).private;
 		if (!channel) return;
-
-		this.webhookManager.fetchWebhooks();
 		let webhooks = this.webhookManager.webhooks.private;
 		privateChs.forEach((ch) => {
 			let webhook = webhooks.get(ch.guild.id);
-			if (!webhook) return;
+
+			if (!webhook) {
+				return this.client.debug(
+					`no webhook found for channel ${ch.name}`
+				);
+			}
 			this.webhookManager.send(webhook, message).catch(() => {
 				this.webhookManager.webhooks.private.delete(webhook.guildID);
 			});
@@ -216,6 +224,7 @@ class System {
 		obj.private = this.channels.private.get(guild.id);
 		return obj;
 	}
+	
 }
 
 module.exports = System;

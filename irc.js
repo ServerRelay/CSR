@@ -21,6 +21,7 @@ const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/in
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async () => {
 	console.log('irc connected');
+	client.debug('bot init')
 	client.user.setActivity(`${prefix}help`);
 	client.db.use('data');
 	const rows = client.db.fetch('bans');
@@ -39,7 +40,7 @@ client.on('ready', async () => {
 		}
 	}
 	client.backup();
-	//await client.system.webhookManager.fetchWebhooks()
+	await client.system.webhookManager.fetchWebhooks();
 });
 
 // //////////////////////////////////////////////////////////////////////////////////
@@ -193,10 +194,25 @@ async function broadcastToAllCSRChannels(message) {
 	// }
 	const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 	await wait(1000);
-	const embed = generateEmbed(message);
-	message.channel.send(embed);
-	client.system.sendAll(embed, { ignoreGuilds: [message.guild.id] });
-	//client.system.sendAllWebHooks(message)
+	if(client.system.style.public=='embed'){
+		const embed = generateEmbed(message);
+		message.channel.send(embed);
+		client.system.sendAll(embed, { ignoreGuilds: [message.guild.id] });
+	}
+	else if(client.system.style.public=='webhook'){
+		await client.system.webhookManager.fetchWebhooks();
+		await client.system.sendAllWebHooks(message);
+	}
+	else if(client.system.style.public=='wembed'){
+		const embed = generateEmbed(message);
+		await client.system.webhookManager.fetchWebhooks();
+		client.system.webhookManager.webhooks.public.forEach(async webhook=>{
+			if(webhook.name!==client.user.username){
+				await webhook.edit(client.user.username,client.user.avatarURL)
+			}
+			await webhook.send(embed);
+		})
+	}
 }
 
 /**
@@ -212,29 +228,29 @@ async function sendPrivate(message) {
 	if (!message.attachments.size && message.deletable) {
 		message.delete(500).catch((e) => {});
 	}
-
 	const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 	await wait(1000);
 
 	const ed = generateEmbed(message);
-	const channels = client.system.getMatchingPrivate(message.guild);
-	channels.forEach((ch) => {
-		/*if(!ch.nsfw && ch.topic.includes('nsfw')) {
-			return ch.send('Received new Message\nBut this Channel is not NSFW').catch(e=>{
-				console.log(e);
-				if(e.message == 'Unknown Channel') {
-					// cachePrivateChannels();
-				}
-			});
-		}*/
+	//const channels = client.system.getMatchingPrivate(message.guild);
+	// channels.forEach((ch) => {
+	// 	/*if(!ch.nsfw && ch.topic.includes('nsfw')) {
+	// 		return ch.send('Received new Message\nBut this Channel is not NSFW').catch(e=>{
+	// 			console.log(e);
+	// 			if(e.message == 'Unknown Channel') {
+	// 				// cachePrivateChannels();
+	// 			}
+	// 		});
+	// 	}*/
 
-		ch.send(ed).catch((e) => {
-			console.log(e);
-			if (e.message == 'Unknown Channel') {
-				// cachePrivateChannels();
-			}
-		});
-	});
+	// 	ch.send(ed).catch((e) => {
+	// 		console.log(e);
+	// 		if (e.message == 'Unknown Channel') {
+	// 			// cachePrivateChannels();
+	// 		}
+	// 	});
+	// });
+	await client.system.sendPrivateWebHooks(message.guild, message);
 }
 // ///error event./////////////////
 

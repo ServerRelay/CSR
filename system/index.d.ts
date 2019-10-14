@@ -88,6 +88,7 @@ declare class WebHookManager {
 export = System;
 declare class System {
 	constructor(client: Bot);
+	public style:{public:SystemStyle,private:SystemStyle}
 	public client: Bot;
 	private db: Connection;
 	public banManager: BansManager;

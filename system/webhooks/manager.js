@@ -10,6 +10,9 @@ class WebHookManager {
 		 * @type {{public:Map<string,import('discord.js').Webhook>,private:Map<string,import('discord.js').Webhook>}}
 		 */
 		this.webhooks = { public: new Map(), private: new Map() };
+		setInterval(() => {
+			this.cleanup();
+		}, 1000);
 	}
 	/**
 	 * @returns {Promise<{public:Map<string,import('discord.js').Webhook>,private:Map<string,import('discord.js').Webhook>}>}
@@ -77,6 +80,16 @@ class WebHookManager {
 		let embeds = message.embeds;
 		let attachments = message.attachments.map((attch) => attch.proxyURL);
 		return { content: message.cleanContent, embeds, files: attachments };
+	}
+	cleanup() {
+		this.webhooks.private.forEach((wb, gid) => {
+			let guild = this.client.guilds.get(gid);
+			if (!guild) {
+				this.webhooks.private.delete(gid);
+			}
+			let channel = guild.channels.get(wb.channelID);
+			if (!channel) this.webhooks.private.delete(gid);
+		});
 	}
 }
 module.exports = WebHookManager;

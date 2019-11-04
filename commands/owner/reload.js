@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { Command } = require('easy-djs-commandhandler');
-const reload = new Command({ name: 'reload', requires: ['botowner'],hideinhelp:true });
+const reload = new Command({ name: 'reload', requires: ['botowner'],hideinhelp:true, });
 module.exports = reload.execute((client, message) => {
 	if (message.author.id !== '298258003470319616') {
 		message.channel.send('NO');

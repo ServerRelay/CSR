@@ -7,11 +7,11 @@ const invite = new Command({
 });
 module.exports = invite.execute((client, message) => {
 	const ed = new Discord.RichEmbed()
-		.setColor([0, 255, 40])
-		.setFooter('CSR', message.client.user.avatarURL);
+		.setColor(client.color)
+		.setFooter('CSR', client.user.avatarURL);
 	message.client
 		.generateInvite(['ADMINISTRATOR'])
-		.then(link => {
+		.then((link) => {
 			ed.setDescription(`thanks for choosing to invite the bot.\n invite:
         ${link}`);
 			message.channel.send(ed);

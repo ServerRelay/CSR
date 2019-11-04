@@ -1,153 +1,172 @@
 const Discord = require('discord.js');
-const helper = require('./helper');
 const system = require('./csrSys');
-const client = new Discord.Client();
-const dmap = require('dmap-postgres');
+const Bot = require('./bot');
+const client = new Bot();
+const jndb = require('jndb');
 const commandHandler = require('easy-djs-commandhandler');
+// @ts-ignore
 require('./env').load('.env');
 const prefix = process.env.prefix || 'c-';
-const cmdHandler = new commandHandler.Handler(client,
-	{
-		prefix: prefix,
-		owners: ['298258003470319616', '193406800614129664'],
-		defaultcmds:true,
-	});
-const System = new system(client, process.env.channel);
-client.banlist = new Discord.Collection();
-client.lockdown = {
-	enabled:false,
-	time:0,
-};
-client.csrCooldowns = new Discord.Collection();
-client.csrchannels = new Discord.Collection();
-client.filter=[];
+const cmdHandler = new commandHandler.Handler(client, {
+	prefix: prefix,
+	owner: ['298258003470319616', '193406800614129664'],
+	defaultcmds: true,
+	prefixFunc: (message) => {
+		if (!message.guild) return prefix;
+		return client.prefixDB.fetch(message.guild.id) || prefix;
+	},
+});
+client.filter = [];
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
-client.on('ready', async ()=>{
-	const db = new dmap('data', { connectionString:process.env.DATABASE_URL, ssl:true });
+client.on('ready', async () => {
 	console.log('irc connected');
+	client.debug('bot init')
 	client.user.setActivity(`${prefix}help`);
-	await db.connect();
-	const rows = await db.get('bans');
-	if(rows) {
-		for(const i in rows) {
+	client.db.use('data');
+	const rows = client.db.fetch('bans');
+	if (rows) {
+		for (const i in rows) {
 			client.banlist.set(i, rows[i]);
 		}
 	}
-
-	await db.end();
-	let filterDB=new dmap('filter',{ connectionString:process.env.DATABASE_URL, ssl:true })
-	await filterDB.connect()
 	/**
 	 * @type {string[]}
 	 */
-	let words=await filterDB.secure('words',[])
-	if(words.length){
-		for(let word of words){
-			client.filter.push(word)
+	let words = client.db.secure('filter', []);
+	if (words.length) {
+		for (let word of words) {
+			client.filter.push(word);
 		}
 	}
-	client.staff = helper.loadStaff();
-	client.system = System;
-
+	client.backup();
+	await client.system.webhookManager.fetchWebhooks();
 });
 
 // //////////////////////////////////////////////////////////////////////////////////
 
-function findemoji(name) {
-	const em = client.guilds.get('497475921855381525').emojis.find(x=>x.name === name);
-	if(em) {
-		return em;
+client.on('guildCreate', async (guild) => {
+	if (!guild.available) {
+		return;
 	}
-	else{
-		new Error('no emoji found');
-	}
-}
-
-// ////////////////////////////////////////////////////////
-client.on('guildCreate', async (guild)=>{
-	if(!guild.available) {return;}
-	const cd = helper.insertRules(client);
-	const ch = await guild.createChannel('irc', 'text').catch(()=>{
-		return guild.owner.send('this bot needs a channel (#irc) to do its intended function');
-	});
-
-	if(ch){
-		ch.send('**make sure you read the rules before proceding**', cd)
-	}
-
 	console.log('joined server ' + guild.name);
-
+	/**
+	 * @type {Discord.TextChannel}
+	 */
+	// @ts-ignore
+	let irc = await guild
+		.createChannel('irc', { type: 'text' })
+		.catch(() => {});
+	if (irc) {
+		await irc.send(client.rules).catch(() => {});
+		client.system.channels.create(guild, { publicChannel: irc });
+	}
 	const ed = new Discord.RichEmbed()
-		.setColor([0, 255, 0])
-		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
-		.setDescription(`has joined the chat ${System.findEmoji('join')}`);
-	System.sendAll(ed);
+		.setColor(client.color)
+		// @ts-ignore
+		.setAuthor(
+			`${guild.name}`,
+			guild.iconURL || client.user.defaultAvatarURL
+		)
+		.setDescription(`has joined ${client.system.findEmoji('join')}`);
+	client.system.sendAll(ed);
 });
 // ////////////////////////////////////////////////////////////////////////////
-client.on('guildDelete', (guild)=>{
-	if(!guild.available) {return;}
+client.on('guildDelete', (guild) => {
+	if (!guild.available) {
+		return;
+	}
+	if (!client.system.channels.public.has(guild.id))
+		client.system.channels.delete(guild, 'private');
+	client.system.channels.delete(guild, 'all');
 	console.log('bot removed from server ' + guild.name);
 	const ed = new Discord.RichEmbed()
-		.setColor([255, 0, 0])
-		.setAuthor(`${guild.name}`, (guild.iconURL || client.user.defaultAvatarURL))
-		.setDescription(`has left the chat ${System.findEmoji('leave')}`);
-	System.sendAll(ed);
-
+		.setColor(client.color)
+		// @ts-ignore
+		.setAuthor(
+			`${guild.name}`,
+			guild.iconURL || client.user.defaultAvatarURL
+		)
+		.setDescription(`has left ${client.system.findEmoji('leave')}`);
+	client.system.sendAll(ed);
 });
 // ///////////MAIN MESSAGE EVENT/////////////////////////////////////////////
-client.on('message', (message)=>{
-	if(message.content.startsWith(prefix)) return;
-	if (message.author == client.user || message.author.bot || !message.guild || message.system) return;
-	if(noInvites.test(message.content)) return;
-	if(message.content.includes('﷽') || message.guild.name.includes('﷽') || message.cleanContent.includes('naked photo'))  return;
-	if(lockdownExpired(limitTime)) {
+client.on('message', (message) => {
+	if (message.content.startsWith(prefix)) return;
+	if (
+		message.author == client.user ||
+		message.author.bot ||
+		!message.guild ||
+		message.system
+	)
+		return;
+	if (noInvites.test(message.content)) return;
+	if (
+		message.content.includes('﷽') ||
+		message.guild.name.includes('﷽') ||
+		message.cleanContent.includes('naked photo')
+	)
+		return;
+	if (lockdownExpired(limitTime)) {
 		endLockdown();
 	}
-	if(client.lockdown.enabled && !client.staff.has(message.author.id)) return;
-	const channel = System.getChannel(message.guild);
-	const privchannel = getPrivateChannel(message.guild);
-	if(channel && message.channel.id === channel.id) {
-		if(client.csrCooldowns.has(message.author.id)) {return;}
+	if (client.lockdown.enabled && !client.staff.has(message.author.id)) return;
+	const channel = client.system.getChannels(message.guild).public;
+	const privchannel = client.system.getChannels(message.guild).private;
+	if (channel && message.channel.id === channel.id) {
+		if (client.csrCooldowns.has(message.author.id)) {
+			return;
+		}
 		broadcastToAllCSRChannels(message);
-		client.csrCooldowns.set(message.author.id);
+		client.csrCooldowns.set(message.author.id, null);
 		setTimeout(() => {
 			client.csrCooldowns.delete(message.author.id);
 		}, 2000);
-	}
-	else if(privchannel && message.channel.id === privchannel.id) {
+	} else if (privchannel && message.channel.id === privchannel.id) {
 		sendPrivate(message);
 	}
 });
 /////////////////////////
-client.on('messageReactionAdd',(reaction,user)=>{
-	let message=reaction.message
-	let guild=message.guild
-	let channel=message.channel
-	let ircChannel=System.getChannel(guild)
-	if(!message.embeds[0] || message.author.id!=client.user.id||!(ircChannel&&ircChannel.id===channel.id)){
-		return
+client.on('messageReactionAdd', (reaction, user) => {
+	let message = reaction.message;
+	let guild = message.guild;
+	let channel = message.channel;
+	let ircChannel = client.system.getChannels(guild).public;
+	if (
+		!message.embeds[0] ||
+		message.author.id != client.user.id ||
+		!(ircChannel && ircChannel.id === channel.id)
+	) {
+		return;
 	}
-	let CSRMessageAuthor=client.users.find(x=>x.tag==message.embeds[0].author.name)
-	if(!CSRMessageAuthor||(CSRMessageAuthor.id!=user.id && !client.staff.has(user.id))){
-		return 
+	let CSRMessageAuthor = client.users.find(
+		(x) => x.tag == message.embeds[0].author.name
+	);
+	if (
+		!CSRMessageAuthor ||
+		(CSRMessageAuthor.id != user.id && !client.staff.has(user.id))
+	) {
+		return;
 	}
-	let messages=System.findMatchingMessages(CSRMessageAuthor.tag,message.embeds[0].description)
-	
-	messages.forEach(msg=>msg.delete().catch(e=>{}))
-})
+	let messages = client.system.findMatchingMessages(
+		CSRMessageAuthor.tag,
+		message.embeds[0].description
+	);
+
+	messages.forEach((msg) => msg.delete().catch((e) => {}));
+});
 // ///////////////////////////////////////////
-client.on('message', (message)=>{
+client.on('message', (message) => {
 	cmdHandler.handle(client, message);
 });
 // /RATE LIMIT EVENT/////////////////////////////////////////////////////////////
 let limitcount = 0;
 const limitTime = 0;
-client.on('rateLimit', (ratelimit)=>{
+client.on('rateLimit', (ratelimit) => {
 	console.log(ratelimit);
-	if(ratelimit) {
+	if (ratelimit) {
 		limitcount += 1;
-		if(limitcount >= 3) {
+		if (limitcount >= 3) {
 			initLockdown();
 			client.lockdown.time += 7000;
 			limitcount = 0;
@@ -160,93 +179,123 @@ client.on('rateLimit', (ratelimit)=>{
  * @param {Discord.Message} message
  */
 async function broadcastToAllCSRChannels(message) {
-	if(message.author.createdAt>(new Date().getTime()-604800000)) {
+	// @ts-ignore
+	if (message.author.createdAt > new Date().getTime() - 604800000) {
 		return;
 	}
-	if(client.filter.some(word=>message.cleanContent.includes(word))){
-		return
-	}
-	if(client.banlist.has(message.author.id)) {
+	if (client.filter.some((word) => message.cleanContent.includes(word))) {
 		return;
-
+	}
+	if (client.banlist.has(message.author.id)) {
+		return;
 	}
 	// if(!message.attachments.size && !message.deleted) {
 	//	message.delete(500);
 	// }
-	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+	const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 	await wait(1000);
-	const embed = generateEmbed(message);
-	message.channel.send(embed);
-	System.sendAll(embed, { ignoreGuilds:[message.guild.id] });
+	if(client.system.style.public=='embed'){
+		const embed = generateEmbed(message);
+		message.channel.send(embed);
+		client.system.sendAll(embed, { ignoreGuilds: [message.guild.id] });
+	}
+	else if(client.system.style.public=='webhook'){
+		await client.system.webhookManager.fetchWebhooks();
+		await client.system.sendAllWebHooks(message);
+	}
+	else if(client.system.style.public=='wembed'){
+		const embed = generateEmbed(message);
+		await client.system.webhookManager.fetchWebhooks();
+		client.system.webhookManager.webhooks.public.forEach(async webhook=>{
+			if(webhook.name!==client.user.username){
+				await webhook.edit(client.user.username,client.user.avatarURL)
+			}
+			await webhook.send(embed);
+		})
+	}
 }
-
 
 /**
  *
  * @param {Discord.Message} message
  */
 async function sendPrivate(message) {
-	const channel = getPrivateChannel(message.guild);
-	if(!channel || !channel.topic || channel.topic === '') {return;}
-
-	if(!message.attachments.size && !message.deleted) {
-		message.delete(500);
+	const channel = client.system.getChannels(message.guild).private;
+	if (!channel) {
+		return;
 	}
 
-	const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+	if (!message.attachments.size && message.deletable) {
+		message.delete(500).catch((e) => {});
+	}
+	const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 	await wait(1000);
 
 	const ed = generateEmbed(message);
-	const channels = System.getMatchingPrivate(message.guild);
-	channels.forEach(ch=>{
-		if(!ch.nsfw && ch.topic.includes('nsfw')) {
-			return ch.send('Received new Message\nBut this Channel is not NSFW').catch(e=>{
-				console.log(e);
-				if(e.message == 'Unknown Channel') {
-					// cachePrivateChannels();
-				}
-			});
-		}
+	//const channels = client.system.getMatchingPrivate(message.guild);
+	// channels.forEach((ch) => {
+	// 	/*if(!ch.nsfw && ch.topic.includes('nsfw')) {
+	// 		return ch.send('Received new Message\nBut this Channel is not NSFW').catch(e=>{
+	// 			console.log(e);
+	// 			if(e.message == 'Unknown Channel') {
+	// 				// cachePrivateChannels();
+	// 			}
+	// 		});
+	// 	}*/
 
-		ch.send(ed)
-			.catch(e=>{
-				console.log(e);
-				if(e.message == 'Unknown Channel') {
-					// cachePrivateChannels();
-				}
-			});
-	});
+	// 	ch.send(ed).catch((e) => {
+	// 		console.log(e);
+	// 		if (e.message == 'Unknown Channel') {
+	// 			// cachePrivateChannels();
+	// 		}
+	// 	});
+	// });
+	await client.system.sendPrivateWebHooks(message.guild, message);
 }
 // ///error event./////////////////
 
-client.on('error', (err)=>{
+client.on('error', (err) => {
 	console.log(err);
 });
 
 // unhandled rej ///////////////////////////////////////////////////////////////////////
 process.on('unhandledRejection', (err) => {
 	console.error(err);
-	if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized') return process.exit();
+	if (err.name == 'DiscordAPIError' && err.message == '401: Unauthorized')
+		return process.exit();
 
-	if(err.name == 'DiscordAPIError') {
+	if (err.name == 'DiscordAPIError') {
 		let addInfo = 'None Found!';
-		if(err.path !== undefined) {
+		if (err.path !== undefined) {
 			const split = err.path.split('/');
 			const info = getDebugInfo(split);
-			addInfo = `Additional Debug Info:\n\tChannel: ${info.channel ? info.channel.name : 'Unknown'}\n\tGuild: ${info.channel ? info.channel.guild ? info.channel.guild.name : 'Unknown' : 'Unknown'}\n\tmessage content:${info.message ? info.message.cleanContent : 'None Found!'}}`;
+			addInfo = `Additional Debug Info:\n\tChannel: ${
+				info.channel ? info.channel.name : 'Unknown'
+			}\n\tGuild: ${
+				info.channel
+					? info.channel.guild
+						? info.channel.guild.name
+						: 'Unknown'
+					: 'Unknown'
+			}\n\tmessage content:${
+				info.message ? info.message.cleanContent : 'None Found!'
+			}}`;
 		}
 
-		return (client.channels.get('543167247330312232')).send(`
+		// @ts-ignore
+		return client.channels.get('543167247330312232').send(`
 	\`\`\`js
-	Error: ${require('util').inspect(err).slice(0, 1800)}
+	Error: ${require('util')
+		.inspect(err)
+		.slice(0, 1800)}
 
 	${addInfo}
 		\`\`\`
 		`);
 	}
 
-
-	return (client.channels.get('543167247330312232')).send(`
+	// @ts-ignore
+	return client.channels.get('543167247330312232').send(`
 \`\`\`xs
 Error: ${err.name}
     ${err.message}
@@ -257,46 +306,42 @@ Error: ${err.name}
 
 function getDebugInfo(arr) {
 	const data = {};
-	if(arr[3] == 'channels') {
+	if (arr[3] == 'channels') {
 		const channel = client.channels.get(arr[4]);
-		if(channel) {
+		if (channel) {
 			data.channel = channel;
+			// @ts-ignore
 			data.guild = channel.guild;
 		}
 	}
-	if(arr[3] == 'guilds') {
+	if (arr[3] == 'guilds') {
 		const guild = client.guilds.get(arr[4]);
-		if(guild) {
+		if (guild) {
 			data.guild = guild;
 		}
 	}
-	if(!arr[5])return data;
+	if (!arr[5]) return data;
 
-	if(arr[5] == 'permissions') {
+	if (arr[5] == 'permissions') {
+		// @ts-ignore
 		const role = data.channel.guild.roles.get(arr[6]);
-		if(role) {
+		if (role) {
 			data.role = role;
 		}
-
 	}
-	if(arr[5] == 'messages') {
+	if (arr[5] == 'messages') {
 		const channel = client.channels.get(arr[4]);
-		if(channel) {
+		if (channel) {
+			// @ts-ignore
 			const msg = channel.messages.get(arr[6]);
-			if(msg) {
+			if (msg) {
 				data.message = msg;
 			}
 		}
 	}
 	return data;
 }
-/**
- * @param {Discord.Guild} guild
- */
-function getPrivateChannel(guild) {
-	const channel = guild.channels.find(x=>x.type == 'text' && x.name == 'privateirc');
-	return channel;
-}
+
 /**
  *
  *
@@ -305,48 +350,59 @@ function getPrivateChannel(guild) {
  */
 function generateEmbed(message) {
 	const relayEmbed = new Discord.RichEmbed()
-		.setAuthor(`${message.author.tag}`, message.author.displayAvatarURL, `https://discordapp.com/users/${message.author.id}`)
+		// @ts-ignore
+		.setAuthor(
+			`${message.author.tag}`,
+			message.author.displayAvatarURL,
+			`https://discordapp.com/users/${message.author.id}`
+		)
 		.setDescription(message.cleanContent)
 		.setTimestamp(new Date())
-		.setFooter(message.guild.name, (message.guild.iconURL || client.user.defaultAvatarURL));
-	if(client.staff.has(message.author.id)) {
+		.setFooter(
+			message.guild.name,
+			message.guild.iconURL || client.user.defaultAvatarURL
+		);
+	if (client.staff.has(message.author.id)) {
 		relayEmbed.setColor([0, 0, 128]);
-	}
-	else if(message.author.id === message.guild.owner.id) {
+	} else if (message.author.id === message.guild.owner.id) {
 		relayEmbed.setColor([205, 205, 0]);
-	}
-	else{
+	} else {
 		relayEmbed.setColor([133, 133, 133]);
 	}
 
 	// find and add image
-	if(message.attachments.array()[0]) {
+	if (message.attachments.array()[0]) {
 		const img = message.attachments.array()[0];
-		if(img.filename.endsWith('.jpg') || img.filename.endsWith('.png') || img.filename.endsWith('.gif') || img.filename.endsWith('.jpeg') || img.filename.endsWith('.PNG')) {
+		let images = ['.jpg', '.jpeg', '.png', '.gif', '.PNG'];
+		if (images.some((x) => img.filename.endsWith(x))) {
 			relayEmbed.setImage(img.url);
-		}
-		else{
+		} else {
 			relayEmbed.addField('Attachment', img.url, false);
 		}
-
 	}
 	// fetch external embeds and place them there
 	const externalembed = new Discord.RichEmbed(message.embeds[0]);
 	// if(externalembed) {
-	externalembed.title && externalembed.description ? relayEmbed.addField(`${externalembed.title}`, externalembed.description) : '';
-	externalembed.thumbnail ? relayEmbed.setThumbnail(externalembed.thumbnail.url) : '';
+	externalembed.title && externalembed.description
+		? relayEmbed.addField(
+				`${externalembed.title}`,
+				externalembed.description
+		  )
+		: '';
+	externalembed.thumbnail
+		? relayEmbed.setThumbnail(externalembed.thumbnail.url)
+		: '';
 	// }
 	return relayEmbed;
 }
 
 function lockdownExpired(time) {
 	// console.log(client.lockdown.time);
-	const x = new Date().getTime;
+	const x = new Date().getTime();
 	const timeleft = x - time;
 	if (timeleft > time || !time) {
 		return true;
-	}
-	else {
+	} else {
 		return false;
 	}
 }

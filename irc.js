@@ -76,10 +76,13 @@ client.on('guildDelete', (guild) => {
 	if (!guild.available) {
 		return;
 	}
+	
 	if (!client.system.channels.public.has(guild.id))
 		client.system.channels.delete(guild, 'private');
 	client.system.channels.delete(guild, 'all');
 	console.log('bot removed from server ' + guild.name);
+	client.system.webhookManager.webhooks.private.delete(guild.id)
+	client.system.webhookManager.webhooks.public.delete(guild.id)
 	const ed = new Discord.RichEmbed()
 		.setColor(client.color)
 		// @ts-ignore

@@ -1,3 +1,4 @@
+const ms=require('ms')
 class WebHookManager {
 	/**
 	 *
@@ -11,8 +12,8 @@ class WebHookManager {
 		 */
 		this.webhooks = { public: new Map(), private: new Map() };
 		setInterval(() => {
-			this.cleanup();
-		}, 1000);
+			this.update();
+		}, ms('30m'));
 	}
 	/**
 	 * @returns {Promise<{public:Map<string,import('discord.js').Webhook>,private:Map<string,import('discord.js').Webhook>}>}
@@ -82,6 +83,7 @@ class WebHookManager {
 		return { content: message.cleanContent, embeds, files: attachments };
 	}
 	cleanup() {
+
 		this.webhooks.private.forEach((wb, gid) => {
 			let guild = this.client.guilds.get(gid);
 			if (!guild) {
@@ -90,6 +92,11 @@ class WebHookManager {
 			let channel = guild.channels.get(wb.channelID);
 			if (!channel) this.webhooks.private.delete(gid);
 		});
+	}
+	async update() {
+		this.webhooks.public.clear();
+		this.webhooks.private.clear();
+		await this.fetchWebhooks();
 	}
 }
 module.exports = WebHookManager;

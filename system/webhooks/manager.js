@@ -88,6 +88,9 @@ class WebHookManager {
 			let webhooks = await ch.fetchWebhooks();
 			if (!webhooks) return;
 			let webhookToGet = this.webhooks.public.get(ch.guild.id);
+			if (!webhookToGet) {
+				return;
+			}
 			let got = webhooks.get(webhookToGet.id);
 			if (!got) {
 				this.webhooks.public.delete(ch.guild.id);
@@ -97,6 +100,9 @@ class WebHookManager {
 			let webhooks = await ch.fetchWebhooks();
 			if (!webhooks) return;
 			let webhookToGet = this.webhooks.private.get(ch.guild.id);
+			if (!webhookToGet) {
+				return;
+			}
 			let got = webhooks.get(webhookToGet.id);
 			if (!got) {
 				this.webhooks.private.delete(ch.guild.id);

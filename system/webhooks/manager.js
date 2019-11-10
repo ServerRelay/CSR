@@ -10,9 +10,9 @@ class WebHookManager {
 		 * @type {{public:Map<string,import('discord.js').Webhook>,private:Map<string,import('discord.js').Webhook>}}
 		 */
 		this.webhooks = { public: new Map(), private: new Map() };
-		setInterval(() => {
-			this.cleanup();
-		}, 1000);
+		setInterval(async () => {
+			await this.cleanup();
+		}, 300000);
 	}
 	/**
 	 * @returns {Promise<{public:Map<string,import('discord.js').Webhook>,private:Map<string,import('discord.js').Webhook>}>}
@@ -21,40 +21,40 @@ class WebHookManager {
 		let pubchannels = this.system.channels.public;
 		let privchannels = this.system.channels.private;
 		if (this.webhooks.public.size !== pubchannels.size) {
-			for (let i of pubchannels) {
-				let ch = i[1];
-				if (this.webhooks.public.has(ch.guild.id)) return;
+		for (let i of pubchannels) {
+			let ch = i[1];
+			if (this.webhooks.public.has(ch.guild.id)) return;
+			// @ts-ignore
+			let webhooks = await ch.fetchWebhooks().catch((e) => {});
+			if (!webhooks) continue;
+			let webhook = webhooks.first();
+			if (!webhook) {
 				// @ts-ignore
-				let webhooks = await ch.fetchWebhooks().catch((e) => {});
-				if (!webhooks) continue;
-				let webhook = webhooks.first();
-				if (!webhook) {
+				webhook = await ch
+					.createWebhook('csr', this.client.user.displayAvatarURL)
 					// @ts-ignore
-					webhook = await ch
-						.createWebhook('csr', this.client.user.displayAvatarURL)
-						// @ts-ignore
-						.catch((e) => {});
-				}
-				this.webhooks.public.set(ch.guild.id, webhook);
+					.catch((e) => {});
 			}
+			this.webhooks.public.set(ch.guild.id, webhook);
+		}
 		}
 		if (this.webhooks.private.size !== privchannels.size) {
-			for (let i of privchannels) {
-				let ch = i[1];
-				if (this.webhooks.private.has(ch.guild.id)) return;
+		for (let i of privchannels) {
+			let ch = i[1];
+			if (this.webhooks.private.has(ch.guild.id)) return;
+			// @ts-ignore
+			let webhooks = await ch.fetchWebhooks().catch((e) => {});
+			if (!webhooks) continue;
+			let webhook = webhooks.first();
+			if (!webhook) {
 				// @ts-ignore
-				let webhooks = await ch.fetchWebhooks().catch((e) => {});
-				if (!webhooks) continue;
-				let webhook = webhooks.first();
-				if (!webhook) {
+				webhook = await ch
+					.createWebhook('csr', this.client.user.displayAvatarURL)
 					// @ts-ignore
-					webhook = await ch
-						.createWebhook('csr', this.client.user.displayAvatarURL)
-						// @ts-ignore
-						.catch((e) => {});
-				}
-				this.webhooks.private.set(ch.guild.id, webhook);
+					.catch((e) => {});
 			}
+			this.webhooks.private.set(ch.guild.id, webhook);
+		}
 		}
 		return this.webhooks;
 	}
@@ -81,14 +81,26 @@ class WebHookManager {
 		let attachments = message.attachments.map((attch) => attch.proxyURL);
 		return { content: message.cleanContent, embeds, files: attachments };
 	}
-	cleanup() {
-		this.webhooks.private.forEach((wb, gid) => {
-			let guild = this.client.guilds.get(gid);
-			if (!guild) {
-				this.webhooks.private.delete(gid);
+	async cleanup() {
+		let pubchannels = this.system.channels.public;
+		let privchannels = this.system.channels.private;
+		pubchannels.forEach(async (ch) => {
+			let webhooks = await ch.fetchWebhooks();
+			if (!webhooks) return;
+			let webhookToGet = this.webhooks.public.get(ch.guild.id);
+			let got = webhooks.get(webhookToGet.id);
+			if (!got) {
+				this.webhooks.public.delete(ch.guild.id);
 			}
-			let channel = guild.channels.get(wb.channelID);
-			if (!channel) this.webhooks.private.delete(gid);
+		});
+		privchannels.forEach(async (ch) => {
+			let webhooks = await ch.fetchWebhooks();
+			if (!webhooks) return;
+			let webhookToGet = this.webhooks.private.get(ch.guild.id);
+			let got = webhooks.get(webhookToGet.id);
+			if (!got) {
+				this.webhooks.private.delete(ch.guild.id);
+			}
 		});
 	}
 }

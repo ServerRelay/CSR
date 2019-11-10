@@ -21,40 +21,40 @@ class WebHookManager {
 		let pubchannels = this.system.channels.public;
 		let privchannels = this.system.channels.private;
 		if (this.webhooks.public.size !== pubchannels.size) {
-		for (let i of pubchannels) {
-			let ch = i[1];
-			if (this.webhooks.public.has(ch.guild.id)) return;
-			// @ts-ignore
-			let webhooks = await ch.fetchWebhooks().catch((e) => {});
-			if (!webhooks) continue;
-			let webhook = webhooks.first();
-			if (!webhook) {
+			for (let i of pubchannels) {
+				let ch = i[1];
+				if (this.webhooks.public.has(ch.guild.id)) return;
 				// @ts-ignore
-				webhook = await ch
-					.createWebhook('csr', this.client.user.displayAvatarURL)
+				let webhooks = await ch.fetchWebhooks().catch((e) => {});
+				if (!webhooks) continue;
+				let webhook = webhooks.first();
+				if (!webhook) {
 					// @ts-ignore
-					.catch((e) => {});
+					webhook = await ch
+						.createWebhook('csr', this.client.user.displayAvatarURL)
+						// @ts-ignore
+						.catch((e) => {});
+				}
+				this.webhooks.public.set(ch.guild.id, webhook);
 			}
-			this.webhooks.public.set(ch.guild.id, webhook);
-		}
 		}
 		if (this.webhooks.private.size !== privchannels.size) {
-		for (let i of privchannels) {
-			let ch = i[1];
-			if (this.webhooks.private.has(ch.guild.id)) return;
-			// @ts-ignore
-			let webhooks = await ch.fetchWebhooks().catch((e) => {});
-			if (!webhooks) continue;
-			let webhook = webhooks.first();
-			if (!webhook) {
+			for (let i of privchannels) {
+				let ch = i[1];
+				if (this.webhooks.private.has(ch.guild.id)) return;
 				// @ts-ignore
-				webhook = await ch
-					.createWebhook('csr', this.client.user.displayAvatarURL)
+				let webhooks = await ch.fetchWebhooks().catch((e) => {});
+				if (!webhooks) continue;
+				let webhook = webhooks.first();
+				if (!webhook) {
 					// @ts-ignore
-					.catch((e) => {});
+					webhook = await ch
+						.createWebhook('csr', this.client.user.displayAvatarURL)
+						// @ts-ignore
+						.catch((e) => {});
+				}
+				this.webhooks.private.set(ch.guild.id, webhook);
 			}
-			this.webhooks.private.set(ch.guild.id, webhook);
-		}
 		}
 		return this.webhooks;
 	}

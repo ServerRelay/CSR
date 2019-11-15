@@ -52,6 +52,7 @@ module.exports = Connect.execute((client, message, args) => {
 			'**make sure you read the rules before proceding**',
 			rules
 		);
+		channel.createWebhook('csr')
 	} else {
 		//if (!args[2] || args[2] == '') {
 			//return message.channel.send('passcode is empty or invalid');
@@ -67,6 +68,7 @@ module.exports = Connect.execute((client, message, args) => {
 			if(pChannel.guild.id==message.guild.id)return
 			pChannel.send(embed);
 		});
+		channel.createWebhook('csr')
 	}
 	message.channel.send('successfully set');
 });

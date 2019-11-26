@@ -102,8 +102,6 @@ client.on('message', (message) => {
 		return;
 	if (noInvites.test(message.content)) return;
 	if (
-		message.content.includes('﷽') ||
-		message.guild.name.includes('﷽') ||
 		message.cleanContent.includes('naked photo')
 	)
 		return;

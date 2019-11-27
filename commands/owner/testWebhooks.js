@@ -7,7 +7,7 @@ module.exports = new Command({
 	requiresBotPermissions: [],
 }).execute(async (client, message, args) => {
 	const guild = message.guild;
-	message.author = client;
+	message.author = client.user;
 	message.content = 'test';
 	let failed = false;
 	let failReason = '';

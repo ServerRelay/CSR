@@ -1,14 +1,15 @@
 const { Command } = require('easy-djs-commandhandler');
 const Connect = new Command({
 	name: 'connect',
-	requires: ['guild','guildowner'],
+	requires: ['guild', 'guildowner'],
 	requiresBotPermissions: ['EMBED_LINKS'],
 	description: "connects to CSR's main chat",
-	usage: '<prefix>connect [channel] [public | private] [passcode](optional, can use channel topic)',
+	usage:
+		'<prefix>connect [channel] [public | private] [passcode](optional, can use channel topic)',
 });
 let allowedTypes = ['public', 'private'];
 /** @param {import("../../bot")} callback */
-module.exports = Connect.execute((client, message, args) => {
+module.exports = Connect.execute(async (client, message, args) => {
 	if (
 		message.author.id !== message.guild.owner.id &&
 		!client.staff.has(message.author.id)
@@ -20,8 +21,7 @@ module.exports = Connect.execute((client, message, args) => {
 	 */
 	// @ts-ignore
 	let channel =
-		message.mentions.channels.first() ||
-		message.guild.channels.get(args[0]);
+		message.mentions.channels.first() || message.guild.channels.get(args[0]);
 	let type = args[1];
 	let passcode = args[2];
 	if (!channel || channel.type !== 'text') {
@@ -48,27 +48,26 @@ module.exports = Connect.execute((client, message, args) => {
 	if (type == 'public') {
 		client.system.channels.update(message.guild, channel, 'public');
 		let rules = client.rules;
-		channel.send(
-			'**make sure you read the rules before proceding**',
-			rules
-		);
-		channel.createWebhook('csr')
+		channel.send('**make sure you read the rules before proceding**', rules);
+		let webhook = await channel.createWebhook('csr');
+		client.system.webhookManager.add(message.guild, { public: webhook });
 	} else {
 		//if (!args[2] || args[2] == '') {
-			//return message.channel.send('passcode is empty or invalid');
+		//return message.channel.send('passcode is empty or invalid');
 		//}
-		channel.passcode = passcode||null;
+		channel.passcode = passcode || null;
 		client.system.channels.update(message.guild, channel, 'private');
-		let embed = new (require('discord.js')).RichEmbed();
+		let embed = new (require('discord.js').RichEmbed)();
 		embed.setColor(client.color);
 		embed.setAuthor(message.guild.name, message.guild.iconURL);
 		embed.setDescription('has connected');
 		let connected = client.system.getMatchingPrivate(message.guild);
 		connected.forEach((pChannel) => {
-			if(pChannel.guild.id==message.guild.id)return
+			if (pChannel.guild.id == message.guild.id) return;
 			pChannel.send(embed);
 		});
-		channel.createWebhook('csr')
+		let webhook = await channel.createWebhook('csr');
+		client.system.webhookManager.add(message.guild, { private: webhook });
 	}
 	message.channel.send('successfully set');
 });

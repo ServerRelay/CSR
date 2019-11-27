@@ -109,5 +109,80 @@ class WebHookManager {
 			}
 		});
 	}
+	/**
+	 *
+	 * @param {import('discord.js').Guild} guild
+	 * @param {{public?:import('discord.js').Webhook,private?:import('discord.js').Webhook}} webhooks
+	 * @returns {{public:boolean,private:boolean}} whethere it was successful in adding the specified webhooks, returns undefined for the type of webhook that wasnt inputted
+	 */
+	add(guild, webhooks) {
+		const gid = guild.id;
+		const results = { public: undefined, private: undefined };
+		if (webhooks.private) {
+			if (!this.webhooks.private.has(gid)) {
+				this.webhooks.private.set(gid, webhooks.private);
+				results.private = true;
+			} else {
+				results.private = false;
+			}
+		}
+		if (webhooks.public) {
+			if (!this.webhooks.public.has(gid)) {
+				this.webhooks.public.set(gid, webhooks.public);
+				results.public = true;
+			} else {
+				results.public = false;
+			}
+		}
+		return results;
+	}
+	/**
+	 *
+	 * @param {import('discord.js').Guild} guild
+	 * @param {'public'|'private'} webhook
+	 */
+	delete(guild, webhook) {
+		const gid = guild.id;
+		let result = false;
+		if (webhook == 'public') {
+			if (this.webhooks.public.has(gid)) {
+				this.webhooks.public.delete(gid);
+				result = true;
+			}
+		} else if (webhook == 'private') {
+			if (this.webhooks.private.has(gid)) {
+				this.webhooks.private.delete(gid);
+				result = true;
+			}
+		}
+		return result;
+	}
+	/**
+	 *
+	 * @param {import('discord.js').Guild} guild
+	 * @param {{public?:import('discord.js').Webhook,private?:import('discord.js').Webhook}} webhooks
+	 */
+	edit(guild, webhooks) {
+		const gid = guild.id;
+		if (webhooks.private) {
+			this.webhooks.private.set(gid, webhooks.private);
+		}
+		if (webhooks.public) {
+			this.webhooks.public.set(gid, webhooks.public);
+		}
+	}
+	/**
+	 *
+	 * @param {import('discord.js').Guild} guild
+	 * @returns {{public:import('discord.js').Webhook,private:import('discord.js').Webhook}}
+	 */
+	get(guild) {
+		const gid = guild.id;
+		const results = {
+			public: this.webhooks.public.get(gid),
+			private: this.webhooks.private.get(gid),
+		};
+		return results;
+	}
 }
 module.exports = WebHookManager;

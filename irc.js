@@ -93,7 +93,6 @@ client.on('message', (message) => {
 	)
 		return;
 	if (noInvites.test(message.content)) return;
-	if (message.cleanContent.includes('naked photo')) return;
 	if (lockdownExpired(limitTime)) {
 		endLockdown();
 	}

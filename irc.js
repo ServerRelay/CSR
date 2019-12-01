@@ -57,9 +57,8 @@ client.on('guildCreate', async (guild) => {
 	let irc = await guild.createChannel('irc', { type: 'text' }).catch(() => {});
 	if (irc) {
 		await irc.send(client.rules).catch(() => {});
-		let webhook = await channel.createWebhook('csr').catch(()=>{});
-		if (webhook)
-			client.system.webhookManager.add(guild, { private: webhook });
+		let webhook = await channel.createWebhook('csr').catch(() => {});
+		if (webhook) client.system.webhookManager.add(guild, { private: webhook });
 		client.system.channels.create(guild, { publicChannel: irc });
 	}
 	const ed = new Discord.RichEmbed()
@@ -197,7 +196,12 @@ async function broadcastToAllCSRChannels(message) {
 			if (webhook.name !== client.user.username) {
 				await webhook.edit(client.user.username, client.user.avatarURL);
 			}
-			await webhook.send(embed);
+			await webhook.send(embed).catch((e) => {
+				client.system.webhookManager.delete(
+					client.guilds.get(webhook.guildID),
+					'public'
+				);
+			});
 		});
 	}
 }

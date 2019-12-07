@@ -3,7 +3,7 @@
 		"prefix": "command",
 		"body": [
 			"const { Command } = require('easy-djs-commandhandler');",
-			"module.exports = new Command({name: '$1',description:'',aliases:[],requires: [],requiresBotPermissions: [],}).execute((client, message,args)=>{});"
+			"module.exports = new Command({name: '$1',description:'',aliases:[],requires: [],requiresBotPermissions: [], hideinhelp:$2}).execute((client, message,args)=>{});"
 		],
 		"description": "boilerplate for command"
 	},
@@ -13,6 +13,6 @@
 			"const { Handler } = require('easy-djs-commandhandler');",
 			"new Handler($1, {prefix: '$2',owner: [],defaultCooldown: '$3',prefixFunc: (message,client) => {}});"
 		],
-		"description": "handler snipper"
+		"description": "handler snippet"
 	}
 }

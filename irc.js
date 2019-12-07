@@ -57,7 +57,7 @@ client.on('guildCreate', async (guild) => {
 	let irc = await guild.createChannel('irc', { type: 'text' }).catch(() => {});
 	if (irc) {
 		await irc.send(client.rules).catch(() => {});
-		let webhook = await channel.createWebhook('csr').catch(() => {});
+		let webhook = await irc.createWebhook('csr').catch(() => {});
 		if (webhook) client.system.webhookManager.add(guild, { private: webhook });
 		client.system.channels.create(guild, { publicChannel: irc });
 	}

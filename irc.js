@@ -3,10 +3,12 @@ const system = require('./csrSys');
 const Bot = require('./bot');
 const client = new Bot();
 const jndb = require('jndb');
+const fs = require('fs');
 const commandHandler = require('easy-djs-commandhandler');
 // @ts-ignore
 require('./env').load('.env');
 const prefix = process.env.prefix || 'c-';
+const testing = process.env.testing || false;
 const cmdHandler = new commandHandler.Handler(client, {
 	prefix: prefix,
 	owner: ['298258003470319616', '193406800614129664'],
@@ -16,13 +18,81 @@ const cmdHandler = new commandHandler.Handler(client, {
 		return client.prefixDB.fetch(message.guild.id) || prefix;
 	},
 });
-client.filter = [];
+// /**
+//  * @type {Map<string,string>}
+//  */
+// const allCmds = new Map();
+// fs.readdir(`./commands/`, (err, files) => {
+// 	// read dir
+// 	const jsfile = files.filter(
+// 		(f) =>
+// 			f.split('.').pop() === 'js' &&
+// 			!fs.statSync(process.cwd() + `/commands/` + f).isDirectory()
+// 	); // get all .js files
+// 	const categorys = files.filter((f) =>
+// 		fs.statSync(process.cwd() + `/commands/` + f).isDirectory()
+// 	);
+
+// 	jsfile.forEach((f, i) => {
+// 		// if commands present
+// 		try {
+// 			const props = require(`${process.cwd()}/commands/${f}`); // => load each one
+
+// 			if (props.help.aliases && !Array.isArray(props.help.aliases))
+// 				props.help.aliases = [props.help.aliases];
+// 			allCmds.set(props.help.name, `${process.cwd()}/commands/${f}`); // => add command to command list
+// 		} catch (err) {}
+// 	});
+// 	categorys.forEach((category) => {
+// 		const catfiles = fs
+// 			.readdirSync(`./commands/` + category)
+// 			.filter(
+// 				(f) =>
+// 					f.split('.').pop() === 'js' &&
+// 					!fs
+// 						.statSync(process.cwd() + `/commands/` + category + '/' + f)
+// 						.isDirectory()
+// 			);
+// 		catfiles.forEach((f, i) => {
+// 			try {
+// 				const props = require(`${process.cwd()}/commands/${category}/${f}`); // => load each one
+
+// 				props.help.category = category;
+// 				if (props.help.aliases && !Array.isArray(props.help.aliases))
+// 					props.help.aliases = [props.help.aliases];
+// 				allCmds.set(
+// 					props.help.name,
+// 					`${process.cwd()}/commands/${category}/${f}`
+// 				); // => add command to command list
+// 			} catch (err) {}
+// 		});
+// 	});
+// });
+// function unload(cmd) {
+// 	client.commands.delete(cmd);
+// }
+// function load(cmd) {
+// 	if (!allCmds.has(cmd)) return;
+// 	const file = allCmds.get(cmd);
+// 	const props = require(file);
+// 	client.commands.set(props.help.name, props);
+// }
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async () => {
+	if(!Boolean(testing)){
+		client.unload('new')
+		client.user.setActivity(
+			`${prefix}help`
+		);
+	}
+	else{
+		client.user.setActivity(
+			`${prefix}help|${prefix}new to check out whats new`
+		);
+	}
 	console.log('irc connected');
 	client.debug('bot init');
-	client.user.setActivity(`${prefix}help`);
 	client.db.use('data');
 	const rows = client.db.fetch('bans');
 	if (rows) {
@@ -197,10 +267,10 @@ async function broadcastToAllCSRChannels(message) {
 				await webhook.edit(client.user.username, client.user.avatarURL);
 			}
 			await webhook.send(embed).catch((e) => {
-				client.system.webhookManager.delete(
-					client.guilds.get(webhook.guildID),
-					'public'
-				);
+				//client.system.webhookManager.delete(
+				//	client.guilds.get(webhook.guildID),
+				//	'public'
+				//);
 			});
 		});
 	}

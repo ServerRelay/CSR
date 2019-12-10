@@ -81,7 +81,7 @@ const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/in
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async () => {
 	if(!Boolean(testing)){
-		client.unload('new')
+		//client.unload('new')
 		client.user.setActivity(
 			`${prefix}help`
 		);

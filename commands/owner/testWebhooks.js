@@ -3,8 +3,8 @@ module.exports = new Command({
 	name: 'testwebhooks',
 	description: '',
 	aliases: [],
-	requires: ['guild', 'botowner'],
-	requiresBotPermissions: [],
+	requires: ['guild', 'guildowner'],
+	requiresBotPermissions: ['MANAGE_WEBHOOKS', 'MANAGE_CHANNELS'],
 }).execute(async (client, message, args) => {
 	const guild = message.guild;
 	message.author = client.user;
@@ -24,6 +24,8 @@ module.exports = new Command({
 			.catch((err) => {
 				(failed = true), (failReason = err);
 			});
+	} else if (!webhooks.public) {
+		message.channel.send('❔ could not find the public webhook');
 	}
 	if (webhooks.private && !failed) {
 		await client.system.webhookManager
@@ -31,6 +33,8 @@ module.exports = new Command({
 			.catch((err) => {
 				(failed = true), (failReason = err);
 			});
+	} else if (!webhooks.private) {
+		message.channel.send("❔ couldn'nt find the private webhook");
 	}
 	if (failed) {
 		message.channel.send('❌ failed: ' + failReason);

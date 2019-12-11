@@ -6,6 +6,7 @@ const Disconnect = new Command({
 	requiresBotPermissions: ['EMBED_LINKS'],
 	description: 'disconnects channel from csr',
 	usage: '<prefix>disconnect [public | private]',
+	requireUserPermissions:['MANAGE_CHANNELS']
 });
 let allowedTypes = ['public', 'private'];
 module.exports = Disconnect.execute((client, message, args) => {

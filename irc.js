@@ -255,7 +255,9 @@ async function broadcastToAllCSRChannels(message) {
 		await client.system.webhookManager.fetchWebhooks();
 		client.system.webhookManager.webhooks.public.forEach(async (webhook) => {
 			if (webhook.name !== client.user.username) {
-				await webhook.edit(client.user.username, client.user.avatarURL);
+				await webhook.edit(client.user.username, client.user.avatarURL).catch(e=>{
+					
+				});
 			}
 			await webhook.send(embed).catch((e) => {
 				//client.system.webhookManager.delete(

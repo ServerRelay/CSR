@@ -1,11 +1,12 @@
 const { Command } = require('easy-djs-commandhandler');
 const Connect = new Command({
 	name: 'connect',
-	requires: ['guild', 'guildowner'],
+	requires: ['guild'],
 	requiresBotPermissions: ['EMBED_LINKS'],
 	description: "connects to CSR's main chat",
 	usage:
 		'<prefix>connect [channel] [public | private] [passcode](optional, can use channel topic)',
+	requireUserPermissions: ['MANAGE_CHANNELS'],
 });
 let allowedTypes = ['public', 'private'];
 /** @param {import("../../bot")} callback */

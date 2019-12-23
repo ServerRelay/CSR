@@ -39,6 +39,57 @@ class Bot extends discord.Client {
 		this.prefixDB = new jndb.Connection({ fileName: 'prefixes.json' });
 		this.prefixDB.use('prefixes');
 		this.color = '#146ea4';
+
+		/**
+		 * @type {Map<string,string>}
+		 */
+		this._allCmds = new Map();
+		fs.readdir(`./commands/`, (err, files) => {
+			// read dir
+			const jsfile = files.filter(
+				(f) =>
+					f.split('.').pop() === 'js' &&
+					!fs.statSync(process.cwd() + `/commands/` + f).isDirectory()
+			); // get all .js files
+			const categorys = files.filter((f) =>
+				fs.statSync(process.cwd() + `/commands/` + f).isDirectory()
+			);
+
+			jsfile.forEach((f, i) => {
+				// if commands present
+				try {
+					const props = require(`${process.cwd()}/commands/${f}`); // => load each one
+
+					if (props.help.aliases && !Array.isArray(props.help.aliases))
+						props.help.aliases = [props.help.aliases];
+					this._allCmds.set(props.help.name, `${process.cwd()}/commands/${f}`); // => add command to command list
+				} catch (err) {}
+			});
+			categorys.forEach((category) => {
+				const catfiles = fs
+					.readdirSync(`./commands/` + category)
+					.filter(
+						(f) =>
+							f.split('.').pop() === 'js' &&
+							!fs
+								.statSync(process.cwd() + `/commands/` + category + '/' + f)
+								.isDirectory()
+					);
+				catfiles.forEach((f, i) => {
+					try {
+						const props = require(`${process.cwd()}/commands/${category}/${f}`); // => load each one
+
+						props.help.category = category;
+						if (props.help.aliases && !Array.isArray(props.help.aliases))
+							props.help.aliases = [props.help.aliases];
+						this._allCmds.set(
+							props.help.name,
+							`${process.cwd()}/commands/${category}/${f}`
+						); // => add command to command list
+					} catch (err) {}
+				});
+			});
+		});
 		const fileWatch = new FileWatch();
 		fileWatch.watch('commands', (event, file) => {
 			if (event != 'change') return;
@@ -122,10 +173,7 @@ class Bot extends discord.Client {
 					const props = require(f); // => load each one
 					props.help.category = category.split('\\').pop();
 
-					if (
-						props.help.aliases &&
-						!Array.isArray(props.help.aliases)
-					)
+					if (props.help.aliases && !Array.isArray(props.help.aliases))
 						props.help.aliases = [props.help.aliases];
 					this.commands.set(props.help.name, props); // => add command to command list
 				} catch (err) {
@@ -135,6 +183,23 @@ class Bot extends discord.Client {
 				}
 			});
 		});
+	}
+	/**
+	 * 
+	 * @param {string} cmd 
+	 */
+	unload(cmd) {
+		this.commands.delete(cmd);
+	}
+	/**
+	 * 
+	 * @param {string} cmd 
+	 */
+	load(cmd) {
+		if (!this._allCmds.has(cmd)) return;
+		const file = this._allCmds.get(cmd);
+		const props = require(file);
+		this.commands.set(props.help.name, props);
 	}
 }
 module.exports = Bot;

@@ -80,17 +80,8 @@ const cmdHandler = new commandHandler.Handler(client, {
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async () => {
-	if(!Boolean(testing)){
-		client.unload('new')
-		client.user.setActivity(
-			`${prefix}help`
-		);
-	}
-	else{
-		client.user.setActivity(
-			`${prefix}help|${prefix}new to check out whats new`
-		);
-	}
+	client.user.setActivity(`${prefix}help`);
+
 	console.log('irc connected');
 	client.debug('bot init');
 	client.db.use('data');

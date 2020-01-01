@@ -29,7 +29,7 @@ module.exports = guildban.execute((client, message, args) => {
 			continue;
 		}
 		o += 1;
-		client.system.banManager.set(i.user);
+		client.system.banManager.add(i.user);
 	}
 	message.channel.send(`${guild.name}:banned ${o} members`);
 });

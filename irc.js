@@ -244,7 +244,41 @@ async function broadcastToAllCSRChannels(message) {
 	const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 	await wait(1000);
 	if (client.system.style.public == 'embed') {
-		const embed = generateEmbed(message);
+		let embed = generateEmbed(message);
+
+		const lastMessage = message.channel.messages
+			.filter((x) => x.author.id == client.user.id)
+			.last();
+		if (lastMessage) {
+			let msgembed = new Discord.RichEmbed(lastMessage.embeds[0]);
+			if (msgembed.author && msgembed.author.name === message.author.tag) {
+				if (
+					(msgembed.description + '\n\n' + message.cleanContent).length <= 1500
+				) {
+					msgembed.setDescription(
+						msgembed.description + '\n\n' + message.cleanContent
+					);
+					await lastMessage.edit(msgembed);
+					await message.delete().catch((e) => {});
+					client.guilds.forEach(async (guild) => {
+						let { public } = client.system.getChannels(guild);
+						if(!public) return
+						const lastMessage = public.messages
+							.filter(
+								(x) =>
+									x.author.id == client.user.id &&
+									x.embeds[0] &&
+									x.embeds[0].author&&
+									x.embeds[0].author.name == message.author.tag
+							)
+							.last();
+						if (!lastMessage) return;
+						await lastMessage.edit(msgembed);
+					});
+					return;
+				}
+			}
+		}
 		message.channel.send(embed);
 		client.system.sendAll(embed, { ignoreGuilds: [message.guild.id] });
 	} else if (client.system.style.public == 'webhook') {
@@ -255,9 +289,9 @@ async function broadcastToAllCSRChannels(message) {
 		await client.system.webhookManager.fetchWebhooks();
 		client.system.webhookManager.webhooks.public.forEach(async (webhook) => {
 			if (webhook.name !== client.user.username) {
-				await webhook.edit(client.user.username, client.user.avatarURL).catch(e=>{
-					
-				});
+				await webhook
+					.edit(client.user.username, client.user.avatarURL)
+					.catch((e) => {});
 			}
 			await webhook.send(embed).catch((e) => {
 				//client.system.webhookManager.delete(

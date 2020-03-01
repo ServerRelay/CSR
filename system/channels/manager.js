@@ -1,6 +1,5 @@
 const jndb = require('jndb');
-const PublicChannel = require('./public');
-const PrivateChannel = require('./private');
+const { PublicChannel, PrivateChannel } = require('../structures');
 class ChannelsManager {
 	/**
 	 *
@@ -80,29 +79,29 @@ class ChannelsManager {
 		guild,
 		{ publicChannel, privateChannel } = {
 			publicChannel: undefined,
-			privateChannel: undefined,
+			privateChannel: undefined
 		}
 	) {
 		let data = this.db.secure(guild.id, {
 			name: null,
 			public: { id: null, name: null },
-			private: { id: null, name: null, passcode: null },
+			private: { id: null, name: null, passcode: null }
 		});
 		data.name = guild.name;
 		if (publicChannel) {
 			data.public = {
 				id: publicChannel.id,
-				name: publicChannel.name,
+				name: publicChannel.name
 			};
 		}
 		if (privateChannel) {
-			if (privateChannel.passcode===undefined) {
+			if (privateChannel.passcode === undefined) {
 				throw new Error('private channel does not have a passcode set');
 			}
 			data.private = {
 				id: privateChannel.id,
 				name: privateChannel.name,
-				passcode: privateChannel.passcode,
+				passcode: privateChannel.passcode
 			};
 		}
 		this.db.insert(guild.id, data);
@@ -132,22 +131,22 @@ class ChannelsManager {
 		let data = this.db.secure(guild.id, {
 			name: null,
 			public: { id: null, name: null },
-			private: { id: null, name: null, passcode: null },
+			private: { id: null, name: null, passcode: null }
 		});
 		data.name = guild.name;
 		if (type == 'public') {
 			data.public = {
 				id: channel.id,
-				name: channel.name,
+				name: channel.name
 			};
 		} else if (type == 'private') {
-			if (channel.passcode===undefined) {
+			if (channel.passcode === undefined) {
 				throw new Error('private channel does not have a passcode set');
 			}
 			data.private = {
 				id: channel.id,
 				name: channel.name,
-				passcode: channel.passcode,
+				passcode: channel.passcode
 			};
 		}
 		this.db.insert(guild.id, data);

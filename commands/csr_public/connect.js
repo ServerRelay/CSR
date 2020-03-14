@@ -11,12 +11,7 @@ const Connect = new Command({
 let allowedTypes = ['public', 'private'];
 /** @param {import("../../bot")} callback */
 module.exports = Connect.execute(async (client, message, args) => {
-	if (
-		message.author.id !== message.guild.owner.id &&
-		!client.staff.has(message.author.id)
-	) {
-		return message.channel.send("you're not allowed to use this command");
-	}
+	
 	/**
 	 * @type {import('discord.js').TextChannel}
 	 */

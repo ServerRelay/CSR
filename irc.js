@@ -9,6 +9,7 @@ const commandHandler = require('easy-djs-commandhandler');
 require('./env').load('.env');
 const prefix = process.env.prefix || 'c-';
 const testing = process.env.testing || false;
+const errorChannel = '543167247330312232';
 const cmdHandler = new commandHandler.Handler(client, {
 	prefix: prefix,
 	owner: ['298258003470319616', '193406800614129664'],
@@ -16,7 +17,7 @@ const cmdHandler = new commandHandler.Handler(client, {
 	prefixFunc: (message) => {
 		if (!message.guild) return prefix;
 		return client.prefixDB.fetch(message.guild.id) || prefix;
-	},
+	}
 });
 // /**
 //  * @type {Map<string,string>}
@@ -80,13 +81,10 @@ const cmdHandler = new commandHandler.Handler(client, {
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async () => {
-	if(!Boolean(testing)){
+	if (!Boolean(testing)) {
 		//client.unload('new')
-		client.user.setActivity(
-			`${prefix}help`
-		);
-	}
-	else{
+		client.user.setActivity(`${prefix}help`);
+	} else {
 		client.user.setActivity(
 			`${prefix}help|${prefix}new to check out whats new`
 		);
@@ -124,17 +122,23 @@ client.on('guildCreate', async (guild) => {
 	 * @type {Discord.TextChannel}
 	 */
 	// @ts-ignore
-	let irc = await guild.createChannel('irc', { type: 'text' }).catch(() => {});
+	let irc = await guild
+		.createChannel('irc', { type: 'text' })
+		.catch(() => {});
 	if (irc) {
 		await irc.send(client.rules).catch(() => {});
 		let webhook = await irc.createWebhook('csr').catch(() => {});
-		if (webhook) client.system.webhookManager.add(guild, { private: webhook });
+		if (webhook)
+			client.system.webhookManager.add(guild, { private: webhook });
 		client.system.channels.create(guild, { publicChannel: irc });
 	}
 	const ed = new Discord.RichEmbed()
 		.setColor(client.color)
 		// @ts-ignore
-		.setAuthor(`${guild.name}`, guild.iconURL || client.user.defaultAvatarURL)
+		.setAuthor(
+			`${guild.name}`,
+			guild.iconURL || client.user.defaultAvatarURL
+		)
 		.setDescription(`has joined ${client.system.findEmoji('join')}`);
 	client.system.sendAll(ed);
 });
@@ -150,7 +154,10 @@ client.on('guildDelete', (guild) => {
 	const ed = new Discord.RichEmbed()
 		.setColor(client.color)
 		// @ts-ignore
-		.setAuthor(`${guild.name}`, guild.iconURL || client.user.defaultAvatarURL)
+		.setAuthor(
+			`${guild.name}`,
+			guild.iconURL || client.user.defaultAvatarURL
+		)
 		.setDescription(`has left ${client.system.findEmoji('leave')}`);
 	client.system.sendAll(ed);
 });
@@ -262,17 +269,22 @@ async function broadcastToAllCSRChannels(message) {
 	} else if (client.system.style.public == 'wembed') {
 		const embed = generateEmbed(message);
 		await client.system.webhookManager.fetchWebhooks();
-		client.system.webhookManager.webhooks.public.forEach(async (webhook) => {
-			if (webhook.name !== client.user.username) {
-				await webhook.edit(client.user.username, client.user.avatarURL);
+		client.system.webhookManager.webhooks.public.forEach(
+			async (webhook) => {
+				if (webhook.name !== client.user.username) {
+					await webhook.edit(
+						client.user.username,
+						client.user.avatarURL
+					);
+				}
+				await webhook.send(embed).catch((e) => {
+					//client.system.webhookManager.delete(
+					//	client.guilds.get(webhook.guildID),
+					//	'public'
+					//);
+				});
 			}
-			await webhook.send(embed).catch((e) => {
-				//client.system.webhookManager.delete(
-				//	client.guilds.get(webhook.guildID),
-				//	'public'
-				//);
-			});
-		});
+		);
 	}
 }
 
@@ -344,7 +356,7 @@ process.on('unhandledRejection', (err) => {
 		}
 
 		// @ts-ignore
-		return client.channels.get('543167247330312232').send(`
+		return client.channels.get(errorChannel).send(`
 	\`\`\`js
 	Error: ${require('util')
 		.inspect(err)
@@ -356,7 +368,7 @@ process.on('unhandledRejection', (err) => {
 	}
 
 	// @ts-ignore
-	return client.channels.get('543167247330312232').send(`
+	return client.channels.get(errorChannel).send(`
 \`\`\`xs
 Error: ${err.name}
     ${err.message}
@@ -445,7 +457,10 @@ function generateEmbed(message) {
 	const externalembed = new Discord.RichEmbed(message.embeds[0]);
 	// if(externalembed) {
 	externalembed.title && externalembed.description
-		? relayEmbed.addField(`${externalembed.title}`, externalembed.description)
+		? relayEmbed.addField(
+				`${externalembed.title}`,
+				externalembed.description
+		  )
 		: '';
 	externalembed.thumbnail
 		? relayEmbed.setThumbnail(externalembed.thumbnail.url)

@@ -164,10 +164,10 @@ client.on('message', (message) => {
 		message.system
 	)
 		return;
-	if (noInvites.test(message.content)) return;
-	if (lockdownExpired(limitTime)) {
-		endLockdown();
-	}
+	// if (noInvites.test(message.content)) return;
+	// if (lockdownExpired(limitTime)) {
+	// 	endLockdown();
+	// }
 	if (client.lockdown.enabled && !client.staff.has(message.author.id)) return;
 	const channel = client.system.getChannels(message.guild).public;
 	const privchannel = client.system.getChannels(message.guild).private;

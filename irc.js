@@ -490,4 +490,4 @@ function endLockdown() {
 	client.user.setActivity(`${prefix}help`);
 }
 // /////////////////////////////////////////////////////////////////////////////////
-client.login(process.env.token);
+client.login(process.env.testing ? process.env.testToken:process.env.token);

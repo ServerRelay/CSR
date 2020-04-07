@@ -9,20 +9,21 @@ class WebhookStore extends Base {
 		this.container = new Map();
 	}
 	get(guild) {
-        const gid = guild.id;
+		const gid = guild.id;
 		return this.container.get(gid);
-    }
-    /**
-     * 
-     * @param {Guild} guild 
-     * @param {GuildWebhooks|{public:Webhook,private:Webhook}} webhooks 
-     */
-	add(guild, webhooks) {
-        const gid = guild.id;
+	}
+	/**
+	 *
+	 * @param {Guild} guild
+	 * @param {GuildWebhooks|{public:Webhook,private:Webhook}} webhooks
+	 */
+	set(guild, webhooks) {
+		const gid = guild.id;
 		this.container.set(gid, webhooks);
 	}
 	delete(guild) {
-		this.container.delete(id);
+		const gid = guild.id;
+		this.container.delete(gid);
 	}
 }
 /**

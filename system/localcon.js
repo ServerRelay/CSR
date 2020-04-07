@@ -38,8 +38,8 @@ class LocalConnection {
 	save() {
 		this[_writeFile](this._data);
 	}
-	refresh(){
-		this._data=fs.readFileSync(this.path)
+	refresh() {
+		this._data = fs.readFileSync(this.path);
 	}
 	/**
 	 *	deletes a key from the database
@@ -101,7 +101,6 @@ class LocalConnection {
 			//console.log(this._data);
 		} else {
 			data[key] = value;
-		
 		}
 		return this;
 	}
@@ -119,7 +118,7 @@ class LocalConnection {
 	 */
 	fetchArray() {
 		const arr = [];
-		let data = this._data
+		let data = this._data;
 		for (const i in data) {
 			arr.push({ [i]: data[i] });
 		}
@@ -131,8 +130,7 @@ class LocalConnection {
 	 * @memberof JNDBClient
 	 */
 	fetchAll() {
-		
-		let data = this._data
+		let data = this._data;
 		// for(const i in data[this['table']]) {
 		// this[i] = data[this['table']][i];
 		// }
@@ -151,7 +149,6 @@ class LocalConnection {
 	 *
 	 */
 	secure(key, defaultValue) {
-
 		const oldVal = this.fetch(key);
 		if (!oldVal) {
 			this.insert(key, defaultValue);
@@ -182,6 +179,7 @@ class LocalConnection {
 		if (typeof key == 'string') {
 			let keys = key.split('.');
 			for (let i of keys) {
+				if (!data[i]) return;
 				data = data[i];
 			}
 			return data;
@@ -210,4 +208,4 @@ class LocalConnection {
 function copyObject(obj) {
 	return JSON.parse(JSON.stringify(obj));
 }
-module.exports=LocalConnection
+module.exports = LocalConnection;

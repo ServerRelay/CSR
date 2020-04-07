@@ -9,7 +9,7 @@ class DBStore extends Base {
 		let fileName = path.basename(filepath);
 		this._db = new jndb.Connection({ path: filePath, fileName });
 	}
-	add(key, value) {
+	set(key, value) {
 		this._db.insert(key, value);
 	}
 	get(key) {
@@ -32,7 +32,7 @@ class ConnectionStore extends Base {
 		this.path = filepath;
 		this._db = new LocalConnection(filepath);
 	}
-	add(key, value) {
+	set(key, value) {
 		this._db.insert(key, value);
 		this._db.save();
 	}
@@ -55,6 +55,9 @@ class ConnectionStore extends Base {
 	}
 	refresh() {
 		this._db.refresh();
+	}
+	has(key) {
+		return this._db.has(key);
 	}
 }
 module.exports = { ConnectionStore, DBStore };

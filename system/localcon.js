@@ -11,7 +11,7 @@ class LocalConnection {
 		if (!fs.existsSync(this['path'])) {
 			fs.writeFileSync(this['path'], JSON.stringify({}, null, '\t'));
 		}
-		this._data = fs.readFileSync(this.path);
+		this._data = JSON.parse(fs.readFileSync(this.path));
 		return this;
 	}
 	[Symbol.iterator]() {

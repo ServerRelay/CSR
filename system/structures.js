@@ -46,7 +46,7 @@ class PrivateChannel extends BaseChannel {
 	 */
 	setPasscode(passcode) {
 		this.passcode = passcode;
-		this.system.channels.update(this.guild, this, 'private');
+		this.system.channelStore.update(this.guild, this, 'private');
 		return this;
 	}
 }

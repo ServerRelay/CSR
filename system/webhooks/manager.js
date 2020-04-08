@@ -18,8 +18,8 @@ class WebHookManager {
 	 * @returns {Promise<{public:Map<string,import('discord.js').Webhook>,private:Map<string,import('discord.js').Webhook>}>}
 	 */
 	async fetchWebhooks() {
-		let pubchannels = this.system.channels.public;
-		let privchannels = this.system.channels.private;
+		let pubchannels = this.system.channelStore.public;
+		let privchannels = this.system.channelStore.private;
 		if (this.webhooks.public.size !== pubchannels.size) {
 			for (let i of pubchannels) {
 				let ch = i[1];
@@ -82,8 +82,8 @@ class WebHookManager {
 		return { content: message.cleanContent, embeds, files: attachments };
 	}
 	async cleanup() {
-		let pubchannels = this.system.channels.public;
-		let privchannels = this.system.channels.private;
+		let pubchannels = this.system.channelStore.public;
+		let privchannels = this.system.channelStore.private;
 		pubchannels.forEach(async (ch) => {
 			let webhooks = await ch.fetchWebhooks();
 			if (!webhooks) return;

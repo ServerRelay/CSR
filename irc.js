@@ -91,24 +91,25 @@ client.on('ready', async () => {
 	}
 	console.log('irc connected');
 	client.debug('bot init');
-	client.db.use('data');
-	const rows = client.db.fetch('bans');
-	if (rows) {
-		for (const i in rows) {
-			client.banlist.set(i, rows[i]);
-		}
-	}
-	/**
-	 * @type {string[]}
-	 */
-	let words = client.db.secure('filter', []);
-	if (words.length) {
-		for (let word of words) {
-			client.filter.push(word);
-		}
-	}
-	client.backup();
-	await client.system.webhookManager.fetchWebhooks();
+	// client.db.use('data');
+	// const rows = client.db.fetch('bans');
+	// if (rows) {
+	// 	for (const i in rows) {
+	// 		client.banlist.set(i, rows[i]);
+	// 	}
+	// }
+	// /**
+	//  * @type {string[]}
+	//  */
+	// let words = client.db.secure('filter', []);
+	// if (words.length) {
+	// 	for (let word of words) {
+	// 		client.filter.push(word);
+	// 	}
+	// }
+	// client.backup();
+	// await client.system.webhookManager.fetchWebhooks();
+	client.system.init()
 });
 
 // //////////////////////////////////////////////////////////////////////////////////

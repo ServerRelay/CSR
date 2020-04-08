@@ -3,6 +3,10 @@ const jndb = require('jndb');
 const BansManager = require('./bans/manager');
 const ChannelsManager = require('./channels/manager');
 const WebhookManager = require('./webhooks/manager');
+
+const WebhookStore = require('./WebhookStore');
+const ChannelStore = require('./ChannelStore');
+const BanStore = require('./BanStore');
 class System {
 	/**
 	 *
@@ -16,18 +20,25 @@ class System {
 		};
 		this.db = new jndb.Connection();
 		this.db.use('channels');
-		this.banManager = new BansManager(client);
-		this.channels = new ChannelsManager(this);
-		this.webhookManager = new WebhookManager(this);
+		// this.banManager = new BansManager(client);
+		// this.channels = new ChannelsManager(this);
+		// this.webhookManager = new WebhookManager(this);
+		this.banStore = new BanStore(this);
+		this.channelStore = new ChannelStore(this);
+		this.webhookStore = new WebhookStore(this);
 	}
-
+	init(){
+		this.banStore.init()
+		this.channelStore.init()
+		this.webhookStore.init()
+	}
 	/**
 	 *
 	 * @param {string|discord.RichEmbed} message
 	 * @param {{ignoreGuilds:string[]}} param1
 	 */
 	sendAll(message, { ignoreGuilds = [] } = { ignoreGuilds: [] }) {
-		const channels = this.channels.public;
+		const channels = this.channelStore.public;
 		channels.forEach((ch) => {
 			if (ignoreGuilds.length && ignoreGuilds.includes(ch.guild.id)) {
 				return;
@@ -42,21 +53,21 @@ class System {
 	 * @param {import('discord.js').Message} message
 	 */
 	async sendAllWebHooks(message) {
-		this.webhookManager.fetchWebhooks();
-		const webhooks = this.webhookManager.webhooks;
+		this.webhookStore.fetchWebhooks();
+		const webhooks = this.webhookStore.webhooks;
 		webhooks.public.forEach((wb) => {
-			this.webhookManager.send(wb, message).catch((e) => {
+			this.webhookStore.send(wb, message).catch((e) => {
 				console.log('error sending message in sendAll:\n' + e);
 			});
 		});
 		message.delete();
 	}
 	async sendPrivateWebHooks(guild, message) {
-		this.webhookManager.fetchWebhooks();
+		this.webhookStore.fetchWebhooks();
 		const privateChs = this.getMatchingPrivate(guild);
 		const channel = this.getChannels(guild).private;
 		if (!channel) return;
-		let webhooks = this.webhookManager.webhooks.private;
+		let webhooks = this.webhookStore.webhooks.private;
 		privateChs.forEach((ch) => {
 			let webhook = webhooks.get(ch.guild.id);
 
@@ -65,8 +76,8 @@ class System {
 					`no webhook found for channel ${ch.name}`
 				);
 			}
-			this.webhookManager.send(webhook, message).catch(() => {
-				this.webhookManager.webhooks.private.delete(webhook.guildID);
+			this.webhookStore.send(webhook, message).catch(() => {
+				this.webhookStore.webhooks.private.delete(webhook.guildID);
 			});
 		});
 	}
@@ -74,7 +85,7 @@ class System {
 	 * @param {string|discord.RichEmbed} message
 	 */
 	sendAllPrivate(message) {
-		const channels = this.channels.private;
+		const channels = this.channelStore.private;
 		channels.forEach((ch) => {
 			ch.send(message).catch((e) => {
 				console.log('error sending message in sendAll:\n' + e);
@@ -91,7 +102,7 @@ class System {
 		if (!channel) {
 			return;
 		}
-		const channelsToMatch = this.channels.private;
+		const channelsToMatch = this.channelStore.private;
 		channelsToMatch.forEach((ch, chGuild) => {
 			if (!ch) {
 				return;
@@ -148,14 +159,14 @@ class System {
 	 */
 	findMatchingMessages(tag, content) {
 		let messages = new discord.Collection();
-		this.channels.public.forEach((channel) => {
+		this.channelStore.public.forEach((channel) => {
 			let msg = channel.messages
 				.filter(
 					(msg) =>
 						msg.author.id == this.client.user.id &&
-						(msg.embeds &&
-							msg.embeds[0].author.name == tag &&
-							msg.embeds[0].description == content)
+						msg.embeds &&
+						msg.embeds[0].author.name == tag &&
+						msg.embeds[0].description == content
 				)
 				.last();
 			if (!msg) {
@@ -220,11 +231,10 @@ class System {
 	 */
 	getChannels(guild) {
 		let obj = {};
-		obj.public = this.channels.public.get(guild.id);
-		obj.private = this.channels.private.get(guild.id);
+		obj.public = this.channelStore.public.get(guild.id);
+		obj.private = this.channelStore.private.get(guild.id);
 		return obj;
 	}
-	
 }
 
 module.exports = System;

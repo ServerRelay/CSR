@@ -1,6 +1,6 @@
 const Base = require('./BaseStore');
 const jndb = require('jndb');
-const path = require(path);
+const path = require('path');
 const LocalConnection = require('./localcon');
 class DBStore extends Base {
 	constructor(filepath) {

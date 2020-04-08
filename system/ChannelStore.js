@@ -36,8 +36,8 @@ class ChannelStore extends ConnectionStore {
 				if (!channel) {
 					continue;
 				}
-			}
 			obj.public = new PublicChannel(this.system, channel);
+			}
 			if (channels[i].private.id) {
 				/**
 				 * @type {import('discord.js').TextChannel}
@@ -54,7 +54,8 @@ class ChannelStore extends ConnectionStore {
 					channel.passcode
 				);
 			}
-			this.container.set();
+			console.log(i,obj)
+			this.container.set(i,obj);
 		}
 	}
 	get public() {
@@ -66,10 +67,8 @@ class ChannelStore extends ConnectionStore {
 			if (!channels.public) return;
 			map.set(gid, channels.public);
 		});
+		return map;
 	}
-	/**
-	 * @returns {Map<string,PrivateChannel>}
-	 */
 	get private() {
 		/**
 		 * @type {Map<string,PrivateChannel>}
@@ -79,6 +78,7 @@ class ChannelStore extends ConnectionStore {
 			if (!channels.private) return;
 			map.set(gid, channels.private);
 		});
+		return map;
 	}
 	/**
 	 *
@@ -131,7 +131,7 @@ class ChannelStore extends ConnectionStore {
 		this.container.set(guild.id, returnObj);
 		return returnObj;
 	}
-	
+
 	/**
 	 *
 	 * @param {import('discord.js').Guild} guild

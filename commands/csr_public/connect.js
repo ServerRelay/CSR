@@ -11,13 +11,13 @@ const Connect = new Command({
 let allowedTypes = ['public', 'private'];
 /** @param {import("../../bot")} callback */
 module.exports = Connect.execute(async (client, message, args) => {
-	
 	/**
 	 * @type {import('discord.js').TextChannel}
 	 */
 	// @ts-ignore
 	let channel =
-		message.mentions.channels.first() || message.guild.channels.get(args[0]);
+		message.mentions.channels.first() ||
+		message.guild.channels.get(args[0]);
 	let type = args[1];
 	let passcode = args[2];
 	if (!channel || channel.type !== 'text') {
@@ -42,17 +42,20 @@ module.exports = Connect.execute(async (client, message, args) => {
 		}
 	}
 	if (type == 'public') {
-		client.system.channels.update(message.guild, channel, 'public');
+		client.system.channelStore.set(message.guild, { publicChannel: channel });
 		let rules = client.rules;
-		channel.send('**make sure you read the rules before proceding**', rules);
+		channel.send(
+			'**make sure you read the rules before proceding**',
+			rules
+		);
 		let webhook = await channel.createWebhook('csr');
-		client.system.webhookManager.add(message.guild, { public: webhook });
+		client.system.webhookStore.set(message.guild, { public: webhook });
 	} else {
 		//if (!args[2] || args[2] == '') {
 		//return message.channel.send('passcode is empty or invalid');
 		//}
 		channel.passcode = passcode || null;
-		client.system.channels.update(message.guild, channel, 'private');
+		client.system.channelStore.set(message.guild, { privateChannel: channel });
 		let embed = new (require('discord.js').RichEmbed)();
 		embed.setColor(client.color);
 		embed.setAuthor(message.guild.name, message.guild.iconURL);
@@ -63,7 +66,7 @@ module.exports = Connect.execute(async (client, message, args) => {
 			pChannel.send(embed);
 		});
 		let webhook = await channel.createWebhook('csr');
-		client.system.webhookManager.add(message.guild, { private: webhook });
+		client.system.webhookStore.set(message.guild, { private: webhook });
 	}
 	message.channel.send('successfully set');
 });

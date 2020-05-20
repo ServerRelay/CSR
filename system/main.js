@@ -35,7 +35,7 @@ class System {
 	/**
 	 *
 	 * @param {string|discord.RichEmbed} message
-	 * @param {{ignoreGuilds:string[]}} param1
+	 * @param {{ignoreGuilds:Array<string>}} param1
 	 */
 	sendAll(message, { ignoreGuilds = [] } = { ignoreGuilds: [] }) {
 		const channels = this.channelStore.public;

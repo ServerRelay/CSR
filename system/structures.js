@@ -1,4 +1,4 @@
-const { TextChannel, User } = require('discord.js');
+const { TextChannel, User, Collection, Message } = require('discord.js');
 const system = require('./main');
 class BaseChannel extends TextChannel {
 	/**
@@ -23,7 +23,7 @@ class PublicChannel extends BaseChannel {
 		super(system, channel);
 		this.csrType = 'public';
 		/**
-		 * @type {import('discord.js').Collection<string,import('discord.js').Message>}
+		 * @type {Collection<string,Message>}
 		 */
 		// @ts-ignore
 		this.messages = channel.messages;
@@ -89,5 +89,5 @@ module.exports = {
 	PrivateChannel,
 	PublicChannel,
 	BaseChannel,
-	BanInfo
+	BanInfo,
 };

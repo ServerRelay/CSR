@@ -3,21 +3,38 @@ const jndb = require('jndb');
 const path = require('path');
 const LocalConnection = require('./localcon');
 class DBStore extends Base {
+	/**
+	 * 
+	 * @param {string} filepath 
+	 */
 	constructor(filepath) {
 		super();
 		let filePath = path.dirname(filepath);
 		let fileName = path.basename(filepath);
 		this._db = new jndb.Connection({ path: filePath, fileName });
 	}
+	/**
+	 * 
+	 * @param {string|number} key 
+	 * @param {*} value 
+	 */
 	set(key, value) {
 		this._db.insert(key, value);
 	}
+	/**
+	 * 
+	 * @param {string|number} key 
+	 */
 	get(key) {
 		return this._db.fetch(key);
 	}
 	getAll() {
 		return this._db.fetchAll();
 	}
+	/**
+	 * 
+	 * @param {string|number} key 
+	 */
 	delete(key) {
 		this._db.delete(key);
 	}

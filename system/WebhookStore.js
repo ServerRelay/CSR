@@ -1,9 +1,11 @@
 const { Webhook } = require('discord.js');
 const Base = require('./BaseStore');
+
 class WebhookStore extends Base {
 	/**
 	 *
 	 * @param {import('./')} system
+	 * @memberof WebhookStore
 	 */
 	constructor(system) {
 		super();
@@ -14,6 +16,9 @@ class WebhookStore extends Base {
 		 */
 		this.container = new Map();
 	}
+	/**
+	 * @memberof WebhookStore
+	 */
 	init() {
 		this.system.channelStore.container.forEach(async (chs, gid) => {
 			let pubchannel = chs.public;
@@ -56,6 +61,13 @@ class WebhookStore extends Base {
 			this.container.set(gid, webhooksObj);
 		});
 	}
+	/**
+	 *
+	 *
+	 * @param {import('discord.js').Guild} guild
+	 * @returns {GuildWebhooks}
+	 * @memberof WebhookStore
+	 */
 	get(guild) {
 		const gid = guild.id;
 		return this.container.get(gid);
@@ -63,15 +75,24 @@ class WebhookStore extends Base {
 	/**
 	 *
 	 * @param {Guild} guild
-	 * @param {GuildWebhooks|{public:Webhook,private:Webhook}} webhooks
+	 * @param {GuildWebhooks|{publicWebhook:Webhook,privateWebhook:Webhook}} webhooks
+	 * @memberof WebhookStore
 	 */
 	set(guild, webhooks) {
 		const gid = guild.id;
 		let wbs = this.container.get(gid);
-		wbs.public ? (wbs.public = webhooks.public) : '';
-		wbs.private ? (wbs.private = private) : '';
+		wbs.publicWebhook ? (wbs.publicWebhook = webhooks.publicWebhook) : '';
+		wbs.privateWebhook
+			? (wbs.privateWebhook = webhooks.privateWebhook)
+			: '';
 		this.container.set(gid, webhooks);
 	}
+	/**
+	 *
+	 *
+	 * @param {import('discord.js').Guild} guild
+	 * @memberof WebhookStore
+	 */
 	delete(guild) {
 		const gid = guild.id;
 		this.container.delete(gid);
@@ -79,7 +100,7 @@ class WebhookStore extends Base {
 }
 /**
  * @typedef GuildWebhooks
- * @property {Webhook} public
- * @property {Webhook} private
+ * @property {Webhook} publicWebhook
+ * @property {Webhook} privateWebhook
  */
 module.exports = WebhookStore;

@@ -1,4 +1,5 @@
 const { ConnectionStore } = require('./DBStore');
+const {User}=require('discord.js')
 class BanStore extends ConnectionStore {
 	/**
 	 *
@@ -29,7 +30,7 @@ class BanStore extends ConnectionStore {
 	}
 	/**
 	 *
-	 * @param {import('discord.js').User} user
+	 * @param {User} user
 	 */
 	add(user) {
 		let info = {

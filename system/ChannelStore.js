@@ -1,8 +1,8 @@
 const { ConnectionStore } = require('./DBStore');
 const { PublicChannel, PrivateChannel } = require('./structures');
+const { Guild, TextChannel } = require('discord.js');
 class ChannelStore extends ConnectionStore {
 	/**
-	 *
 	 * @param {import('./')} system
 	 */
 	constructor(system) {
@@ -29,18 +29,18 @@ class ChannelStore extends ConnectionStore {
 			}
 			if (channels[i].public.id) {
 				/**
-				 * @type {import('discord.js').TextChannel}
+				 * @type {TextChannel}
 				 */
 				// @ts-ignore
 				let channel = guild.channels.get(channels[i].public.id);
 				if (!channel) {
 					continue;
 				}
-			obj.public = new PublicChannel(this.system, channel);
+				obj.public = new PublicChannel(this.system, channel);
 			}
 			if (channels[i].private.id) {
 				/**
-				 * @type {import('discord.js').TextChannel}
+				 * @type {TextChannel}
 				 */
 				// @ts-ignore
 				let channel = guild.channels.get(channels[i].private.id);
@@ -54,8 +54,8 @@ class ChannelStore extends ConnectionStore {
 					channel.passcode
 				);
 			}
-			console.log(i,obj)
-			this.container.set(i,obj);
+			//console.log(i,obj)
+			this.container.set(i, obj);
 		}
 	}
 	get public() {
@@ -80,11 +80,13 @@ class ChannelStore extends ConnectionStore {
 		});
 		return map;
 	}
+	//{{publicChannel?:TextChannel,privateChannel?:TextChannel}} param1
+	//replaced this param with GuildChannels
 	/**
 	 *
-	 * @param {import('discord.js').Guild} guild
-	 * @param {{publicChannel?:import('discord.js').TextChannel,privateChannel?:import('discord.js').TextChannel}} param1
-	 * @returns {{publicChannel:PublicChannel,privateChannel:PrivateChannel}} newly created data for channels
+	 * @param {Guild} guild
+	 * @param {GuildChannels} param1
+	 * @returns {GuildChannels} newly created data for channels
 	 */
 	set(
 		guild,
@@ -134,7 +136,7 @@ class ChannelStore extends ConnectionStore {
 
 	/**
 	 *
-	 * @param {import('discord.js').Guild} guild
+	 * @param {Guild} guild
 	 * @param {'all'|'public'|'private'} type
 	 */
 	delete(guild, type = 'all') {
@@ -154,4 +156,9 @@ class ChannelStore extends ConnectionStore {
 		return this;
 	}
 }
+/**
+ * @typedef GuildChannels
+ * @property {PublicChannel} publicChannel
+ * @property {PrivateChannel} privateChannel
+ */
 module.exports = ChannelStore;

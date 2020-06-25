@@ -28,9 +28,9 @@ class WebhookStore extends Base {
 				private: undefined,
 			};
 			if (pubchannel) {
-				let webhooks = await pubchannel
-					.fetchWebhooks()
-					.catch((e) => {});
+				let webhooks = await pubchannel.fetchWebhooks().catch((e) => {
+					console.log('[WEBHOOK INIT ERROR]: ', e);
+				});
 				if (!webhooks) return;
 				let webhook = webhooks.first();
 				if (!webhook) {
@@ -38,14 +38,16 @@ class WebhookStore extends Base {
 					webhook = await pubchannel
 						.createWebhook('csr', this.client.user.displayAvatarURL)
 						// @ts-ignore
-						.catch((e) => {});
+						.catch((e) => {
+							console.log('[WEBHOOK INIT ERROR]: ', e);
+						});
 				}
 				webhooksObj.public = webhook;
 			}
 			if (privchannel) {
-				let webhooks = await privchannel
-					.fetchWebhooks()
-					.catch((e) => {});
+				let webhooks = await privchannel.fetchWebhooks().catch((e) => {
+					console.log('[WEBHOOK INIT ERROR]: ', e);
+				});
 				if (!webhooks) return;
 				let webhook = webhooks.first();
 				if (!webhook) {
@@ -53,7 +55,9 @@ class WebhookStore extends Base {
 					webhook = await privchannel
 						.createWebhook('csr', this.client.user.displayAvatarURL)
 						// @ts-ignore
-						.catch((e) => {});
+						.catch((e) => {
+							console.log('[WEBHOOK INIT ERROR]: ', e);
+						});
 				}
 				webhooksObj.private = webhook;
 			}

@@ -17,99 +17,17 @@ const cmdHandler = new commandHandler.Handler(client, {
 	prefixFunc: (message) => {
 		if (!message.guild) return prefix;
 		return client.prefixDB.fetch(message.guild.id) || prefix;
-	}
+	},
 });
-// /**
-//  * @type {Map<string,string>}
-//  */
-// const allCmds = new Map();
-// fs.readdir(`./commands/`, (err, files) => {
-// 	// read dir
-// 	const jsfile = files.filter(
-// 		(f) =>
-// 			f.split('.').pop() === 'js' &&
-// 			!fs.statSync(process.cwd() + `/commands/` + f).isDirectory()
-// 	); // get all .js files
-// 	const categorys = files.filter((f) =>
-// 		fs.statSync(process.cwd() + `/commands/` + f).isDirectory()
-// 	);
-
-// 	jsfile.forEach((f, i) => {
-// 		// if commands present
-// 		try {
-// 			const props = require(`${process.cwd()}/commands/${f}`); // => load each one
-
-// 			if (props.help.aliases && !Array.isArray(props.help.aliases))
-// 				props.help.aliases = [props.help.aliases];
-// 			allCmds.set(props.help.name, `${process.cwd()}/commands/${f}`); // => add command to command list
-// 		} catch (err) {}
-// 	});
-// 	categorys.forEach((category) => {
-// 		const catfiles = fs
-// 			.readdirSync(`./commands/` + category)
-// 			.filter(
-// 				(f) =>
-// 					f.split('.').pop() === 'js' &&
-// 					!fs
-// 						.statSync(process.cwd() + `/commands/` + category + '/' + f)
-// 						.isDirectory()
-// 			);
-// 		catfiles.forEach((f, i) => {
-// 			try {
-// 				const props = require(`${process.cwd()}/commands/${category}/${f}`); // => load each one
-
-// 				props.help.category = category;
-// 				if (props.help.aliases && !Array.isArray(props.help.aliases))
-// 					props.help.aliases = [props.help.aliases];
-// 				allCmds.set(
-// 					props.help.name,
-// 					`${process.cwd()}/commands/${category}/${f}`
-// 				); // => add command to command list
-// 			} catch (err) {}
-// 		});
-// 	});
-// });
-// function unload(cmd) {
-// 	client.commands.delete(cmd);
-// }
-// function load(cmd) {
-// 	if (!allCmds.has(cmd)) return;
-// 	const file = allCmds.get(cmd);
-// 	const props = require(file);
-// 	client.commands.set(props.help.name, props);
-// }
 const noInvites = /(discord\.gg\/|invite\.gg\/|discord\.io\/|discordapp\.com\/invite\/)/;
 // ////////////////////////////////////////////////////////////////////////////
 client.on('ready', async () => {
-	if (!Boolean(testing)) {
-		//client.unload('new')
-		client.user.setActivity(`${prefix}help`);
-	} else {
-		client.user.setActivity(
-			`${prefix}help|${prefix}new to check out whats new`
-		);
-	}
+	client.user.setActivity(`${prefix}help`);
+
 	console.log('irc connected');
 	client.debug('bot init');
-	// client.db.use('data');
-	// const rows = client.db.fetch('bans');
-	// if (rows) {
-	// 	for (const i in rows) {
-	// 		client.banlist.set(i, rows[i]);
-	// 	}
-	// }
-	// /**
-	//  * @type {string[]}
-	//  */
-	// let words = client.db.secure('filter', []);
-	// if (words.length) {
-	// 	for (let word of words) {
-	// 		client.filter.push(word);
-	// 	}
-	// }
-	// client.backup();
-	// await client.system.webhookManager.fetchWebhooks();
-	client.system.init()
+	
+	client.system.init();
 });
 
 // //////////////////////////////////////////////////////////////////////////////////
@@ -359,9 +277,7 @@ process.on('unhandledRejection', (err) => {
 		// @ts-ignore
 		return client.channels.get(errorChannel).send(`
 	\`\`\`js
-	Error: ${require('util')
-		.inspect(err)
-		.slice(0, 1800)}
+	Error: ${require('util').inspect(err).slice(0, 1800)}
 
 	${addInfo}
 		\`\`\`
@@ -491,4 +407,4 @@ function endLockdown() {
 	client.user.setActivity(`${prefix}help`);
 }
 // /////////////////////////////////////////////////////////////////////////////////
-client.login(process.env.testing ? process.env.testToken:process.env.token);
+client.login(process.env.testing ? process.env.testToken : process.env.token);

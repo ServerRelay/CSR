@@ -10,12 +10,12 @@ const Disconnect = new Command({
 });
 let allowedTypes = ['public', 'private'];
 module.exports = Disconnect.execute((client, message, args) => {
-	if (
-		message.author.id !== message.guild.owner.id &&
-		!client.staff.has(message.author.id)
-	) {
-		return message.channel.send("you're not allowed to use this command");
-	}
+	// if (
+	// 	message.author.id !== message.guild.owner.id &&
+	// 	!client.staff.has(message.author.id)
+	// ) {
+	// 	return message.channel.send("you're not allowed to use this command");
+	// }
 	let type = args[0];
 	if (!allowedTypes.includes(type)) {
 		return message.channel.send('invalid type');

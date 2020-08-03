@@ -24,3 +24,5 @@ example
  token=bot_token
  prefix=c-
  ```
+
+ To start the bot, `node irc.js`
